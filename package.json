@@ -1,0 +1,28 @@
+{
+  "name": "mugchat-backend",
+  "version": "0.0.1",
+  "description": "Mugchat is a video chatting application where users can compose their own short videos based on the message words.",
+  "main": "index.js",
+  "scripts": {
+    "test": "grunt test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/arctouch/mugchat-backend.git"
+  },
+  "keywords": [
+    "mugchat",
+    "chat",
+    "video"
+  ],
+  "author": "ArcTouch Inc.",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/arctouch/mugchat-backend/issues"
+  },
+  "homepage": "https://github.com/arctouch/mugchat-backend",
+  "dependencies": {
+    "express": "~4.8.7",
+    "passport": "~0.2.1"
+  }
+}
