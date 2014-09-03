@@ -40,7 +40,6 @@ module.exports.http = {
        'compress',
        'methodOverride',
        'poweredBy',
-       '$custom',
        'router',
        'www',
        'favicon',
