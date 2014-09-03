@@ -46,8 +46,6 @@ var AuthController = {
           return response.badRequest(loginErr);
         }
 
-        // Upon successful login, send the user to the homepage were req.user
-        // will available.
        return response.ok(user);
       });
     });
@@ -62,6 +60,7 @@ var AuthController = {
     }
 
     passport.signin(request, response, function(err, user) {
+
       if (err) {
         return response.serverError({error: 'Error retrieving user.'});
       }
@@ -70,7 +69,16 @@ var AuthController = {
         return response.badRequest({error: 'Username not found.'});
       }
 
-      return response.ok(user);
+      request.login(user, function (loginErr) {
+
+        if (loginErr) {
+          return response.badRequest(loginErr);
+        }
+
+        // Upon successful login, send the user to the homepage were req.user
+        // will available.
+        return response.ok(user);
+      });
     });
   },
 

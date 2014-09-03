@@ -3,9 +3,14 @@
   "private": true,
   "version": "0.0.0",
   "description": "Mugchat is a video chatting application where users can compose their own short videos based on the message words.",
-  "keywords": [],
+  "keywords": [
+    "mugchat",
+    "chat",
+    "video"
+  ],
   "dependencies": {
     "bcrypt": "^0.8.0",
+    "connect-mongo": "^0.4.1",
     "ejs": "~0.8.4",
     "grunt": "0.4.2",
     "grunt-contrib-clean": "~0.5.0",
@@ -30,11 +35,6 @@
     "sails-disk": "~0.10.0",
     "validator": "^3.17.1"
   },
-  "keywords": [
-    "mugchat",
-    "chat",
-    "video"
-  ],
   "author": "ArcTouch Inc.",
   "license": "ISC",
   "bugs": {
