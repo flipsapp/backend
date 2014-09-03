@@ -23,6 +23,7 @@
   "homepage": "https://github.com/arctouch/mugchat-backend",
   "dependencies": {
     "express": "~4.8.7",
-    "passport": "~0.2.1"
+    "passport": "~0.2.1",
+    "socket.io": "~1.0.6"
   }
 }
