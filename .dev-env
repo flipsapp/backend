@@ -1,0 +1,5 @@
+RDS_HOSTNAME          = aait1a9i50qx05.cuc047pruo5n.us-west-2.rds.amazonaws.com
+RDS_USERNAME          = root
+RDS_PASSWORD          = sdv13rn97x0ftw313
+RDS_PORT              = 3306
+RDS_DB_NAME           = mugchat
