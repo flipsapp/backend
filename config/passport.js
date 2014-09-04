@@ -23,7 +23,6 @@ module.exports.passport = {
   facebook: {
     name: 'Facebook',
     protocol: 'oauth2',
-    strategy: require('passport-facebook').Strategy,
     options: {
       clientID: '1453104728312261',
       clientSecret: 'bd84e5d8082b0ce5068b333810a4fa51'

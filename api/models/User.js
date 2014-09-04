@@ -15,9 +15,9 @@ var User = {
       required: true
     },
 
-    firstName : {
+    firstName: {
       type: 'string',
-      required: 'true'
+      required: true
     },
 
     lastName: {
@@ -30,8 +30,12 @@ var User = {
       required: 'true'
     },
 
-    facebook_id: {
+    facebookID: {
       type: 'string'
+    },
+
+    photoUrl: {
+      type: 'url'
     },
 
     nickname: {
