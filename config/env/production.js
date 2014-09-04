@@ -10,6 +10,10 @@
  *
  */
 
+var dotenv = require('dotenv');
+dotenv._getKeyAndValueFromLine('./.prod-env');
+dotenv._setEnvs();
+
 module.exports = {
 
   /***************************************************************************

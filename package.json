@@ -34,7 +34,9 @@
     "sails": "~0.10.5",
     "sails-disk": "~0.10.0",
     "validator": "^3.17.1",
-    "socket.io": "~1.0.6"
+    "socket.io": "~1.0.6",
+    "dotenv": "~0.4.0",
+    "sails-mysql": "~0.10.6"
   },
   "author": "ArcTouch Inc.",
   "license": "ISC",

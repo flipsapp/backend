@@ -10,15 +10,26 @@
  *
  */
 
+var dotenv = require('dotenv');
+dotenv._getKeysAndValuesFromEnvFilePath('./.dev-env');
+dotenv._setEnvs();
+
+console.log(process.env.RDS_HOSTNAME);
+console.log(process.env.RDS_USERNAME);
+console.log(process.env.RDS_PASSWORD);
+console.log(process.env.RDS_PORT);
+console.log(process.env.RDS_DB_NAME);
+
 module.exports = {
 
-  /***************************************************************************
-   * Set the default database connection for models in the development       *
-   * environment (see config/connections.js and config/models.js )           *
-   ***************************************************************************/
+/***************************************************************************
+ * Set the default database connection for models in the development       *
+ * environment (see config/connections.js and config/models.js )           *
+ ***************************************************************************/
 
-  // models: {
-  //   connection: 'someMongodbServer'
-  // }
+// models: {
+//   connection: 'someMongodbServer'
+// }
 
-};
+}
+;
