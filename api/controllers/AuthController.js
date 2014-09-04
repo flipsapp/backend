@@ -69,8 +69,8 @@ var AuthController = {
           return response.badRequest(loginErr);
         }
 
-        // Upon successful login, send the user to the homepage were req.user
-        // will available.
+        // Upon successful login, send the user to the homepage
+        // were req.user will available.
         return response.ok(user);
       });
     });
