@@ -36,75 +36,7 @@ exports.register = function (request, response, next) {
     return next(new Error('No password was entered.'));
   }
 
-  User.create(userModel, function (err, user) {
-    if (err) {
-      if (err.code === 'E_VALIDATION') {
-        if (err.invalidAttributes.email) {
-          request.flash('error', 'Error.Passport.Email.Exists');
-        } else {
-          request.flash('error', 'Error.Passport.User.Exists');
-        }
-      }
-      
-      return next(err);
-    }
-
-    Passport.create({
-      protocol : 'local'
-    , password : userModel.password
-    , user     : user.id
-    }, function (err, passport) {
-      if (err) {
-        if (err.code === 'E_VALIDATION') {
-          request.flash('error', 'Error.Passport.Password.Invalid');
-        }
-        
-        return user.destroy(function (destroyErr) {
-          next(destroyErr || err);
-        });
-      }
-
-      next(null, user);
-    });
-  });
-};
-
-/**
- * Assign local Passport to user
- *
- * This function can be used to assign a local Passport to a user who doens't
- * have one already. This would be the case if the user registered using a
- * third-party service and therefore never set a password.
- *
- * @param {Object}   req
- * @param {Object}   res
- * @param {Function} next
- */
-exports.connect = function (req, res, next) {
-  var user     = req.user
-    , password = req.param('password');
-
-  Passport.findOne({
-    protocol : 'local'
-  , user     : user.id
-  }, function (err, passport) {
-    if (err) {
-      return next(err);
-    }
-
-    if (!passport) {
-      Passport.create({
-        protocol : 'local'
-      , password : password
-      , user     : user.id
-      }, function (err, passport) {
-        next(err, user);
-      });
-    }
-    else {
-      next(null, user);
-    }
-  });
+  createUser(userModel, next);
 };
 
 /**
@@ -155,6 +87,40 @@ exports.login = function (req, identifier, password, next) {
         req.flash('error', 'Error.Passport.Password.NotSet');
         return next(null, false);
       }
+    });
+  });
+};
+
+exports.createUser = function(userModel, next) {
+  User.create(userModel, function (err, user) {
+    if (err) {
+      if (err.code === 'E_VALIDATION') {
+        if (err.invalidAttributes.email) {
+          request.flash('error', 'Error.Passport.Email.Exists');
+        } else {
+          request.flash('error', 'Error.Passport.User.Exists');
+        }
+      }
+
+      return next(err);
+    }
+
+    Passport.create({
+      protocol : 'local'
+      , password : userModel.password
+      , user     : user.id
+    }, function (err, passport) {
+      if (err) {
+        if (err.code === 'E_VALIDATION') {
+          request.flash('error', 'Error.Passport.Password.Invalid');
+        }
+
+        return user.destroy(function (destroyErr) {
+          next(destroyErr || err);
+        });
+      }
+
+      next(null, user);
     });
   });
 };

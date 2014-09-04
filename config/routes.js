@@ -48,8 +48,6 @@ module.exports.routes = {
 
   'POST /signin': 'AuthController.signin',
   'POST /signup': 'AuthController.signup',
-
-  'GET /signin/:provider': 'AuthController.provider',
-  'GET /signin/:provider/callback': 'AuthController.callback'
+  'POST /signin/facebook': 'AuthController.facebook'
 
 };

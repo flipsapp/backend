@@ -14,8 +14,26 @@ var User = {
       required: true
     },
 
+    firstName: {
+      type: 'string',
+      required: true
+    },
+
+    lastName: {
+      type: 'string',
+      required: true
+    },
+
+    birthdate: {
+      type: 'date'
+    },
+
     "facebookID": {
       "type": 'string'
+    },
+
+    photoUrl: {
+      type: 'url'
     }
   }
 };
