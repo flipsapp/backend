@@ -11,8 +11,8 @@ var Mug = {
 
     word: {
       type: 'string',
-      required: 'true',
-      index: 'true'
+      required: true,
+      index: true
     },
 
     mediaURL: {
@@ -29,7 +29,8 @@ var Mug = {
     },
 
     isPrivate: {
-      type: 'boolean'
+      type: 'boolean',
+      default: true
     }
 
   }

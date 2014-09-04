@@ -22,12 +22,12 @@ var User = {
 
     lastName: {
       type: 'string',
-      required: 'true'
+      required: true
     },
 
     birthday: {
       type: 'datetime',
-      required: 'true'
+      required: true
     },
 
     facebookID: {
@@ -45,7 +45,7 @@ var User = {
     mugs: {
       collection: 'Mug',
       via: 'usedBy',
-      dominant: 'true'
+      dominant: true
     },
 
     rooms: {

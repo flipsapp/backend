@@ -11,19 +11,19 @@ var Room = {
 
     jabberID: {
       type: 'string',
-      required: 'true',
-      unique: 'true'
+      required: true,
+      unique: true
     },
 
     nickname: {
       type: 'string',
-      required: 'true'
+      required: true
     },
 
     users : {
       collection: 'User',
       via: 'rooms',
-      dominant: 'true'
+      dominant: true
     }
 
   }
