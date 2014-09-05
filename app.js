@@ -24,6 +24,20 @@ process.chdir(__dirname);
 
 GLOBAL.requires = require('r').r;
 
+// CREATE AND LOAD ENVIRONMENT VARIABLES
+
+var dotenv_path;
+if (process.env.NODE_ENV.toUpperCase() === 'PRODUCTION') {
+  dotenv_path = './.prod-env';
+} else {
+  dotenv_path = './.prod-env';
+}
+var dotenv = require('dotenv');
+dotenv._getKeysAndValuesFromEnvFilePath(dotenv_path);
+dotenv._setEnvs();
+
+/////////////////////////////
+
 Object.defineProperty(Error.prototype, 'toJSON', {
   value: function () {
     var alt = {};
@@ -38,7 +52,7 @@ Object.defineProperty(Error.prototype, 'toJSON', {
 });
 
 // Ensure a "sails" can be located:
-(function() {
+(function () {
   var sails;
   try {
     sails = require('sails');
@@ -64,7 +78,9 @@ Object.defineProperty(Error.prototype, 'toJSON', {
       console.error('Your `.sailsrc` file(s) will be ignored.');
       console.error('To resolve this, run:');
       console.error('npm install rc --save');
-      rc = function () { return {}; };
+      rc = function () {
+        return {};
+      };
     }
   }
 
