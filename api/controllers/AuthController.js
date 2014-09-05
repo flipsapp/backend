@@ -41,12 +41,8 @@ var AuthController = {
 
   signup: function(request, response) {
     passport.signup(request, response, function(err, user) {
-      if (err) {
-        return response.serverError({error: 'Server error: Error creating user.', details: err.details});
-      }
-
-      if (!user) {
-        return response.badRequest({error: 'Request error: user was not created.'});
+      if (err || !user) {
+        return response.badRequest({error: 'Request error: Creating user.', details: err.details});
       }
 
       return response.ok(user);
