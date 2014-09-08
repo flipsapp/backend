@@ -4,8 +4,8 @@ var S3Service = {
     file.upload({
       adapter: require('skipper-s3'),
       bucket: upload_bucket,
-      key: 'AKIAILGTT2X6FTUAFI6Q',
-      secret: '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'
+      key: process.env.AWS_S3_KEY,
+      secret: process.env.AWS_S3_SECRET
     }, callback);
   },
 
