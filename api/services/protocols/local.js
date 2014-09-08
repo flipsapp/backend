@@ -23,6 +23,9 @@ var validator = require('validator')
  * @param {Object}   res
  * @param {Function} next
  */
+
+var MINIMAL_AGE = 13;
+
 exports.register = function (request, response, next) {
   var userModel = actionUtil.parseValues(request);
 
@@ -36,7 +39,7 @@ exports.register = function (request, response, next) {
     return next(new Error('No password was entered.'));
   }
 
-  createUser(userModel, next);
+  this.createUser(userModel, next);
 };
 
 /**
@@ -92,35 +95,50 @@ exports.login = function (req, identifier, password, next) {
 };
 
 exports.createUser = function(userModel, next) {
-  User.create(userModel, function (err, user) {
-    if (err) {
-      if (err.code === 'E_VALIDATION') {
-        if (err.invalidAttributes.email) {
-          request.flash('error', 'Error.Passport.Email.Exists');
-        } else {
-          request.flash('error', 'Error.Passport.User.Exists');
-        }
-      }
+  checkAge(userModel, function(err, age) {
 
+    if (age < MINIMAL_AGE) {
+      return next({ details: 'You must have at least 13 years old.'});
+    }
+
+    if (err) {
       return next(err);
     }
 
-    Passport.create({
-      protocol : 'local'
-      , password : userModel.password
-      , user     : user.id
-    }, function (err, passport) {
+    User.create(userModel, function (err, user) {
       if (err) {
-        if (err.code === 'E_VALIDATION') {
-          request.flash('error', 'Error.Passport.Password.Invalid');
-        }
-
-        return user.destroy(function (destroyErr) {
-          next(destroyErr || err);
-        });
+        return next(err);
       }
 
-      next(null, user);
+      Passport.create({
+        protocol : 'local'
+        , password : userModel.password
+        , user     : user.id
+      }, function (err, passport) {
+        if (err) {
+          if (err.code === 'E_VALIDATION') {
+            request.flash('error', 'Error.Passport.Password.Invalid');
+          }
+
+          return user.destroy(function (destroyErr) {
+            next(destroyErr || err);
+          });
+        }
+
+        return next(null, user);
+      });
     });
   });
+};
+
+var checkAge = function(userModel, callback) {
+  try {
+    var birthday = new Date(userModel.birthday);
+    var diff = new Date() - new Date(birthday);
+    var diffInDays = diff / 1000 / (60 * 60 * 24);
+    var age = Math.floor(diffInDays / 365.25);
+    callback(null, age);
+  } catch (err) {
+    callback(err);
+  }
 };
