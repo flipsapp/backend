@@ -23,6 +23,7 @@
 process.chdir(__dirname);
 
 GLOBAL.requires = require('r').r;
+GLOBAL.MugError = requires('>/api/utilities/MugError');
 
 // CREATE AND LOAD ENVIRONMENT VARIABLES
 
