@@ -72,7 +72,7 @@ var MugController = {
         if (!mug) {
           return response.send(404, new MugError('Mug not found'));
         }
-        if (mug.owner && mug.owner.id != request.params.id) {
+        if (mug.owner && mug.owner.id !== request.params.id) {
           return response.send(403, new MugError('This mug does not belong to this user'));
         }
         mug.backgroundURL = uploadedFiles[0].extra.Location;
@@ -105,6 +105,7 @@ var MugController = {
           return response.send(404, new MugError('Mug not found'));
         }
         if (mug.owner && mug.owner.id != request.params.id) {
+
           return response.send(403, new MugError('This mug does not belong to this user'));
         }
         mug.soundURL = uploadedFiles[0].extra.Location;

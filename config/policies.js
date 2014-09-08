@@ -36,7 +36,8 @@ module.exports.policies = {
   ***************************************************************************/
 
   UserController: {
-    uploadPhoto: ['passport', 'owner']
+    uploadPhoto: ['passport', 'owner'],
+    update: ['passport', 'owner']
   },
 
 	MugController: {

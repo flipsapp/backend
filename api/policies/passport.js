@@ -17,17 +17,18 @@
  * For more information on the Passport.js middleware, check out:
  * http://passportjs.org/guide/configure/
  *
- * @param {Object}   req
- * @param {Object}   res
+ * @param {Object}   request
+ * @param {Object}   response
  * @param {Function} next
  */
-module.exports = function (req, res, next) {
+module.exports = function (request, response, next) {
   // Initialize Passport
-  passport.initialize()(req, res, function () {
+  passport.initialize()(request, response, function () {
     // Use the built-in sessions
-    passport.session()(req, res, function () {
+    passport.session()(request, response, function () {
+
       // Make the user available throughout the frontend
-      res.locals.user = req.user;
+      response.locals.user = request.user;
 
       next();
     });
