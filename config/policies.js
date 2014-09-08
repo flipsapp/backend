@@ -30,6 +30,7 @@ module.exports.policies = {
 
   UserController: {
     forgot: true,
+    verify: true,
     uploadPhoto: ['passport', 'owner'],
     update: ['passport', 'owner']
   },

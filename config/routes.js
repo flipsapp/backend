@@ -51,6 +51,7 @@ module.exports.routes = {
   'POST   /signin/facebook'                 : 'AuthController.facebook',
 
   'POST   /user/forgot'                     : 'UserController.forgot',
+  'POST   /user/verify'                     : 'UserController.verify',
   'PUT    /user/:id/photo'                  : 'UserController.uploadPhoto',
   'POST   /user/:id/mug'                    : 'MugController.create',
   'PUT    /user/:id/mug/:mug_id/background' : 'MugController.updateBackground',
