@@ -105,8 +105,6 @@ var MugController = {
           return response.send(404, new MugError('Mug not found'));
         }
         if (mug.owner && mug.owner.id != request.params.id) {
-          console.log(mug.owner.id);
-          console.log(request.params.id);
           return response.send(403, new MugError('This mug does not belong to this user'));
         }
         mug.soundURL = uploadedFiles[0].extra.Location;
