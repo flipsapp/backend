@@ -49,8 +49,7 @@ var User = {
 
     devices: {
       collection: 'Device',
-      via: 'user',
-      dominant: true
+      via: 'user'
     },
 
     rooms: {
@@ -61,16 +60,14 @@ var User = {
     contacts: {
       collection: 'User',
       via: 'hasMeAsContact',
-      dominant: 'true'
+      dominant: true
     },
 
     hasMeAsContact: {
       collection: 'User',
       via: 'contacts'
     }
-
   }
-
 };
 
 module.exports = User;

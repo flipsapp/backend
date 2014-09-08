@@ -25,7 +25,10 @@ module.exports = {
 
     uuid: {
       type: 'string'
+    },
+
+    verificationCode: {
+      type: 'string'
     }
   }
 };
-
