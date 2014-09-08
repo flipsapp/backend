@@ -1,3 +1,5 @@
+AWS_S3_KEY            = AKIAILGTT2X6FTUAFI6Q
+AWS_S3_SECRET         = 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
 RDS_HOSTNAME          = aait1a9i50qx05.cuc047pruo5n.us-west-2.rds.amazonaws.com
 RDS_USERNAME          = root
 RDS_PASSWORD          = sdv13rn97x0ftw313
