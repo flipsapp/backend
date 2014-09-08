@@ -28,14 +28,8 @@ module.exports.policies = {
 
   '*': ['passport'],
 
-  /***************************************************************************
-  *                                                                          *
-  * Here's an example of mapping some policies to run before a controller    *
-  * and its actions                                                          *
-  *                                                                          *
-  ***************************************************************************/
-
   UserController: {
+    forgot: true,
     uploadPhoto: ['passport', 'owner'],
     update: ['passport', 'owner']
   },
@@ -46,6 +40,10 @@ module.exports.policies = {
     uploadSound: ['passport'],
     updateBackground: ['passport', 'owner'],
     updateSound: ['passport', 'owner']
+  },
+
+  DeviceController: {
+    findOne: ['passport', 'deviceOwner']
   }
 
 };

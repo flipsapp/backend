@@ -47,6 +47,12 @@ var User = {
       via: 'owner'
     },
 
+    devices: {
+      collection: 'Device',
+      via: 'user',
+      dominant: true
+    },
+
     rooms: {
       collection: 'Room',
       via: 'users'
