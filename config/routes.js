@@ -55,8 +55,12 @@ module.exports.routes = {
   'POST   /user/:id/mug'                    : 'MugController.create',
   'PUT    /user/:id/mug/:mug_id/background' : 'MugController.updateBackground',
   'PUT    /user/:id/mug/:mug_id/sound'      : 'MugController.updateSound',
+  'GET    /user/:parentid/devices/:id'      : 'DeviceController.findOne',
 
   'POST   /background'                      : 'MugController.uploadBackground',
-  'POST   /sound'                           : 'MugController.uploadSound'
+  'POST   /sound'                           : 'MugController.uploadSound',
+
+
+
 
 };

@@ -40,6 +40,10 @@ module.exports.policies = {
     uploadSound: ['passport'],
     updateBackground: ['passport', 'owner'],
     updateSound: ['passport', 'owner']
+  },
+
+  DeviceController: {
+    findOne: ['passport', 'deviceOwner']
   }
 
 };

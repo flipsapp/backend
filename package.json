@@ -37,6 +37,7 @@
     "sails-mysql": "~0.10.6",
     "skipper": "^0.5.3",
     "skipper-s3": "^0.5.4",
+    "twilio": "^1.7.0",
     "validator": "^3.17.1"
   },
   "author": "ArcTouch Inc.",
