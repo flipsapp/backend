@@ -55,14 +55,44 @@ var UserController = {
           return response.send(404, new MugError('User not found.', 'username = ' + email));
         }
 
-        twilioService.sendSms(phoneNumber, 'Testing', function(err, message) {
-          console.log(err || message);
-        });
 
-        return response.send(200);
+        Device.findOne({ phoneNumber: phoneNumber })
+          .populate('user')
+          .exec(function (error, device) {
+            if (error) {
+              return response.send(500, new MugError('Error retrieving the user.'));
+            }
+
+            if (!device) {
+              return response.send(404, new MugError('Device not found.', 'device number = ' + phoneNumber));
+            }
+
+            if (device.user.id != user.id) {
+              return response.send(403, new MugError('This device is not yours.'));
+            }
+
+            var number = generateValidationNumber();
+            var message = 'Your MugChat validation code: ' + number;
+
+            device.verificationCode = number;
+            device.save();
+
+            twilioService.sendSms(phoneNumber, message, function(err, message) {
+              //TODO Change to a better Logger
+              console.log(err || message);
+            });
+
+            return response.send(200);
+
+          }
+        );
       }
     );
   }
 };
 
 module.exports = UserController;
+
+var generateValidationNumber = function() {
+  return Math.floor(Math.random() * 8999) + 1000;
+}
