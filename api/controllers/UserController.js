@@ -55,7 +55,6 @@ var UserController = {
           return response.send(404, new MugError('User not found.', 'username = ' + email));
         }
 
-
         Device.findOne({ phoneNumber: phoneNumber })
           .populate('user')
           .exec(function (error, device) {
