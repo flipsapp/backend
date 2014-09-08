@@ -4,6 +4,7 @@
  * @description :: Server-side logic for managing users
  * @help        :: See http://links.sailsjs.org/docs/controllers
  */
+var MAX_RETRY_COUNT = 2;
 
 var UserController = {
 
@@ -70,16 +71,7 @@ var UserController = {
               return response.send(403, new MugError('This device is not yours.'));
             }
 
-            var number = generateValidationNumber();
-            var message = 'Your MugChat validation code: ' + number;
-
-            device.verificationCode = number;
-            device.save();
-
-            twilioService.sendSms(phoneNumber, message, function(err, message) {
-              //TODO Change to a better Logger
-              console.log(err || message);
-            });
+            sendVerificationCode(device);
 
             return response.send(200);
 
@@ -87,11 +79,61 @@ var UserController = {
         );
       }
     );
+  },
+
+  verify: function (request, response) {
+    var phoneNumber = request.param('phone_number');
+    var verificationCode = request.param('verification_code');
+
+    if (!phoneNumber || !verificationCode) {
+      return response.send(400, new MugError('Error requesting to reset password.', 'Phone Number or verification code is empty.'));
+    }
+
+    Device.findOne({ phoneNumber: phoneNumber })
+      .populate('user')
+      .exec(function (error, device) {
+        if (error) {
+          return response.send(500, new MugError('Error retrieving the user.'));
+        }
+
+        if (!device) {
+          return response.send(404, new MugError('Device not found.', 'device number = ' + phoneNumber));
+        }
+
+        if (device.verificationCode != verificationCode) {
+          device.retryCount++;
+
+          if (device.retryCount > MAX_RETRY_COUNT) {
+            sendVerificationCode(device);
+          }
+
+          device.save();
+          return response.send(400, new MugError('Wrong validation code.'));
+        }
+
+        device.isVerified = true;
+        device.retryCount = 0;
+        device.save();
+
+        return response.send(200, device.user);
+
+      }
+    );
   }
 };
 
 module.exports = UserController;
 
-var generateValidationNumber = function() {
-  return Math.floor(Math.random() * 8999) + 1000;
-}
+var sendVerificationCode = function(device) {
+  var verificationCode = Math.floor(Math.random() * 8999) + 1000;
+  var message = 'Your MugChat validation code: ' + verificationCode;
+
+  device.verificationCode = verificationCode;
+  device.retryCount = 0;
+  device.save();
+
+  twilioService.sendSms(device.phoneNumber, message, function (err, message) {
+    //TODO Change to a better Logger
+    console.log(err || message);
+  });
+};
