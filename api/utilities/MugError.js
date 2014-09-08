@@ -1,3 +1,4 @@
+
 var MugError = function (error, details) {
   this.error = error;
   this.details = details;

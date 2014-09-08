@@ -1,7 +1,8 @@
 var path     = require('path')
   , url      = require('url')
   , passport = require('passport')
-  , FB       = require('fb');
+  , FB       = require('fb')
+  ,MugError = requires('>/api/utilities/MugError');
 
 // Load authentication protocols
 passport.protocols = require('./protocols');
@@ -24,7 +25,7 @@ passport.facebook = function(request, response, next) {
   var facebookConfig = sails.config.passport.facebook.options;
 
   if (!accessToken) {
-    return response.badRequest({ error: 'access_token header not defined.'});
+    return response.send(400, new MugError('access_token header not defined.'));
   }
 
   FB.api('/me', {
@@ -35,7 +36,7 @@ passport.facebook = function(request, response, next) {
   }, function (fbProfile) {
 
     if (!fbProfile) {
-      return next({ error: 'Unable to retrieve Facebook Account.'});
+      return next(new MugError('Unable to retrieve Facebook Account.'));
     }
 
     if (fbProfile.error) {
@@ -45,7 +46,7 @@ passport.facebook = function(request, response, next) {
     User.findOne({ username: fbProfile.email})
       .exec(function(err, user) {
         if (err) {
-          return next({ error: 'Error retrieving User.'});
+          return next(new MugError('Error retrieving User.'));
         }
 
         if (!user) {
@@ -66,11 +67,11 @@ passport.facebook = function(request, response, next) {
           User.update(whereClause, updateColumns)
             .exec(function(err, affectedUsers) {
               if (err) {
-                return next({ error: 'Error updating User.'});
+                return next(new MugError('Error updating User.'));
               }
 
               if (!affectedUsers || affectedUsers.length < 1) {
-                return next({ error: 'Error updating User.'});
+                return next(new MugError('Error updating User.'));
               }
 
               return next(null, affectedUsers[0]);
@@ -150,7 +151,7 @@ var createFacebookUser = function(fbProfile, next) {
     }
 
     if (!user) {
-      return next({ error: 'Error creating user.'} );
+      return next(new MugError('Error creating user.'));
     }
 
     return next(null, user);
