@@ -11,7 +11,7 @@ module.exports = {
     var deviceId = request.params.id;
 
     if (!deviceId) {
-      return response.send(400, new MugError('Invalid parameter [id]'));
+      return response.send(400, new MugError('Missing parameter [id]'));
     }
 
     Device.findOne(deviceId)
