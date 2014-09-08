@@ -23,14 +23,14 @@
 module.exports.routes = {
 
   /***************************************************************************
-  *                                                                          *
-  * Make the view located at `views/homepage.ejs` (or `views/homepage.jade`, *
-  * etc. depending on your default view engine) your home page.              *
-  *                                                                          *
-  * (Alternatively, remove this and add an `index.html` file in your         *
-  * `assets` directory)                                                      *
-  *                                                                          *
-  ***************************************************************************/
+   *                                                                          *
+   * Make the view located at `views/homepage.ejs` (or `views/homepage.jade`, *
+   * etc. depending on your default view engine) your home page.              *
+   *                                                                          *
+   * (Alternatively, remove this and add an `index.html` file in your         *
+   * `assets` directory)                                                      *
+   *                                                                          *
+   ***************************************************************************/
 
   '/': {
     view: 'homepage'
@@ -46,16 +46,20 @@ module.exports.routes = {
   *                                                                          *
   ***************************************************************************/
 
-  'POST   /background'                       : 'MugController.uploadBackground',
+  'POST   /signin'                          : 'AuthController.signin',
+  'POST   /signup'                          : 'AuthController.signup',
+  'POST   /signin/facebook'                 : 'AuthController.facebook',
+
+  'POST   /user/forgot'                     : 'UserController.forgot',
+  'PUT    /user/:id/photo'                  : 'UserController.uploadPhoto',
+  'POST   /user/:id/mug'                    : 'MugController.create',
+  'PUT    /user/:id/mug/:mug_id/background' : 'MugController.updateBackground',
+  'PUT    /user/:id/mug/:mug_id/sound'      : 'MugController.updateSound',
   'GET    /user/:id/mugs/:mug_id'            : 'MugController.mugById',
-  'PUT    /user/:id/mug/:mug_id/background'  : 'MugController.updateBackground',
-  'PUT    /user/:id/mug/:mug_id/sound'       : 'MugController.updateSound',
   'GET    /user/:id/mugs'                    : 'MugController.myMugs',
-  'POST   /signin'                           : 'AuthController.signin',
-  'POST   /signin/facebook'                  : 'AuthController.facebook',
-  'POST   /signup'                           : 'AuthController.signup',
-  'POST   /sound'                            : 'MugController.uploadSound',
-  'POST   /user/:id/mug'                     : 'MugController.create',
-  'PUT    /user/:id/photo'                   : 'UserController.uploadPhoto'
+  'GET    /user/:parentid/devices/:id'      : 'DeviceController.findOne',
+
+  'POST   /background'                      : 'MugController.uploadBackground',
+  'POST   /sound'                           : 'MugController.uploadSound'
 
 };
