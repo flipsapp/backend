@@ -49,6 +49,7 @@ module.exports.routes = {
   'POST /signin': 'AuthController.signin',
   'POST /signup': 'AuthController.signup',
   'POST /signin/facebook': 'AuthController.facebook',
-  'PUT /user/:id/photo': 'UserController.uploadPhoto'
+  'PUT /user/:id/photo': 'UserController.uploadPhoto',
+  'POST /user/forgot': 'UserController.forgot'
 
 };

@@ -35,6 +35,33 @@ var UserController = {
           return response.ok(updatedUser);
       });
     });
+  },
+
+  forgot: function(request, response) {
+    var phoneNumber = request.param('phone_number');
+    var email = request.param('email');
+
+    if (!phoneNumber || !email) {
+      return response.send(400, new MugError('Error requesting to reset password.', 'Phone Number or email is empty.'));
+    }
+
+    User.findOne({ username: email })
+      .exec(function(err, user) {
+        if (err) {
+          return response.send(500, new MugError('Error retrieving the user.'));
+        }
+
+        if (!user) {
+          return response.send(404, new MugError('User not found.', 'username = ' + email));
+        }
+
+        twilioService.sendSms(phoneNumber, 'Testing', function(err, message) {
+          console.log(err || message);
+        });
+
+        return response.send(200);
+      }
+    );
   }
 };
 
