@@ -15,7 +15,7 @@ var Mug = {
       index: true
     },
 
-    mediaURL: {
+    backgroundURL: {
       type: 'string'
     },
 
@@ -23,14 +23,13 @@ var Mug = {
       type: 'string'
     },
 
-    usedBy: {
-      collection: 'User',
-      via: 'mugs'
+    owner: {
+      model: 'User'
     },
 
     isPrivate: {
       type: 'boolean',
-      default: true
+      defaultsTo: true
     }
 
   }

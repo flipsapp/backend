@@ -44,8 +44,7 @@ var User = {
 
     mugs: {
       collection: 'Mug',
-      via: 'usedBy',
-      dominant: true
+      via: 'owner'
     },
 
     rooms: {

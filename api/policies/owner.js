@@ -1,3 +1,5 @@
+var MugError = requires('>/api/utilities/MugError');
+
 module.exports = function (request, response, next) {
   var id = request.params.id;
 
@@ -5,5 +7,5 @@ module.exports = function (request, response, next) {
     return next();
   }
 
-  return response.forbidden({ error: 'This entity does not belong to you.'} );
+  return response.send(403, new MugError('This entity does not belong to you.'));
 };

@@ -26,11 +26,12 @@ GLOBAL.requires = require('r').r;
 
 // CREATE AND LOAD ENVIRONMENT VARIABLES
 
+
 var dotenv_path;
 if (process.env.NODE_ENV.toUpperCase() === 'PRODUCTION') {
   dotenv_path = './.prod-env';
 } else {
-  dotenv_path = './.prod-env';
+  dotenv_path = './.dev-env';
 }
 var dotenv = require('dotenv');
 dotenv._getKeysAndValuesFromEnvFilePath(dotenv_path);
@@ -87,4 +88,5 @@ Object.defineProperty(Error.prototype, 'toJSON', {
 
   // Start server
   sails.lift(rc('sails'));
+
 })();

@@ -40,7 +40,11 @@ module.exports.policies = {
   },
 
 	MugController: {
-    create: ['passport', 'owner']
+    create: ['passport', 'owner'],
+    uploadBackground: ['passport'],
+    uploadSound: ['passport'],
+    updateBackground: ['passport', 'owner'],
+    updateSound: ['passport', 'owner']
   }
 
 };
