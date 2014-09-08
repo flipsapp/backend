@@ -23,6 +23,7 @@
 process.chdir(__dirname);
 
 GLOBAL.requires = require('r').r;
+GLOBAL.MugError = requires('>/api/utilities/MugError');
 
 Object.defineProperty(Error.prototype, 'toJSON', {
   value: function () {
