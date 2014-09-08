@@ -47,8 +47,10 @@ module.exports.routes = {
   ***************************************************************************/
 
   'POST   /background'                       : 'MugController.uploadBackground',
+  'GET    /user/:id/mugs/:mug_id'            : 'MugController.mugById',
   'PUT    /user/:id/mug/:mug_id/background'  : 'MugController.updateBackground',
   'PUT    /user/:id/mug/:mug_id/sound'       : 'MugController.updateSound',
+  'GET    /user/:id/mugs'                    : 'MugController.myMugs',
   'POST   /signin'                           : 'AuthController.signin',
   'POST   /signin/facebook'                  : 'AuthController.facebook',
   'POST   /signup'                           : 'AuthController.signup',

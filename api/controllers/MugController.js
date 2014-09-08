@@ -117,12 +117,38 @@ var MugController = {
         });
       })
     });
+  },
+
+  myMugs: function (request, response) {
+    var whereClause = {
+      owner: request.params.id
+    };
+    if (request.param('word')) {
+      whereClause.word = request.param('word');
+    }
+    Mug.find(whereClause).exec(function (err, mugs) {
+      if (err) {
+        return response.send(500, new MugError('Error trying to retrieve mugs', err));
+      }
+      if (!mugs) {
+        return response.send(404, new MugError('Mugs not found'));
+      }
+      return response.send(200, mugs);
+    })
+  },
+
+  mugById: function (request, response) {
+    Mug.findOne({id: request.params.mug_id, owner: request.params.id}).exec(function (err, mug) {
+      if (err) {
+        return response.send(500, new MugError('Error trying to retrieve mug', err));
+      }
+      if (!mug) {
+        return response.send(404, new MugError('Mug not found'));
+      }
+      return response.send(200, mug);
+    })
   }
 
 };
-
-function uploadFile(file, bucket, callback) {
-  return true;
-}
 
 module.exports = MugController;
