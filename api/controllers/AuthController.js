@@ -6,6 +6,8 @@
  * the basics of Passport.js to work.
  */
 
+var MugError = requires('>/api/utilities/MugError');
+
 var AuthController = {
 
   signin: function(request, response) {
@@ -13,28 +15,28 @@ var AuthController = {
     var password = request.body.password;
 
     if (!username || !password) {
-      return response.badRequest({error: 'Username/Password is empty.'});
+      return response.send(400, new MugError('Username and password are required'));
     }
 
     passport.signin(request, response, function(err, user) {
 
       if (err) {
-        return response.serverError({error: 'Error retrieving user.'});
+        return response.send(500, new MugError('Error signing in user', err));
       }
 
       if (!user) {
-        return response.badRequest({error: 'Username not found.'});
+        return response.send(404, new MugError('Username or password not found'));
       }
 
       request.login(user, function (loginErr) {
 
         if (loginErr) {
-          return response.badRequest(loginErr);
+          return response.send(400, new MugError('Error logging in user', loginErr));
         }
 
         // Upon successful login, send the user to the homepage were req.user
         // will available.
-        return response.ok(user);
+        return response.send(200, user);
       });
     });
   },
@@ -42,32 +44,32 @@ var AuthController = {
   signup: function(request, response) {
     passport.signup(request, response, function(err, user) {
       if (err || !user) {
-        return response.badRequest({error: 'Request error: Creating user.', details: err.details});
+        return response.send(400, new MugError('Error signing up user', err));
       }
 
-      return response.ok(user);
+      return response.send(201, user);
     });
   },
 
   facebook: function(request, response) {
     passport.facebook(request, response, function(err, user) {
       if (err) {
-        return response.serverError({error: 'Error retrieving user.'});
+        return response.send(500, new MugError('Error retrieving user', err));
       }
 
       if (!user) {
-        return response.badRequest({error: 'Username not found.'});
+        return response.send(404, new MugError('Username not found'));
       }
 
       request.login(user, function (loginErr) {
 
         if (loginErr) {
-          return response.badRequest(loginErr);
+          return response.send(400, new MugError('Error logging in user', loginErr));
         }
 
         // Upon successful login, send the user to the homepage
         // were req.user will available.
-        return response.ok(user);
+        return response.send(200, user);
       });
     });
   }

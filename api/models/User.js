@@ -44,25 +44,24 @@ var User = {
 
     mugs: {
       collection: 'Mug',
-      via: 'usedBy',
-      dominant: true
+      via: 'owner'
     },
 
     rooms: {
       collection: 'Room',
       via: 'users'
-    }/*,
+    },
 
     contacts: {
       collection: 'User',
-      via: 'haveMeAsContact',
+      via: 'hasMeAsContact',
       dominant: 'true'
     },
 
-    haveMeAsContact: {
+    hasMeAsContact: {
       collection: 'User',
       via: 'contacts'
-    }*/
+    }
 
   }
 

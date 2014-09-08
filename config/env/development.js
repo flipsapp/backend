@@ -10,10 +10,6 @@
  *
  */
 
-var dotenv = require('dotenv');
-dotenv._getKeysAndValuesFromEnvFilePath('./.dev-env');
-dotenv._setEnvs();
-
 module.exports = {
 
 /***************************************************************************
