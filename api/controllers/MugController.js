@@ -5,8 +5,6 @@
  * @help        :: See http://links.sailsjs.org/docs/controllers
  */
 
-var MugError = requires('>/api/utilities/MugError');
-
 var MugController = {
 
   create: function (request, response) {

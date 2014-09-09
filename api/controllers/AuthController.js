@@ -6,8 +6,6 @@
  * the basics of Passport.js to work.
  */
 
-var MugError = requires('>/api/utilities/MugError');
-
 var AuthController = {
 
   signin: function(request, response) {
