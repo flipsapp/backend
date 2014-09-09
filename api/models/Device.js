@@ -29,6 +29,16 @@ module.exports = {
 
     verificationCode: {
       type: 'string'
+    },
+
+    isVerified: {
+      type: 'boolean',
+      defaultsTo: false
+    },
+
+    retryCount: {
+      type: 'integer',
+      defaultsTo: 0
     }
   }
 };
