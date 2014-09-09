@@ -1,8 +1,7 @@
 var path     = require('path')
   , url      = require('url')
   , passport = require('passport')
-  , FB       = require('fb')
-  ,MugError = requires('>/api/utilities/MugError');
+  , FB       = require('fb');
 
 // Load authentication protocols
 passport.protocols = require('./protocols');

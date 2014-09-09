@@ -5,6 +5,8 @@
  * @help        :: See http://links.sailsjs.org/docs/controllers
  */
 
+var actionUtil = requires('>/node_modules/sails/lib/hooks/blueprints/actionUtil');
+
 var MAX_RETRY_COUNT = 2;
 
 var DeviceController = {
@@ -27,6 +29,34 @@ var DeviceController = {
         }
 
         return response.send(200, device);
+      }
+    );
+  },
+
+  create: function (request, response) {
+
+    var user = request.params.parentid;
+    var device = actionUtil.parseValues(request);
+
+    if (!user) {
+      return response.send(400, new MugError('Missing parameter [User Id]'));
+    }
+
+    device.user = user;
+
+    Device.create(device)
+      .exec(function (err, device) {
+        if (err) {
+          return response.send(500, new MugError('Error creating device.', err.details));
+        }
+
+        if (!device) {
+          return response.send(400, new MugError('Error creating device.', 'Device returned empty.'));
+        }
+
+        sendVerificationCode(device);
+
+        return response.send(201, device);
       }
     );
   },

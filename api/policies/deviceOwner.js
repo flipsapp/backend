@@ -1,5 +1,3 @@
-var MugError = requires('>/api/utilities/MugError');
-
 module.exports = function (request, response, next) {
 
   var deviceId = request.params.id;

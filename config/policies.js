@@ -47,8 +47,8 @@ module.exports.policies = {
   },
 
   DeviceController: {
-    findOne: ['passport', 'deviceOwner'],
+    findOne: ['passport', 'owner', 'deviceOwner'],
+    create : ['passport', 'owner'],
     verify : ['passport']
   }
-
 };

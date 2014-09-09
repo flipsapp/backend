@@ -36,14 +36,16 @@ module.exports.routes = {
                                                                                // /mugs/stock?category=Toon&owner=123
   'POST   /user/forgot'                           : 'UserController.forgot',
   'POST   /user/verify'                           : 'UserController.verify',
-  'POST   /user/:parentid/devices/:id/verify'     : 'DeviceController.verify',
-  'PUT    /user/:id/photo'                        : 'UserController.uploadPhoto',
   'POST   /user/:user_id/mugs'                    : 'MugController.create',
   'PUT    /user/:user_id/mugs/:mug_id/background' : 'MugController.updateBackground',
   'PUT    /user/:user_id/mugs/:mug_id/sound'      : 'MugController.updateSound',
   'GET    /user/:user_id/mugs/:mug_id'            : 'MugController.mugById',
   'GET    /user/:user_id/mugs'                    : 'MugController.myMugs',  // all mugs or filtered by word -> /user/:user_id/mugs?word='San Francisco'
+
+  'PUT    /user/:parentid/photo'                  : 'UserController.uploadPhoto',
+  'POST   /user/:parentid/devices'                : 'DeviceController.create',
   'GET    /user/:parentid/devices/:id'            : 'DeviceController.findOne',
+  'POST   /user/:parentid/devices/:id/verify'     : 'DeviceController.verify',
 
   'POST   /background'                            : 'MugController.uploadBackground',
   'POST   /sound'                                 : 'MugController.uploadSound'
