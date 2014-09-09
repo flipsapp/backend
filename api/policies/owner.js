@@ -1,9 +1,7 @@
-var MugError = requires('>/api/utilities/MugError');
-
 module.exports = function (request, response, next) {
-  var id = request.params.id;
+  var parentid = request.params.parentid;
 
-  if (id == request.user.id) {
+  if (parentid == request.user.id) {
     return next();
   }
 
