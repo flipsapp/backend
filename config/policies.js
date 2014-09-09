@@ -36,13 +36,14 @@ module.exports.policies = {
   },
 
 	MugController: {
-    create: ['passport', 'owner'],
+    create: ['passport', 'mugOwner'],
     uploadBackground: ['passport'],
     uploadSound: ['passport'],
-    updateBackground: ['passport', 'owner'],
-    updateSound: ['passport', 'owner'],
-    myMugs: ['passport', 'owner'],
-    mugById: ['passport', 'owner']
+    updateBackground: ['passport', 'mugOwner'],
+    updateSound: ['passport', 'mugOwner'],
+    myMugs: ['passport', 'mugOwner'],
+    mugById: ['passport', 'mugOwner'],
+    stockMugs: ['passport']
   },
 
   DeviceController: {
