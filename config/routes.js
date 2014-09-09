@@ -46,20 +46,20 @@ module.exports.routes = {
   *                                                                          *
   ***************************************************************************/
 
-  'POST   /signin'                          : 'AuthController.signin',
-  'POST   /signup'                          : 'AuthController.signup',
-  'POST   /signin/facebook'                 : 'AuthController.facebook',
+  'POST   /signin'                                : 'AuthController.signin',
+  'POST   /signup'                                : 'AuthController.signup',
+  'POST   /signin/facebook'                       : 'AuthController.facebook',
 
-  'POST   /user/forgot'                     : 'UserController.forgot',
-  'PUT    /user/:id/photo'                  : 'UserController.uploadPhoto',
-  'POST   /user/:id/mug'                    : 'MugController.create',
-  'PUT    /user/:id/mug/:mug_id/background' : 'MugController.updateBackground',
-  'PUT    /user/:id/mug/:mug_id/sound'      : 'MugController.updateSound',
-  'GET    /user/:id/mugs/:mug_id'            : 'MugController.mugById',
-  'GET    /user/:id/mugs'                    : 'MugController.myMugs',
-  'GET    /user/:parentid/devices/:id'      : 'DeviceController.findOne',
+  'POST   /user/forgot'                           : 'UserController.forgot',
+  'PUT    /user/:id/photo'                        : 'UserController.uploadPhoto',
+  'POST   /user/:user_id/mug'                     : 'MugController.create',
+  'PUT    /user/:user_id/mug/:mug_id/background'  : 'MugController.updateBackground',
+  'PUT    /user/:user_id/mug/:mug_id/sound'       : 'MugController.updateSound',
+  'GET    /user/:user_id/mugs/:mug_id'            : 'MugController.mugById',
+  'GET    /user/:user_id/mugs'                    : 'MugController.myMugs',
+  'GET    /user/:parentid/devices/:id'            : 'DeviceController.findOne',
 
-  'POST   /background'                      : 'MugController.uploadBackground',
-  'POST   /sound'                           : 'MugController.uploadSound'
+  'POST   /background'                            : 'MugController.uploadBackground',
+  'POST   /sound'                                 : 'MugController.uploadSound'
 
 };
