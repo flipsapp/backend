@@ -31,6 +31,8 @@ module.exports.routes = {
   'POST   /signin/facebook'                       : 'AuthController.facebook',
 
   'POST   /user/forgot'                           : 'UserController.forgot',
+  'POST   /user/verify'                           : 'UserController.verify',
+  'POST   /user/:parentid/devices/:id/verify'     : 'DeviceController.verify',
   'PUT    /user/:id/photo'                        : 'UserController.uploadPhoto',
   'POST   /user/:user_id/mug'                     : 'MugController.create',
   'PUT    /user/:user_id/mug/:mug_id/background'  : 'MugController.updateBackground',
@@ -38,7 +40,6 @@ module.exports.routes = {
   'GET    /user/:user_id/mugs/:mug_id'            : 'MugController.mugById',
   'GET    /user/:user_id/mugs'                    : 'MugController.myMugs',
   'GET    /user/:parentid/devices/:id'            : 'DeviceController.findOne',
-  'POST   /user/verify'                           : 'UserController.verify',
 
   'POST   /background'                            : 'MugController.uploadBackground',
   'POST   /sound'                                 : 'MugController.uploadSound'

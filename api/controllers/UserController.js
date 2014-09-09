@@ -102,6 +102,7 @@ var UserController = {
 
         if (device.verificationCode != verificationCode) {
           device.retryCount++;
+          device.isVerified = false;
 
           if (device.retryCount > MAX_RETRY_COUNT) {
             sendVerificationCode(device);
