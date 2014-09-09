@@ -10,13 +10,25 @@ var MugError = requires('>/api/utilities/MugError');
 var MugController = {
 
   create: function (request, response) {
-    Mug.create({
-      word: request.body.word,
-      backgroundURL: request.body.background_url,
-      soundURL: request.body.sound_url,
-      owner: request.params.user_id,
-      isPrivate: request.body.is_private
-    }).exec(function (err, mug) {
+    var values = {
+      word: request.body.word
+    };
+    if (request.body.background_url) {
+      values.backgroundURL = request.body.background_url
+    }
+    if (request.body.sound_url) {
+      values.soundURL = request.body.sound_url
+    }
+    if (request.params.user_id) {
+      values.owner = request.params.user_id
+    }
+    if (request.body.is_private) {
+      values.isPrivate = request.body.is_private
+    }
+    if (request.body.category) {
+      values.category = request.body.category
+    }
+    Mug.create(values).exec(function (err, mug) {
       if (err || !mug) {
         return response.send(400, new MugError('Error trying to create mug', err));
       }
@@ -146,6 +158,27 @@ var MugController = {
         return response.send(404, new MugError('Mug not found'));
       }
       return response.send(200, mug);
+    })
+  },
+
+  stockMugs: function (request, response) {
+    var whereClause = {
+      isPrivate: false
+    };
+    if (request.param('owner')) {
+      whereClause.owner = request.param('owner');
+    }
+    if (request.param('category')) {
+      whereClause.category = request.param('category');
+    }
+    Mug.find(whereClause).exec(function (err, mugs) {
+      if (err) {
+        return response.send(500, new MugError('Error trying to retrieve mugs', err));
+      }
+      if (!mugs) {
+        return response.send(404, new MugError('Mugs not found'));
+      }
+      return response.send(200, mugs);
     })
   }
 

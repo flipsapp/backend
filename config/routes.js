@@ -30,15 +30,19 @@ module.exports.routes = {
   'POST   /signup'                                : 'AuthController.signup',
   'POST   /signin/facebook'                       : 'AuthController.facebook',
 
+  'GET    /mugs/stock'                            : 'MugController.stockMugs', // all stock mugs or filtered by category or owner or both
+                                                                               // /mugs/stock?category=Toon
+                                                                               // /mugs/stock?owner=123
+                                                                               // /mugs/stock?category=Toon&owner=123
   'POST   /user/forgot'                           : 'UserController.forgot',
   'POST   /user/verify'                           : 'UserController.verify',
   'POST   /user/:parentid/devices/:id/verify'     : 'DeviceController.verify',
   'PUT    /user/:id/photo'                        : 'UserController.uploadPhoto',
-  'POST   /user/:user_id/mug'                     : 'MugController.create',
-  'PUT    /user/:user_id/mug/:mug_id/background'  : 'MugController.updateBackground',
-  'PUT    /user/:user_id/mug/:mug_id/sound'       : 'MugController.updateSound',
+  'POST   /user/:user_id/mugs'                    : 'MugController.create',
+  'PUT    /user/:user_id/mugs/:mug_id/background' : 'MugController.updateBackground',
+  'PUT    /user/:user_id/mugs/:mug_id/sound'      : 'MugController.updateSound',
   'GET    /user/:user_id/mugs/:mug_id'            : 'MugController.mugById',
-  'GET    /user/:user_id/mugs'                    : 'MugController.myMugs',
+  'GET    /user/:user_id/mugs'                    : 'MugController.myMugs',  // all mugs or filtered by word -> /user/:user_id/mugs?word='San Francisco'
   'GET    /user/:parentid/devices/:id'            : 'DeviceController.findOne',
 
   'POST   /background'                            : 'MugController.uploadBackground',

@@ -30,6 +30,10 @@ var Mug = {
     isPrivate: {
       type: 'boolean',
       defaultsTo: true
+    },
+
+    category: {
+      type: 'string'
     }
 
   }
