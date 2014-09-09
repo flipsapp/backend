@@ -35,6 +35,8 @@ module.exports.routes = {
                                                                                // /mugs/stock?owner=123
                                                                                // /mugs/stock?category=Toon&owner=123
   'POST   /user/forgot'                           : 'UserController.forgot',
+  'POST   /user/verify'                           : 'UserController.verify',
+  'POST   /user/:parentid/devices/:id/verify'     : 'DeviceController.verify',
   'PUT    /user/:id/photo'                        : 'UserController.uploadPhoto',
   'POST   /user/:user_id/mugs'                    : 'MugController.create',
   'PUT    /user/:user_id/mugs/:mug_id/background' : 'MugController.updateBackground',
@@ -42,7 +44,6 @@ module.exports.routes = {
   'GET    /user/:user_id/mugs/:mug_id'            : 'MugController.mugById',
   'GET    /user/:user_id/mugs'                    : 'MugController.myMugs',  // all mugs or filtered by word -> /user/:user_id/mugs?word='San Francisco'
   'GET    /user/:parentid/devices/:id'            : 'DeviceController.findOne',
-  'POST   /user/verify'                           : 'UserController.verify',
 
   'POST   /background'                            : 'MugController.uploadBackground',
   'POST   /sound'                                 : 'MugController.uploadSound'
