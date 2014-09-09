@@ -14,7 +14,7 @@ var MugController = {
       word: request.body.word,
       backgroundURL: request.body.background_url,
       soundURL: request.body.sound_url,
-      owner: request.params.id,
+      owner: request.params.user_id,
       isPrivate: request.body.is_private
     }).exec(function (err, mug) {
       if (err || !mug) {
@@ -72,7 +72,7 @@ var MugController = {
         if (!mug) {
           return response.send(404, new MugError('Mug not found'));
         }
-        if (mug.owner && mug.owner.id !== request.params.id) {
+        if (mug.owner && mug.owner.id !== request.params.user_id) {
           return response.send(403, new MugError('This mug does not belong to this user'));
         }
         mug.backgroundURL = uploadedFiles[0].extra.Location;
@@ -104,7 +104,7 @@ var MugController = {
         if (!mug) {
           return response.send(404, new MugError('Mug not found'));
         }
-        if (mug.owner && mug.owner.id != request.params.id) {
+        if (mug.owner && mug.owner.id != request.params.user_id) {
 
           return response.send(403, new MugError('This mug does not belong to this user'));
         }
@@ -117,12 +117,38 @@ var MugController = {
         });
       })
     });
+  },
+
+  myMugs: function (request, response) {
+    var whereClause = {
+      owner: request.params.user_id
+    };
+    if (request.param('word')) {
+      whereClause.word = request.param('word');
+    }
+    Mug.find(whereClause).exec(function (err, mugs) {
+      if (err) {
+        return response.send(500, new MugError('Error trying to retrieve mugs', err));
+      }
+      if (!mugs) {
+        return response.send(404, new MugError('Mugs not found'));
+      }
+      return response.send(200, mugs);
+    })
+  },
+
+  mugById: function (request, response) {
+    Mug.findOne({id: request.params.mug_id, owner: request.params.user_id}).exec(function (err, mug) {
+      if (err) {
+        return response.send(500, new MugError('Error trying to retrieve mug', err));
+      }
+      if (!mug) {
+        return response.send(404, new MugError('Mug not found'));
+      }
+      return response.send(200, mug);
+    })
   }
 
 };
-
-function uploadFile(file, bucket, callback) {
-  return true;
-}
 
 module.exports = MugController;

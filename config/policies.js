@@ -40,7 +40,9 @@ module.exports.policies = {
     uploadBackground: ['passport'],
     uploadSound: ['passport'],
     updateBackground: ['passport', 'owner'],
-    updateSound: ['passport', 'owner']
+    updateSound: ['passport', 'owner'],
+    myMugs: ['passport', 'owner'],
+    mugById: ['passport', 'owner']
   },
 
   DeviceController: {
