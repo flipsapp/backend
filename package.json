@@ -38,7 +38,9 @@
     "skipper": "^0.5.3",
     "skipper-s3": "^0.5.4",
     "twilio": "^1.7.0",
-    "validator": "^3.17.1"
+    "validator": "^3.17.1",
+    "mocha": "~1.21.4",
+    "grunt-mocha-test": "~0.11.0"
   },
   "author": "ArcTouch Inc.",
   "license": "ISC",
@@ -47,8 +49,9 @@
   },
   "homepage": "https://github.com/arctouch/mugchat-backend",
   "scripts": {
-    "start": "node app.js",
-    "debug": "node debug app.js"
+    "start": "node app.js --prod",
+    "debug": "node debug app.js --prod",
+    "test": "make test"
   },
   "main": "app.js",
   "repository": {
