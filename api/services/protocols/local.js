@@ -98,7 +98,7 @@ exports.createUser = function(userModel, next) {
   checkAge(userModel, function(err, age) {
 
     if (age < MINIMAL_AGE) {
-      return next({ details: 'You must have at least 13 years old.'});
+      return next('You must have at least 13 years old.');
     }
 
     if (err) {
