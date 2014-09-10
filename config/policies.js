@@ -32,7 +32,8 @@ module.exports.policies = {
     forgot: true,
     verify: true,
     uploadPhoto: ['passport', 'owner'],
-    update: ['passport', 'owner']
+    update: ['passport', 'owner'],
+    findOne: ['passport', 'owner']
   },
 
 	MugController: {

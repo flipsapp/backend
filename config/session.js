@@ -67,11 +67,7 @@ module.exports.session = {
   *                                                                          *
   ***************************************************************************/
 
-  adapter: 'mongo',
-  host: 'ds035270.mongolab.com',
-  port: 35270,
-  db: 'mugchat-session',
-  collection: 'sessions',
+  adapter: 'memory'
 
   /***************************************************************************
   *                                                                          *
@@ -82,8 +78,6 @@ module.exports.session = {
   *                                                                          *
   ***************************************************************************/
 
-  username: 'mugchat',
-  password: 'mugchat'
   // auto_reconnect: false,
   // ssl: false,
   // stringify: true

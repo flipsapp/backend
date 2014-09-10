@@ -1,7 +1,7 @@
 module.exports = function (request, response, next) {
-  var parentid = request.params.parentid;
+  var owner = request.params.parentid || request.params.id;
 
-  if (parentid == request.user.id) {
+  if (owner == request.user.id) {
     return next();
   }
 
