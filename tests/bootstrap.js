@@ -1,13 +1,12 @@
 GLOBAL.requires = require('r').r;
 GLOBAL.MugError = requires('>/api/utilities/MugError');
 
-// Require app factory
+var sinon = require('sinon');
+var app = null;
 var sails = require('sails');
 
 // Instantiate the Sails app instance we'll be using
 // (note that we don't use `new`, just call it like a function)
-
-var app = null;
 
 var start = function () {
   before(function (done) {
@@ -37,11 +36,15 @@ var start = function () {
 
     }, function (err, sails) {
       app = sails;
+
+      sinon.stub(app.services.twilioservice, 'sendSms', function(to, message, callback) {
+        callback(null, { status: "Sent" });
+      });
+
       done(err, sails);
     });
 
   });
-
 
 // After Function
   after(function (done) {
