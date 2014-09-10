@@ -1,6 +1,5 @@
 var request = require('superagent'),
-  assert = require('assert'),
-  bootstrap = require('./bootstrap')();
+  assert = require('assert');
 
 describe('MugController', function () {
 
