@@ -39,8 +39,7 @@
     "skipper-s3": "^0.5.4",
     "twilio": "^1.7.0",
     "validator": "^3.17.1",
-    "mocha": "~1.21.4",
-    "grunt-mocha-test": "~0.11.0"
+    "sails-memory": "~0.10.3"
   },
   "author": "ArcTouch Inc.",
   "license": "ISC",
@@ -57,5 +56,11 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/arctouch/mugchat-backend.git"
+  },
+  "devDependencies": {
+    "mocha": "~1.21.4",
+    "supertest": "~0.13.0",
+    "grunt-mocha-test": "~0.11.0",
+    "superagent": "~0.18.2"
   }
 }
