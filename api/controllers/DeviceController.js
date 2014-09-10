@@ -39,7 +39,15 @@ var DeviceController = {
     var device = actionUtil.parseValues(request);
 
     if (!user) {
-      return response.send(400, new MugError('Missing parameter [User Id]'));
+      return response.send(400, new MugError('Missing parameter [User Id].'));
+    }
+
+    if (!device.platform) {
+      return response.send(400, new MugError('Missing parameter [Device platform].'));
+    }
+
+    if (!device.phoneNumber) {
+      return response.send(400, new MugError('Missing parameter [Device phone number].'));
     }
 
     device.user = user;
