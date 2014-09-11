@@ -8,6 +8,10 @@ var sinon = require('sinon');
 var app = null;
 var sails = require('sails');
 
+var dotenv = require('dotenv');
+dotenv._getKeysAndValuesFromEnvFilePath(dotenv_path);
+dotenv._setEnvs();
+
 // Instantiate the Sails app instance we'll be using
 // (note that we don't use `new`, just call it like a function)
 var start = function () {
