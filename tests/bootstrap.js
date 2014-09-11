@@ -3,13 +3,7 @@ GLOBAL.MugError = requires('>/api/utilities/MugError');
 
 // CREATE AND LOAD ENVIRONMENT VARIABLES
 
-var dotenv_path;
-if (process.env.NODE_ENV.toUpperCase() === 'PRODUCTION') {
-  dotenv_path = './.prod-env';
-} else {
-  dotenv_path = './.dev-env';
-}
-
+var dotenv_path = './.dev-env';
 var sinon = require('sinon');
 var app = null;
 var sails = require('sails');
