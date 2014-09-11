@@ -1,28 +1,20 @@
 GLOBAL.requires = require('r').r;
 GLOBAL.MugError = requires('>/api/utilities/MugError');
 
+var sinon = require('sinon');
+var app = null;
+
 // CREATE AND LOAD ENVIRONMENT VARIABLES
-
-
-var dotenv_path;
-if (process.env.NODE_ENV.toUpperCase() === 'PRODUCTION') {
-  dotenv_path = './.prod-env';
-} else {
-  dotenv_path = './.dev-env';
-}
+var dotenv_path = './.dev-env';
 var dotenv = require('dotenv');
 dotenv._getKeysAndValuesFromEnvFilePath(dotenv_path);
 dotenv._setEnvs();
-
 
 // Require app factory
 var sails = require('sails');
 
 // Instantiate the Sails app instance we'll be using
 // (note that we don't use `new`, just call it like a function)
-
-var app = null;
-
 var start = function () {
   before(function (done) {
     console.log('########## BOOTSTRAP BEFORE #############');
@@ -51,11 +43,15 @@ var start = function () {
 
     }, function (err, sails) {
       app = sails;
+
+      sinon.stub(app.services.twilioservice, 'sendSms', function(to, message, callback) {
+        callback(null, { status: "Sent" });
+      });
+
       done(err, sails);
     });
 
   });
-
 
 // After Function
   after(function (done) {
