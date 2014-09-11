@@ -9,9 +9,6 @@ if (process.env.NODE_ENV.toUpperCase() === 'PRODUCTION') {
 } else {
   dotenv_path = './.dev-env';
 }
-var dotenv = require('dotenv');
-dotenv._getKeysAndValuesFromEnvFilePath(dotenv_path);
-dotenv._setEnvs();
 
 var sinon = require('sinon');
 var app = null;
@@ -19,7 +16,6 @@ var sails = require('sails');
 
 // Instantiate the Sails app instance we'll be using
 // (note that we don't use `new`, just call it like a function)
-
 var start = function () {
   before(function (done) {
     console.log('########## BOOTSTRAP BEFORE #############');

@@ -26,14 +26,13 @@ GLOBAL.requires = require('r').r;
 GLOBAL.MugError = requires('>/api/utilities/MugError');
 
 // CREATE AND LOAD ENVIRONMENT VARIABLES
-
-
 var dotenv_path;
 if (process.env.NODE_ENV.toUpperCase() === 'PRODUCTION') {
   dotenv_path = './.prod-env';
 } else {
   dotenv_path = './.dev-env';
 }
+
 var dotenv = require('dotenv');
 dotenv._getKeysAndValuesFromEnvFilePath(dotenv_path);
 dotenv._setEnvs();
