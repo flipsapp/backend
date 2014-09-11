@@ -3,11 +3,18 @@ GLOBAL.MugError = requires('>/api/utilities/MugError');
 
 var sinon = require('sinon');
 var app = null;
+
+// CREATE AND LOAD ENVIRONMENT VARIABLES
+var dotenv_path = './.dev-env';
+var dotenv = require('dotenv');
+dotenv._getKeysAndValuesFromEnvFilePath(dotenv_path);
+dotenv._setEnvs();
+
+// Require app factory
 var sails = require('sails');
 
 // Instantiate the Sails app instance we'll be using
 // (note that we don't use `new`, just call it like a function)
-
 var start = function () {
   before(function (done) {
     console.log('########## BOOTSTRAP BEFORE #############');
