@@ -9,8 +9,17 @@ var MAX_RETRY_COUNT = 2;
 var UserController = {
 
   uploadPhoto: function(request, response) {
-    var userId = request.params.id;
+    var userId = request.params.parentid;
     var photo = request.file('photo');
+
+    if (!userId) {
+      return response.send(400, new MugError('Missing parameter: [User Id]'));
+    }
+
+    if (!photo || photo._files.length < 1) {
+      return response.send(400, new MugError('Missing parameter: [User Photo]'));
+    }
+
     s3service.upload(photo, s3service.PICTURES_BUCKET, function(err, uploadedFiles) {
       if (err) {
         return response.send(500, new MugError('Error uploading picture', err));  
@@ -29,11 +38,11 @@ var UserController = {
             return response.send(500, new MugError('Error updating user', err));
           }
 
-          if (!updatedUser){
+          if (!updatedUser || updatedUser.length < 1){
             return response.send(400, new MugError('Error updating user with photo url'));
           }
 
-          return response.send(200, updatedUser);
+          return response.send(200, updatedUser[0]);
       });
     });
   },
@@ -116,7 +125,7 @@ var UserController = {
         device.retryCount = 0;
         device.save();
 
-        return response.send(200, device.user);
+        return response.send(200, device);
 
       }
     );
