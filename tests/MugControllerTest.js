@@ -8,7 +8,6 @@ describe('MugController', function () {
   var userId, user2Id;
 
   before(function (done) {
-    this.timeout(5000);
     var aUser = {
       username: 'devtest@arctouch.com',
       password: 'password',
@@ -132,7 +131,6 @@ describe('MugController', function () {
   });
 
   it('should retrieve stock mugs', function (done) {
-    this.timeout(10000);
     var aMug = {
       word: "non stock mug",
       is_private: "true",
@@ -305,6 +303,22 @@ describe('MugController', function () {
         var fileExtension = data.background_url.split('.').slice(-1)[0].toLowerCase();
         assert.equal(res.status, 201, 'Response status is ' + res.status + ' and should be 201');
         assert.equal(fileExtension, 'jpg', 'File extension is ' + fileExtension + ' and should be "jpg"');
+        done();
+      })
+  });
+
+  it('should upload a sound file', function (done) {
+    this.timeout(5000);
+    user1.post('http://localhost:1337/sound')
+      .attach('sound', './tests/fixtures/arctouch.wav')
+      .end(function (err, res) {
+        if (err) {
+          throw err;
+        }
+        var data = res.body;
+        var fileExtension = data.sound_url.split('.').slice(-1)[0].toLowerCase();
+        assert.equal(res.status, 201, 'Response status is ' + res.status + ' and should be 201');
+        assert.equal(fileExtension, 'wav', 'File extension is ' + fileExtension + ' and should be "wav"');
         done();
       })
   });
