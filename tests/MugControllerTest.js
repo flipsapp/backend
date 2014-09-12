@@ -322,9 +322,19 @@ describe('MugController', function () {
       })
   });
 
-  it('should not upload a sound file when filename is different than "sound"', function (done) {
+  it('should return an error when no file is attached when uploading a sound file', function (done) {
     user1.post('http://localhost:1337/sound')
-      .attach('sound1', './tests/fixtures/arctouch.wav')
+      .end(function (err, res) {
+        if (err) {
+          throw err;
+        }
+        assert.equal(res.status, 400, 'Response status is ' + res.status + ' and should be 400');
+        done();
+      })
+  });
+
+  it('should return an error when no file is attached when uploading a background file', function (done) {
+    user1.post('http://localhost:1337/background')
       .end(function (err, res) {
         if (err) {
           throw err;
@@ -363,6 +373,5 @@ describe('MugController', function () {
         done();
       })
   });
-
 
 });
