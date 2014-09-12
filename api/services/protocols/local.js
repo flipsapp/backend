@@ -26,6 +26,12 @@ var validator = require('validator')
 
 var MINIMAL_AGE = 13;
 
+// at least 8 characters
+// at least 1 uppercase
+// at least 1 lowercase
+// at least 1 number
+var PASSWORD_REGEX = '^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9]).{8,}$';
+
 exports.register = function (request, response, next) {
   var userModel = actionUtil.parseValues(request);
 
@@ -34,9 +40,15 @@ exports.register = function (request, response, next) {
     return next(new Error('No username was entered.'));
   }
 
-  if (!userModel.password) {
+  var password = userModel.password;
+
+  if (!password) {
     request.flash('error', 'Error.Passport.Password.Missing');
     return next(new Error('No password was entered.'));
+  }
+
+  if (!password.match(PASSWORD_REGEX)) {
+    return next(new Error('Password must have at least eight characters, one uppercase letter and one lowercase letter and one number.'));
   }
 
   this.createUser(userModel, next);

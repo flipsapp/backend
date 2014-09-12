@@ -11,7 +11,7 @@ describe('AuthController - Using correct params', function () {
   it('Should create a user', function (done) {
     var aUser = {
       username: 'devtest@arctouch.com',
-      password: 'password',
+      password: 'Password1',
       firstName: 'Dev',
       lastName: 'Test',
       birthday: '1968-12-02'
@@ -29,7 +29,7 @@ describe('AuthController - Using correct params', function () {
         userId = createdUser.id;
         assert.equal(res.status, 201);
         assert.equal(createdUser.username, 'devtest@arctouch.com');
-        assert.equal(createdUser.password, 'password');
+        assert.equal(createdUser.password, 'Password1');
         assert.equal(createdUser.firstName, 'Dev');
         assert.equal(createdUser.lastName, 'Test');
         assert.equal(createdUser.birthday.substring(0, 10), '1968-12-02');
@@ -88,7 +88,7 @@ describe('AuthController - Sign up missing username', function () {
 
   it('Should receive an error message', function (done) {
     var aUser = {
-      password: 'password',
+      password: 'Password1',
       firstName: 'Dev',
       lastName: 'Test',
       birthday: '1968-12-02'
@@ -119,7 +119,7 @@ describe('AuthController - User < 13 years old', function () {
   it('Should receive an error message', function (done) {
     var aUser = {
       username: 'devtest@arctouch.com',
-      password: 'password',
+      password: 'Password1',
       firstName: 'Dev',
       lastName: 'Test',
       birthday: '2002-12-02'
@@ -149,7 +149,7 @@ describe('AuthController - Sign in', function () {
   var userId;
   var aUser = {
     username: 'devtest@arctouch.com',
-    password: 'password',
+    password: 'Password1',
     firstName: 'Dev',
     lastName: 'Test',
     birthday: '1968-12-02'
@@ -186,7 +186,7 @@ describe('AuthController - Sign in', function () {
   it('Using correct credentials, should receive a user information', function (done) {
     var credentials = {
       username: 'devtest@arctouch.com',
-      password: 'password'
+      password: 'Password1'
     };
 
     user1.post(BASE_URL + '/signin')
@@ -210,7 +210,7 @@ describe('AuthController - Sign in', function () {
   it('Using wrong credentials, should receive an error message', function (done) {
     var credentials = {
       username: 'devtest2@arctouch.com',
-      password: 'password'
+      password: 'Password1'
     };
 
     user1.post(BASE_URL + '/signin')
@@ -229,7 +229,7 @@ describe('AuthController - Sign in', function () {
 
   it('Without send username, should receive an error message', function (done) {
     var credentials = {
-      password: 'password'
+      password: 'Password1'
     };
 
     user1.post(BASE_URL + '/signin')
@@ -275,7 +275,7 @@ describe('AuthController - Policy test', function () {
 
   var aUser = {
     username: 'devtest@arctouch.com',
-    password: 'password',
+    password: 'Password1',
     firstName: 'Dev',
     lastName: 'Test',
     birthday: '1968-12-02'
@@ -283,7 +283,7 @@ describe('AuthController - Policy test', function () {
 
   var bUser = {
     username: 'devtest2@arctouch.com',
-    password: 'password2',
+    password: 'Password2',
     firstName: 'Dev2',
     lastName: 'Test2',
     birthday: '1968-12-02'
