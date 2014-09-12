@@ -37,18 +37,18 @@ exports.register = function (request, response, next) {
 
   if (!userModel.username) {
     request.flash('error', 'Error.Passport.Username.Missing');
-    return next(new Error('No username was entered.'));
+    return next('No username was entered.');
   }
 
   var password = userModel.password;
 
   if (!password) {
     request.flash('error', 'Error.Passport.Password.Missing');
-    return next(new Error('No password was entered.'));
+    return next('No password was entered.');
   }
-
   if (!password.match(PASSWORD_REGEX)) {
-    return next(new Error('Password must have at least eight characters, one uppercase letter and one lowercase letter and one number.'));
+    request.flash('error', 'Error.Passport.Password.Missing');
+    return next('Password must have at least eight characters, one uppercase letter and one lowercase letter and one number.');
   }
 
   this.createUser(userModel, next);

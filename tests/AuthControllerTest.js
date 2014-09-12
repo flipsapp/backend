@@ -51,12 +51,12 @@ describe('AuthController - Using correct params', function () {
   });
 });
 
-describe('AuthController - Sign up missing password', function () {
+describe('AuthController - Signing up with wrong requests', function () {
 
   var user1 = request.agent();
   var userId;
 
-  it('Should receive an error message', function (done) {
+  it('Requesting with missing password, should receive an error message', function (done) {
     var aUser = {
       username: 'devtest@arctouch.com',
       firstName: 'Dev',
@@ -79,14 +79,9 @@ describe('AuthController - Sign up missing password', function () {
         done();
       });
   });
-});
 
-describe('AuthController - Sign up missing username', function () {
+  it('Requesting with missing username, should receive an error message', function (done) {
 
-  var user1 = request.agent();
-  var userId;
-
-  it('Should receive an error message', function (done) {
     var aUser = {
       password: 'Password1',
       firstName: 'Dev',
@@ -109,14 +104,8 @@ describe('AuthController - Sign up missing username', function () {
         done();
       });
   });
-});
 
-describe('AuthController - User < 13 years old', function () {
-
-  var user1 = request.agent();
-  var userId;
-
-  it('Should receive an error message', function (done) {
+  it('Requesting with user < 13 years old, should receive an error message', function (done) {
     var aUser = {
       username: 'devtest@arctouch.com',
       password: 'Password1',
@@ -137,6 +126,107 @@ describe('AuthController - User < 13 years old', function () {
         assert.equal(res.status, 400);
         assert.equal(res.body.error, "Error signing up user");
         assert.equal(res.body.details, "You must have at least 13 years old.");
+
+        done();
+      });
+  });
+
+  it('Requesting a password without uppercase letter, should receive an error message', function (done) {
+    var aUser = {
+      username: 'devtest@arctouch.com',
+      password: 'password1',
+      firstName: 'Dev',
+      lastName: 'Test',
+      birthday: '1970-12-02'
+    };
+    user1.post(BASE_URL + '/signup')
+      .send(aUser)
+      .end(function (err, res) {
+        if (err) {
+          throw err;
+        }
+
+        var body = res.body;
+        assert.equal(res.status, 400);
+        assert.equal(body.error, 'Error signing up user');
+        assert.equal(body.details, 'Password must have at least eight characters, one uppercase letter and one lowercase letter and one number.');
+
+        done();
+      });
+  });
+
+  it('Requesting a password without lowercase letter, should receive an error message', function (done) {
+    var aUser = {
+      username: 'devtest@arctouch.com',
+      password: 'PASSWORD1',
+      firstName: 'Dev',
+      lastName: 'Test',
+      birthday: '1970-12-02'
+    };
+    user1.post(BASE_URL + '/signup')
+      .send(aUser)
+      .end(function (err, res) {
+        if (err) {
+          throw err;
+        }
+
+        var body = res.body;
+
+        assert.equal(body.error, 'Error signing up user');
+        assert.equal(body.details, 'Password must have at least eight characters, one uppercase letter and one lowercase letter and one number.');
+        assert.equal(res.status, 400);
+
+        done();
+      });
+  });
+
+  it('Requesting a password without a number, should receive an error message', function (done) {
+    var aUser = {
+      username: 'devtest@arctouch.com',
+      password: 'PasswordA',
+      firstName: 'Dev',
+      lastName: 'Test',
+      birthday: '1970-12-02'
+    };
+    user1.post(BASE_URL + '/signup')
+      .send(aUser)
+      .end(function (err, res) {
+        if (err) {
+          throw err;
+        }
+
+        var body = res.body;
+
+        assert.equal(body.error, 'Error signing up user');
+        assert.equal(body.details, 'Password must have at least eight characters, one uppercase letter and one lowercase letter and one number.');
+        assert.equal(res.status, 400);
+
+
+        done();
+      });
+  });
+
+  it('Requesting a password less than eight characters, should receive an error message', function (done) {
+    var aUser = {
+      username: 'devtest@arctouch.com',
+      password: 'PaS1',
+      firstName: 'Dev',
+      lastName: 'Test',
+      birthday: '1970-12-02'
+    };
+    user1.post(BASE_URL + '/signup')
+      .send(aUser)
+      .end(function (err, res) {
+        if (err) {
+          throw err;
+        }
+
+        var body = res.body;
+
+        assert.equal(body.error, 'Error signing up user');
+        assert.equal(body.details, 'Password must have at least eight characters, one uppercase letter and one lowercase letter and one number.');
+        assert.equal(res.status, 400);
+
 
         done();
       });
@@ -382,4 +472,3 @@ describe('AuthController - Policy test', function () {
       });
   });
 });
-
