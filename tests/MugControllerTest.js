@@ -10,7 +10,7 @@ describe('MugController', function () {
   before(function (done) {
     var aUser = {
       username: 'devtest@arctouch.com',
-      password: 'password',
+      password: 'Password1',
       firstName: 'Dev',
       lastName: 'Test',
       birthday: '1968-12-02'
@@ -25,7 +25,7 @@ describe('MugController', function () {
         userId = createdUser.id;
         assert.equal(res.status, 201);
         assert.equal(createdUser.username, 'devtest@arctouch.com');
-        assert.equal(createdUser.password, 'password');
+        assert.equal(createdUser.password, 'Password1');
         assert.equal(createdUser.firstName, 'Dev');
         assert.equal(createdUser.lastName, 'Test');
         assert.equal(createdUser.birthday.substring(0, 10), '1968-12-02');
@@ -39,7 +39,7 @@ describe('MugController', function () {
             assert.equal(res.status, 200);
             var aUser = {
               username: 'devtest1@arctouch.com',
-              password: 'password',
+              password: 'Password1',
               firstName: 'Dev1',
               lastName: 'Test1',
               birthday: '1968-12-02'
@@ -54,7 +54,7 @@ describe('MugController', function () {
                 user2Id = createdUser.id;
                 assert.equal(res.status, 201);
                 assert.equal(createdUser.username, 'devtest1@arctouch.com');
-                assert.equal(createdUser.password, 'password');
+                assert.equal(createdUser.password, 'Password1');
                 assert.equal(createdUser.firstName, 'Dev1');
                 assert.equal(createdUser.lastName, 'Test1');
                 assert.equal(createdUser.birthday.substring(0, 10), '1968-12-02');

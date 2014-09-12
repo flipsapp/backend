@@ -7,7 +7,7 @@ describe('User Controller', function () {
   var userId;
   var aUser = {
     username: 'usercontroller@arctouch.com',
-    password: 'password',
+    password: 'Password1',
     firstName: 'Dev',
     lastName: 'Test',
     birthday: '1968-12-02'
