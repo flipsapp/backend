@@ -21,7 +21,9 @@ var DeviceController = {
     Device.findOne(deviceId)
       .exec(function (error, device) {
         if (error) {
-          return response.send(500, new MugError('Error retrieving the device.', error.details));
+          var errmsg = new MugError('Error retrieving the device.', error.details);
+          logger.error(errmsg);
+          return response.send(500, errmsg);
         }
 
         if (!device) {
@@ -55,7 +57,9 @@ var DeviceController = {
     Device.create(device)
       .exec(function (err, device) {
         if (err) {
-          return response.send(500, new MugError('Error creating device.', err.details));
+          var errmsg = new MugError('Error creating device.', err.details);
+          logger.error(errmsg);
+          return response.send(500, errmsg);
         }
 
         if (!device) {
@@ -91,7 +95,9 @@ var DeviceController = {
       .exec(function (error, device) {
 
         if (error) {
-          return response.send(500, new MugError('Error retrieving device.', err.details));
+          var errmsg = new MugError('Error retrieving the device.', error.details);
+          logger.error(errmsg);
+          return response.send(500, errmsg);
         }
 
         if (!device) {
@@ -137,7 +143,6 @@ var sendVerificationCode = function(device) {
   device.save();
 
   twilioService.sendSms(device.phoneNumber, message, function (err, message) {
-    //TODO Change to a better Logger
-    console.log(err || message);
+    logger.info(err || message);
   });
 };

@@ -40,7 +40,9 @@ var MugController = {
     }
     s3service.upload(request.file('background'), s3service.BACKGROUND_BUCKET, function (err, uploadedFiles) {
       if (err) {
-        return response.send(500, new MugError('Error trying to upload background file to S3', err));
+        var errmsg = new MugError('Error trying to upload background file to S3', err);
+        logger.error(errmsg);
+        return response.send(500, errmsg);
       }
       if (!uploadedFiles || uploadedFiles.length < 1) {
         return response.send(400, new MugError('Error trying to upload background file to S3', err));
@@ -55,7 +57,9 @@ var MugController = {
     }
     s3service.upload(request.file('sound'), s3service.SOUND_BUCKET, function (err, uploadedFiles) {
       if (err) {
-        return response.send(500, new MugError('Error trying to upload audio file to S3', err));
+        var errmsg = new MugError('Error trying to upload audio file to S3', err);
+        logger.error(errmsg);
+        return response.send(500, errmsg);
       }
       if (!uploadedFiles || uploadedFiles.length < 1) {
         return response.send(400, new MugError('Error trying to upload audio file to S3', err));
@@ -70,14 +74,18 @@ var MugController = {
     }
     s3service.upload(request.file('background'), s3service.BACKGROUND_BUCKET, function (err, uploadedFiles) {
       if (err) {
-        return response.send(500, new MugError('Error trying to upload background file to S3', err));
+        var errmsg = new MugError('Error trying to upload background file to S3', err);
+        logger.error(errmsg);
+        return response.send(500, errmsg);
       }
       if (!uploadedFiles || uploadedFiles.length < 1) {
         return response.send(400, new MugError('Error trying to upload background file to S3', err));
       }
       Mug.findOne(request.params.mug_id).populate('owner').exec(function (err, mug) {
         if (err) {
-          return response.send(500, new MugError('Error trying to retrieve Mug', err));
+          var errmsg = new MugError('Error trying to retrieve Mug', err);
+          logger.error(errmsg);
+          return response.send(500, errmsg);
         }
         if (!mug) {
           return response.send(404, new MugError('Mug not found'));
@@ -88,7 +96,9 @@ var MugController = {
         mug.backgroundURL = uploadedFiles[0].extra.Location;
         mug.save(function (err) {
           if (err) {
-            return response.send(500, new MugError('Error trying to save Mug', err));
+            var errmsg = new MugError('Error trying to save Mug', err);
+            logger.error(errmsg);
+            return response.send(500, errmsg);
           }
           return response.send(200, mug);
         });
@@ -102,14 +112,18 @@ var MugController = {
     }
     s3service.upload(request.file('sound'), s3service.SOUND_BUCKET, function (err, uploadedFiles) {
       if (err) {
-        return response.send(500, new MugError('Error trying to upload audio file to S3', err));
+        var errmsg = new MugError('Error trying to upload audio file to S3', err);
+        logger.error(errmsg);
+        return response.send(500, errmsg);
       }
       if (!uploadedFiles || uploadedFiles.length < 1) {
         return response.send(400, new MugError('Error trying to upload audio file to S3', err));
       }
       Mug.findOne(request.params.mug_id).populate('owner').exec(function (err, mug) {
         if (err) {
-          return response.send(500, new MugError('Error trying to retrieve Mug', err));
+          var errmsg = new MugError('Error trying to retrieve Mug', err);
+          logger.error(errmsg);
+          return response.send(500, errmsg);
         }
         if (!mug) {
           return response.send(404, new MugError('Mug not found'));
@@ -121,7 +135,9 @@ var MugController = {
         mug.soundURL = uploadedFiles[0].extra.Location;
         mug.save(function (err) {
           if (err) {
-            return response.send(500, new MugError('Error trying to save Mug', err));
+            var errmsg = new MugError('Error trying to save Mug', err);
+            logger.error(errmsg);
+            return response.send(500, errmsg);
           }
           return response.send(200, mug);
         });
@@ -138,7 +154,9 @@ var MugController = {
     }
     Mug.find(whereClause).exec(function (err, mugs) {
       if (err) {
-        return response.send(500, new MugError('Error trying to retrieve mugs', err));
+        var errmsg = new MugError('Error trying to retrieve mugs', err);
+        logger.error(errmsg);
+        return response.send(500, errmsg);
       }
       if (!mugs) {
         return response.send(404, new MugError('Mugs not found'));
@@ -150,7 +168,9 @@ var MugController = {
   mugById: function (request, response) {
     Mug.findOne({id: request.params.mug_id, owner: request.params.user_id}).exec(function (err, mug) {
       if (err) {
-        return response.send(500, new MugError('Error trying to retrieve mug', err));
+        var errmsg = new MugError('Error trying to retrieve mugs', err);
+        logger.error(errmsg);
+        return response.send(500, errmsg);
       }
       if (!mug) {
         return response.send(404, new MugError('Mug not found'));
@@ -171,7 +191,9 @@ var MugController = {
     }
     Mug.find(whereClause).exec(function (err, mugs) {
       if (err) {
-        return response.send(500, new MugError('Error trying to retrieve mugs', err));
+        var errmsg = new MugError('Error trying to retrieve mugs', err);
+        logger.error(errmsg);
+        return response.send(500, errmsg);
       }
       if (!mugs) {
         return response.send(404, new MugError('Mugs not found'));
