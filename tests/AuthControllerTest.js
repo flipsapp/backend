@@ -2,6 +2,7 @@ var request = require('superagent');
 var assert = require('assert');
 var bootstrap = require('./bootstrap')();
 var BASE_URL = 'http://localhost:1337';
+var moment = require('moment');
 
 describe('AuthController - Using correct params', function () {
 
@@ -105,14 +106,15 @@ describe('AuthController - Signing up with wrong requests', function () {
       });
   });
 
-  it('Requesting with user < 13 years old, should receive an error message', function (done) {
+  it('Requesting with user 12 years old, should receive an error message', function (done) {
     var aUser = {
-      username: 'devtest@arctouch.com',
+      username: 'tooyoung@arctouch.com',
       password: 'Password1',
       firstName: 'Dev',
       lastName: 'Test',
-      birthday: '2002-12-02'
+      birthday: moment().subtract(12, 'years').format('YYYY-MM-DD')
     };
+
     user1.post(BASE_URL + '/signup')
       .send(aUser)
       .end(function (err, res) {
@@ -123,6 +125,30 @@ describe('AuthController - Signing up with wrong requests', function () {
         var createdUser = res.body;
 
         userId = createdUser.id;
+        assert.equal(res.status, 400);
+        assert.equal(res.body.error, "Error signing up user");
+        assert.equal(res.body.details, "You must have at least 13 years old.");
+
+        done();
+      });
+  });
+
+  it('Requesting with user with 13 years + 1 day, should receive an error message', function (done) {
+    var aUser = {
+      username: 'tomorrowismybirthday@arctouch.com',
+      password: 'Password1',
+      firstName: 'Dev',
+      lastName: 'Test',
+      birthday: moment().subtract(13, 'years').add(1, 'days').format('YYYY-MM-DD')
+    };
+
+    user1.post(BASE_URL + '/signup')
+      .send(aUser)
+      .end(function (err, res) {
+        if (err) {
+          throw err;
+        }
+
         assert.equal(res.status, 400);
         assert.equal(res.body.error, "Error signing up user");
         assert.equal(res.body.details, "You must have at least 13 years old.");

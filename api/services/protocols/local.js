@@ -1,5 +1,6 @@
 var validator = require('validator')
-  , actionUtil = requires('>/node_modules/sails/lib/hooks/blueprints/actionUtil');
+  , actionUtil = requires('>/node_modules/sails/lib/hooks/blueprints/actionUtil')
+  , moment    = require('moment');
 
 /**
  * Local Authentication Protocol
@@ -109,10 +110,6 @@ exports.login = function (req, identifier, password, next) {
 exports.createUser = function(userModel, next) {
   checkAge(userModel, function(err, age) {
 
-    if (age < MINIMAL_AGE) {
-      return next('You must have at least 13 years old.');
-    }
-
     if (err) {
       return next(err);
     }
@@ -145,11 +142,15 @@ exports.createUser = function(userModel, next) {
 
 var checkAge = function(userModel, callback) {
   try {
-    var birthday = new Date(userModel.birthday);
-    var diff = new Date() - new Date(birthday);
-    var diffInDays = diff / 1000 / (60 * 60 * 24);
-    var age = Math.floor(diffInDays / 365.25);
-    callback(null, age);
+    var birthday = moment(userModel.birthday);
+    var now = moment();
+    var difference = now.diff(birthday, 'years');
+
+    if (difference < MINIMAL_AGE) {
+      callback('You must have at least 13 years old.', null);
+    }
+
+    callback(null, userModel);
   } catch (err) {
     callback(err);
   }
