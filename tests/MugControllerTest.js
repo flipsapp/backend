@@ -333,7 +333,7 @@ describe('MugController', function () {
       })
   });
 
-  it('should return an error when no file is attached when uploading a background file', function (done) {
+  it('should return an error when no finpm installe is attached when uploading a background file', function (done) {
     user1.post('http://localhost:1337/background')
       .end(function (err, res) {
         if (err) {

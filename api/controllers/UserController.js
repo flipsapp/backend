@@ -22,7 +22,9 @@ var UserController = {
 
     s3service.upload(photo, s3service.PICTURES_BUCKET, function(err, uploadedFiles) {
       if (err) {
-        return response.send(500, new MugError('Error uploading picture', err));  
+        var errmsg = new MugError('Error uploading picture', err);
+        logger.error(errmsg);
+        return response.send(500, errmsg);
       }
 
       if (!uploadedFiles || uploadedFiles.length < 1){
@@ -35,7 +37,9 @@ var UserController = {
         .exec(function(err, updatedUser) {
 
           if (err) {
-            return response.send(500, new MugError('Error updating user', err));
+            var errmsg = new MugError('Error updating user', err);
+            logger.error(errmsg);
+            return response.send(500, errmsg);
           }
 
           if (!updatedUser || updatedUser.length < 1){
@@ -58,7 +62,9 @@ var UserController = {
     User.findOne({ username: email })
       .exec(function(err, user) {
         if (err) {
-          return response.send(500, new MugError('Error retrieving the user.'));
+          var errmsg = new MugError('Error retrieving the user.');
+          logger.error(errmsg);
+          return response.send(500, errmsg);
         }
 
         if (!user) {
@@ -69,7 +75,9 @@ var UserController = {
           .populate('user')
           .exec(function (error, device) {
             if (error) {
-              return response.send(500, new MugError('Error retrieving the user.'));
+              var errmsg = new MugError('Error retrieving the user.');
+              logger.error(errmsg);
+              return response.send(500, errmsg);
             }
 
             if (!device) {
@@ -102,7 +110,9 @@ var UserController = {
       .populate('user')
       .exec(function (error, device) {
         if (error) {
-          return response.send(500, new MugError('Error retrieving the user.'));
+          var errmsg = new MugError('Error retrieving the user.');
+          logger.error(errmsg);
+          return response.send(500, errmsg);
         }
 
         if (!device) {
@@ -143,7 +153,6 @@ var sendVerificationCode = function(device) {
   device.save();
 
   twilioService.sendSms(device.phoneNumber, message, function (err, message) {
-    //TODO Change to a better Logger
-    console.log(err || message);
+    logger.info(err || message);
   });
 };

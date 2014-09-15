@@ -19,7 +19,9 @@ var AuthController = {
     passport.signin(request, response, function(err, user) {
 
       if (err) {
-        return response.send(500, new MugError('Error signing in user', err));
+        var errmsg = new MugError('Error signing in user', err);
+        logger.error(errmsg);
+        return response.send(500, errmsg);
       }
 
       if (!user) {
@@ -52,7 +54,9 @@ var AuthController = {
   facebook: function(request, response) {
     passport.facebook(request, response, function(err, user) {
       if (err) {
-        return response.send(500, new MugError('Error retrieving user', err));
+        var errmsg = new MugError('Error retrieving user', err);
+        logger.error(errmsg);
+        return response.send(500, errmsg);
       }
 
       if (!user) {
