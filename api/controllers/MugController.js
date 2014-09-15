@@ -35,7 +35,7 @@ var MugController = {
   },
 
   uploadBackground: function (request, response) {
-    if (!request.file('background')) {
+    if (!request.file('background') || request.file('background')._files.length < 1) {
       return response.send(400, new MugError('No background file to upload'));
     }
     s3service.upload(request.file('background'), s3service.BACKGROUND_BUCKET, function (err, uploadedFiles) {
@@ -50,7 +50,7 @@ var MugController = {
   },
 
   uploadSound: function (request, response) {
-    if (!request.file('sound')) {
+    if (!request.file('sound') || request.file('sound')._files.length < 1) {
       return response.send(400, new MugError('No sound file to upload'));
     }
     s3service.upload(request.file('sound'), s3service.SOUND_BUCKET, function (err, uploadedFiles) {
@@ -65,7 +65,7 @@ var MugController = {
   },
 
   updateBackground: function (request, response) {
-    if (!request.file('background')) {
+    if (!request.file('background') || request.file('background')._files.length < 1) {
       return response.send(400, new MugError('No background file to upload'));
     }
     s3service.upload(request.file('background'), s3service.BACKGROUND_BUCKET, function (err, uploadedFiles) {
@@ -97,7 +97,7 @@ var MugController = {
   },
 
   updateSound: function (request, response) {
-    if (!request.file('sound')) {
+    if (!request.file('sound') || request.file('sound')._files.length < 1) {
       return response.send(400, new MugError('No sound file to upload'));
     }
     s3service.upload(request.file('sound'), s3service.SOUND_BUCKET, function (err, uploadedFiles) {

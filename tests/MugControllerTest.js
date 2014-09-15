@@ -308,7 +308,6 @@ describe('MugController', function () {
   });
 
   it('should upload a sound file', function (done) {
-    this.timeout(5000);
     user1.post('http://localhost:1337/sound')
       .attach('sound', './tests/fixtures/arctouch.wav')
       .end(function (err, res) {
@@ -323,8 +322,29 @@ describe('MugController', function () {
       })
   });
 
+  it('should return an error when no file is attached when uploading a sound file', function (done) {
+    user1.post('http://localhost:1337/sound')
+      .end(function (err, res) {
+        if (err) {
+          throw err;
+        }
+        assert.equal(res.status, 400, 'Response status is ' + res.status + ' and should be 400');
+        done();
+      })
+  });
+
+  it('should return an error when no file is attached when uploading a background file', function (done) {
+    user1.post('http://localhost:1337/background')
+      .end(function (err, res) {
+        if (err) {
+          throw err;
+        }
+        assert.equal(res.status, 400, 'Response status is ' + res.status + ' and should be 400');
+        done();
+      })
+  });
+
   it('should update a background file', function (done) {
-    this.timeout(5000);
     user1.put('http://localhost:1337/user/' + userId + '/mugs/1/background')
       .attach('background', './tests/fixtures/me.jpg')
       .end(function (err, res) {
@@ -340,7 +360,6 @@ describe('MugController', function () {
   });
 
   it('should update a sound file', function (done) {
-    this.timeout(5000);
     user1.put('http://localhost:1337/user/' + userId + '/mugs/1/sound')
       .attach('sound', './tests/fixtures/arctouch.wav')
       .end(function (err, res) {
@@ -354,6 +373,5 @@ describe('MugController', function () {
         done();
       })
   });
-
 
 });
