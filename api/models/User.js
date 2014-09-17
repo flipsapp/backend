@@ -4,6 +4,7 @@
  * @description :: TODO: You might write a short summary of how this model works and what it represents here.
  * @docs        :: http://sailsjs.org/#!documentation/models
  */
+var bcrypt = require('bcrypt');
 
 var User = {
 
@@ -42,6 +43,10 @@ var User = {
       type: 'string'
     },
 
+    pubnubId: {
+      type: 'string'
+    },
+
     mugs: {
       collection: 'Mug',
       via: 'owner'
@@ -56,7 +61,6 @@ var User = {
       collection: 'Room',
       via: 'users'
     },
-
     contacts: {
       collection: 'User',
       via: 'hasMeAsContact',
@@ -67,6 +71,13 @@ var User = {
       collection: 'User',
       via: 'contacts'
     }
+  },
+
+  beforeCreate: function (user, next) {
+    bcrypt.hash(user.username, 10, function (err, hash) {
+      user.pubnubId = hash.replace("/", "");
+      next();
+    });
   }
 };
 
