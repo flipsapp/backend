@@ -38,16 +38,16 @@ var RoomController = {
     room.participants = participants;
 
     Room.create(room)
-      .exec(function(error, room) {
+      .exec(function(error, newRoom) {
         if (error) {
           return response.send(500, new MugError('Server error creating Room', err.details));
         }
 
-        if (!room) {
+        if (!newRoom) {
           return response.send(400, new MugError('Request error creating Room', 'Room returned empty'));
         }
 
-        Room.findOne(room.id)
+        Room.findOne(newRoom.id)
           .populate('participants')
           .exec(function(error, populatedRoom) {
             if (error) {
