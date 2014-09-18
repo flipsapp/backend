@@ -9,23 +9,21 @@ var Room = {
 
   attributes: {
 
-    jabberID: {
-      type: 'string',
-      required: true,
-      unique: true
-    },
-
-    nickname: {
+    name: {
       type: 'string',
       required: true
     },
 
-    users : {
+    admin: {
+      model: 'User',
+      required: true
+    },
+
+    participants : {
       collection: 'User',
       via: 'rooms',
       dominant: true
     }
-
   }
 
 };

@@ -142,7 +142,7 @@ exports.createUser = function(userModel, next) {
 
 var checkAge = function(userModel, callback) {
   try {
-    var birthday = moment(userModel.birthday);
+    var birthday = moment(userModel.birthday, "YYYY/MM/DD");
     var now = moment();
     var difference = now.diff(birthday, 'years');
 
