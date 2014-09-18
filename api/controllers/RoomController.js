@@ -13,7 +13,7 @@ var RoomController = {
     var room = actionUtil.parseValues(request);
 
     if (!room) {
-      return response.send(400, new MugError('Error creating Room'));
+      return response.send(400, new MugError('Error creating Room', 'Missing parameters.'));
     }
 
     var admin = room.parentid;
