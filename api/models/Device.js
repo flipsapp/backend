@@ -23,7 +23,7 @@ module.exports = {
       required: true
     },
 
-    uuid: {
+    uuid: {  // APNS token or GCM registration_id
       type: 'string'
     },
 

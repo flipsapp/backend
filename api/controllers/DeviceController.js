@@ -6,7 +6,6 @@
  */
 
 var actionUtil = requires('>/node_modules/sails/lib/hooks/blueprints/actionUtil');
-
 var MAX_RETRY_COUNT = 2;
 
 var DeviceController = {
@@ -66,9 +65,14 @@ var DeviceController = {
           return response.send(400, new MugError('Error creating device.', 'Device returned empty.'));
         }
 
-        sendVerificationCode(device);
+        PubnubGateway.addDeviceToPushNotification(device.uuid, device.uuid, device.platform, function(err, channel) {
+          if (err) {
+            return response.send(500, new MugError(err));
+          }
+          sendVerificationCode(device);
+          return response.send(201, device);
+        });
 
-        return response.send(201, device);
       }
     );
   },
