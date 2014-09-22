@@ -59,8 +59,9 @@ var User = {
 
     rooms: {
       collection: 'Room',
-      via: 'users'
+      via: 'participants'
     },
+
     contacts: {
       collection: 'User',
       via: 'hasMeAsContact',
