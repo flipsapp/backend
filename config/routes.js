@@ -47,6 +47,11 @@ module.exports.routes = {
   'GET    /user/:parentid/devices/:id'            : 'DeviceController.findOne',
   'POST   /user/:parentid/devices/:id/verify'     : 'DeviceController.verify',
 
+  'POST   /user/:parentid/rooms'                  : 'RoomController.create',
+  'GET    /user/:parentid/rooms/:id'              : 'RoomController.findOne',
+  'PUT    /user/:parentid/rooms/:id/participants' : 'RoomController.updateParticipants',
+  'PUT    /user/:parentid/rooms/:id'              : 'RoomController.update',
+
   'POST   /background'                            : 'MugController.uploadBackground',
   'POST   /sound'                                 : 'MugController.uploadSound'
 

@@ -33,7 +33,8 @@ module.exports.policies = {
     verify: true,
     uploadPhoto: ['passport', 'owner'],
     update: ['passport', 'owner'],
-    findOne: ['passport', 'owner']
+    findOne: ['passport', 'owner'],
+    populate: ['passport', 'owner']
   },
 
 	MugController: {
@@ -51,5 +52,12 @@ module.exports.policies = {
     findOne: ['passport', 'owner', 'deviceOwner'],
     create : ['passport', 'owner'],
     verify : ['passport']
+  },
+
+  RoomController: {
+    create: ['passport', 'owner'],
+    updateParticipants: ['passport', 'owner'],
+    update: ['passport', 'owner'],
+    destroy: ['passport', 'owner']
   }
 };
