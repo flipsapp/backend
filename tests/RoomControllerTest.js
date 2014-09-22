@@ -1,6 +1,7 @@
 var request = require('superagent');
 var assert = require('assert');
 var BASE_URL = 'http://localhost:1337';
+var jwt = require('jwt-simple');
 
 describe('Room Controller', function () {
   var user1 = request.agent();
@@ -104,7 +105,42 @@ describe('Room Controller', function () {
           assert.equal(room.admin, userId);
           assert.equal(room.participants.length, 1);
           assert.equal(room.participants[0].id, userId);
+          assert.notEqual(room.pubnubId, null);
           assert.notEqual(room.id, null);
+
+          roomId = room.id;
+
+          user1.del(BASE_URL + '/user/' + userId + 'rooms/' + roomId)
+            .end(function (err, res) {
+              if (err) {
+                throw err;
+              }
+
+              done();
+
+            });
+        });
+    });
+
+    it('When using correct fields, pubnubId must be valid', function (done) {
+      var roomId;
+
+      user1.post(BASE_URL + '/user/' + userId + "/rooms")
+        .send({ name: "Room 1" })
+        .end(function (err, res) {
+          if (err) {
+            throw err;
+          }
+          
+          var room = res.body;
+
+          assert.equal(res.status, 201);
+          assert.notEqual(room.id, null);
+          assert.notEqual(room.pubnubId, null);
+
+          var decoded = jwt.decode(room.pubnubId, process.env.JWT_SECRET);
+          assert.equal(decoded.name, room.name);
+          assert.equal(decoded.admin, room.admin);
 
           roomId = room.id;
 
