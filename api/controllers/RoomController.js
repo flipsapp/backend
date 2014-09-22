@@ -6,6 +6,7 @@
  */
 
 var actionUtil = requires('>/node_modules/sails/lib/hooks/blueprints/actionUtil');
+var jwt = require('jwt-simple');
 
 var RoomController = {
 
@@ -27,6 +28,8 @@ var RoomController = {
     }
 
     room.admin = admin;
+    room.pubnubId = jwt.encode({ name: room.name, admin: admin, timestamp: new Date() }, process.env.JWT_SECRET);
+
     var participants = room.participants;
 
     if (!participants || participants.length < 1) {
@@ -40,7 +43,7 @@ var RoomController = {
     Room.create(room)
       .exec(function(error, newRoom) {
         if (error) {
-          return response.send(500, new MugError('Server error creating Room', err.details));
+          return response.send(500, new MugError('Server error creating Room', error.details));
         }
 
         if (!newRoom) {

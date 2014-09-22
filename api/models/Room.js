@@ -23,6 +23,11 @@ var Room = {
       collection: 'User',
       via: 'rooms',
       dominant: true
+    },
+
+    pubnubId: {
+      type: 'string',
+      unique: true
     }
   }
 
