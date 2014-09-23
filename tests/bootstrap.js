@@ -58,7 +58,7 @@ var start = function () {
       });
 
       sinon.stub(app.services.pubnubgateway, 'addDeviceToPushNotification', function(token, channel, type, callback) {
-        callback(null, { status: "Sent" });
+        callback(null, channel);
       });
 
       done(err, sails);

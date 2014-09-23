@@ -35,24 +35,18 @@ var DeviceController = {
   },
 
   create: function (request, response) {
-
     var user = request.params.parentid;
     var device = actionUtil.parseValues(request);
-
     if (!user) {
       return response.send(400, new MugError('Missing parameter [User Id].'));
     }
-
     if (!device.platform) {
       return response.send(400, new MugError('Missing parameter [Device platform].'));
     }
-
     if (!device.phoneNumber) {
       return response.send(400, new MugError('Missing parameter [Device phone number].'));
     }
-
     device.user = user;
-
     Device.create(device)
       .exec(function (err, device) {
         if (err) {
@@ -60,11 +54,9 @@ var DeviceController = {
           logger.error(errmsg);
           return response.send(500, errmsg);
         }
-
         if (!device) {
           return response.send(400, new MugError('Error creating device.', 'Device returned empty.'));
         }
-
         PubnubGateway.addDeviceToPushNotification(device.uuid, device.uuid, device.platform, function(err, channel) {
           if (err) {
             return response.send(500, new MugError(err));
