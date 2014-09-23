@@ -42,7 +42,9 @@
     "skipper-s3": "^0.5.4",
     "twilio": "^1.7.0",
     "validator": "^3.17.1",
-    "winston": "~0.7.3"
+    "winston": "~0.7.3",
+    "pubnub": "~3.6.7",
+    "request": "~2.44.0"
   },
   "author": "ArcTouch Inc.",
   "license": "ISC",

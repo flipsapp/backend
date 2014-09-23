@@ -54,7 +54,7 @@ describe('Device Controller', function () {
       var aDevice = {
         phoneNumber: '+554898010707',
         platform: 'ios',
-        uuid: 'ABCDEF-GHIJKL'
+        uuid: '0f744707bebcf74f9b7c25d48e3358945f6aa01da5ddb387462c7eaf61bbad78'
       };
 
       user1.post(BASE_URL + '/user/'+userId+"/devices")

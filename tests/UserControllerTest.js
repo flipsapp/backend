@@ -106,7 +106,7 @@ describe('User Controller', function () {
       var device = {
         phoneNumber: '+1234567890',
         platform: 'ios',
-        uuid: 'ABCDEF-GHIJKL'
+        uuid: '0f744707bebcf74f9b7c25d48e3358945f6aa01da5ddb387462c7eaf61bbad78'
       };
 
       user1.post(BASE_URL + '/user/' + userId + "/devices")
@@ -222,13 +222,13 @@ describe('User Controller', function () {
     var device = {
       phoneNumber: '+1111111111',
       platform: 'ios',
-      uuid: 'ABCDEF-GHIJKL'
+      uuid: '0f744707bebcf74f9b7c25d48e3358945f6aa01da5ddb387462c7eaf61bbad78'
     };
 
     var otherdevice = {
       phoneNumber: '+2222222222',
       platform: 'ios',
-      uuid: 'ABCDEF-GHIJKL'
+      uuid: '0f744707bebcf74f9b7c25d48e3358945f6aa01da5ddb387462c7eaf61bbad79'
     };
 
     before(function (done) {
