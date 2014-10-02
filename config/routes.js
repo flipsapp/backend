@@ -46,6 +46,7 @@ module.exports.routes = {
   'POST   /user/:parentid/devices'                : 'DeviceController.create',
   'GET    /user/:parentid/devices/:id'            : 'DeviceController.findOne',
   'POST   /user/:parentid/devices/:id/verify'     : 'DeviceController.verify',
+  'POST   /user/:parentid/devices/:id/resend'     : 'DeviceController.resendVerificationCode',
 
   'POST   /user/:parentid/rooms'                  : 'RoomController.create',
   'GET    /user/:parentid/rooms/:id'              : 'RoomController.findOne',
