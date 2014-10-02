@@ -55,7 +55,6 @@ passport.facebook = function(request, response, next) {
             facebookID: fbProfile.id,
             firstName : fbProfile.first_name,
             lastName  : fbProfile.last_name,
-            birthday : fbProfile.birthday,
             photoUrl  : fbProfile.picture.data.url
           };
 

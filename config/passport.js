@@ -24,8 +24,8 @@ module.exports.passport = {
     name: 'Facebook',
     protocol: 'oauth2',
     options: {
-      clientID: '1453104728312261',
-      clientSecret: 'bd84e5d8082b0ce5068b333810a4fa51'
+      clientID: '338424696329576',
+      clientSecret: '975b64d446111c82860cfa32febc45ac'
     }
   }
 };
