@@ -21,10 +21,10 @@ passport.callback = function (req, res, next) {
 };
 
 passport.facebook = function(request, response, next) {
-  var accessToken = request.headers['access_token'] || request.headers['token'];
+  var acess_token = request.headers['facebook_access_token'];
   var facebookConfig = sails.config.passport.facebook.options;
 
-  logger.info('Trying to authenticate with Facebook using token ['+accessToken+']');
+  logger.info('Trying to authenticate with Facebook using token ['+acess_token+']');
   logger.info('Headers ['+JSON.stringify(request.headers)+']');
 
   if (!accessToken) {
@@ -33,7 +33,7 @@ passport.facebook = function(request, response, next) {
 
   FB.api('/me', {
     fields: ['id', 'first_name', 'last_name', 'birthday', 'age_range', 'email', 'picture.width(160)'],
-    access_token: accessToken,
+    access_token: acess_token,
     client_id: facebookConfig.clientID,
     client_secret: facebookConfig.clientSecret
   }, function (fbProfile) {
