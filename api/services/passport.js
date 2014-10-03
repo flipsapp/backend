@@ -21,7 +21,7 @@ passport.callback = function (req, res, next) {
 };
 
 passport.facebook = function(request, response, next) {
-  var accessToken = request.headers['access_token'];
+  var accessToken = request.headers['access_token'] || request.headers['token'];
   var facebookConfig = sails.config.passport.facebook.options;
 
   logger.info('Trying to authenticate with Facebook using token ['+accessToken+']');
