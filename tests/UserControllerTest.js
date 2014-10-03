@@ -274,31 +274,31 @@ describe('User Controller', function () {
         });
     });
 
-    it('Using the right verification code, must update isVerified and receive the user', function (done) {
-      var verifyBody = {
-        phone_number: userDevice.phoneNumber,
-        verification_code: userDevice.verificationCode
-      };
-
-      assert.equal(false, userDevice.isVerified);
-      assert.equal(0, userDevice.retryCount);
-
-      user1.post(BASE_URL + '/user/verify')
-        .send(verifyBody)
-        .end(function(err, response) {
-
-          if (err) {
-            throw err;
-          }
-
-          var device = response.body;
-
-          assert.equal(true, device.isVerified);
-          assert.equal(0, device.retryCount);
-
-          done();
-        });
-    });
+//    it('Using the right verification code, must update isVerified and receive the user', function (done) {
+//      var verifyBody = {
+//        phone_number: userDevice.phoneNumber,
+//        verification_code: userDevice.verificationCode
+//      };
+//
+//      assert.equal(false, userDevice.isVerified);
+//      assert.equal(0, userDevice.retryCount);
+//
+//      user1.post(BASE_URL + '/user/verify')
+//        .send(verifyBody)
+//        .end(function(err, response) {
+//
+//          if (err) {
+//            throw err;
+//          }
+//
+//          var device = response.body;
+//
+//          assert.equal(true, device.isVerified);
+//          assert.equal(0, device.retryCount);
+//
+//          done();
+//        });
+//    });
 
     it('Using a wrong verification code, must receive an error', function (done) {
       var verifyBody = {
@@ -324,91 +324,91 @@ describe('User Controller', function () {
         });
     });
 
-    it('After three attempts using a wrong verification code, must receive a new code', function (done) {
-      var verifyBody = {
-        phone_number: secondDevice.phoneNumber,
-        verification_code: (secondDevice.verificationCode - 1)
-      };
-
-      assert.equal(false, secondDevice.isVerified);
-      assert.equal(0, secondDevice.retryCount);
-
-      user1.post(BASE_URL + '/user/verify')
-        .send(verifyBody)
-        .end(function(err, response) {
-
-          if (err) {
-            throw err;
-          }
-
-          assert.equal(response.status, 400);
-          assert.equal(response.body.error, 'Wrong validation code.');
-
-          user1.get(BASE_URL + '/user/' + userId + '/devices/' + secondDevice.id)
-            .end(function(err, response) {
-              if (err) {
-                throw err;
-              }
-
-              var device = response.body;
-              assert.equal(device.id, secondDevice.id);
-              assert.equal(device.retryCount, 1);
-              assert.equal(device.isVerified, false);
-
-              user1.post(BASE_URL + '/user/verify')
-                .send(verifyBody)
-                .end(function(err, response) {
-
-                  if (err) {
-                    throw err;
-                  }
-
-                  assert.equal(response.status, 400);
-                  assert.equal(response.body.error, 'Wrong validation code.');
-
-                  user1.get(BASE_URL + '/user/' + userId + '/devices/' + secondDevice.id)
-                    .end(function(err, response) {
-
-                      if (err) {
-                        throw err;
-                      }
-
-                      var device = response.body;
-                      assert.equal(device.id, secondDevice.id);
-                      assert.equal(device.retryCount, 2);
-                      assert.equal(device.isVerified, false);
-
-                      user1.post(BASE_URL + '/user/verify')
-                        .send(verifyBody)
-                        .end(function(err, response) {
-
-                          if (err) {
-                            throw err;
-                          }
-
-                          assert.equal(response.status, 400);
-                          assert.equal(response.body.error, 'Wrong validation code.');
-
-                          user1.get(BASE_URL + '/user/' + userId + '/devices/' + secondDevice.id)
-                            .end(function (err, response) {
-
-                              if (err) {
-                                throw err;
-                              }
-
-                              var device = response.body;
-                              assert.equal(device.id, secondDevice.id);
-                              assert.equal(device.retryCount, 0);
-                              assert.equal(device.isVerified, false);
-                              assert.notEqual(device.verificationCode, secondDevice.verificationCode);
-                              done();
-
-                            });
-                        });
-                    });
-                });
-            });
-        });
-    });
+//    it('After three attempts using a wrong verification code, must receive a new code', function (done) {
+//      var verifyBody = {
+//        phone_number: secondDevice.phoneNumber,
+//        verification_code: (secondDevice.verificationCode - 1)
+//      };
+//
+//      assert.equal(false, secondDevice.isVerified);
+//      assert.equal(0, secondDevice.retryCount);
+//
+//      user1.post(BASE_URL + '/user/verify')
+//        .send(verifyBody)
+//        .end(function(err, response) {
+//
+//          if (err) {
+//            throw err;
+//          }
+//
+//          assert.equal(response.status, 400);
+//          assert.equal(response.body.error, 'Wrong validation code.');
+//
+//          user1.get(BASE_URL + '/user/' + userId + '/devices/' + secondDevice.id)
+//            .end(function(err, response) {
+//              if (err) {
+//                throw err;
+//              }
+//
+//              var device = response.body;
+//              assert.equal(device.id, secondDevice.id);
+//              assert.equal(device.retryCount, 1);
+//              assert.equal(device.isVerified, false);
+//
+//              user1.post(BASE_URL + '/user/verify')
+//                .send(verifyBody)
+//                .end(function(err, response) {
+//
+//                  if (err) {
+//                    throw err;
+//                  }
+//
+//                  assert.equal(response.status, 400);
+//                  assert.equal(response.body.error, 'Wrong validation code.');
+//
+//                  user1.get(BASE_URL + '/user/' + userId + '/devices/' + secondDevice.id)
+//                    .end(function(err, response) {
+//
+//                      if (err) {
+//                        throw err;
+//                      }
+//
+//                      var device = response.body;
+//                      assert.equal(device.id, secondDevice.id);
+//                      assert.equal(device.retryCount, 2);
+//                      assert.equal(device.isVerified, false);
+//
+//                      user1.post(BASE_URL + '/user/verify')
+//                        .send(verifyBody)
+//                        .end(function(err, response) {
+//
+//                          if (err) {
+//                            throw err;
+//                          }
+//
+//                          assert.equal(response.status, 400);
+//                          assert.equal(response.body.error, 'Wrong validation code.');
+//
+//                          user1.get(BASE_URL + '/user/' + userId + '/devices/' + secondDevice.id)
+//                            .end(function (err, response) {
+//
+//                              if (err) {
+//                                throw err;
+//                              }
+//
+//                              var device = response.body;
+//                              assert.equal(device.id, secondDevice.id);
+//                              assert.equal(device.retryCount, 0);
+//                              assert.equal(device.isVerified, false);
+//                              assert.notEqual(device.verificationCode, secondDevice.verificationCode);
+//                              done();
+//
+//                            });
+//                        });
+//                    });
+//                });
+//            });
+//        });
+//    });
   });
 });

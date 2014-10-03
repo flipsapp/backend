@@ -39,6 +39,13 @@ module.exports = {
     retryCount: {
       type: 'integer',
       defaultsTo: 0
+    },
+
+    toJSON: function () {
+      var device = this.toObject();
+      device.verificationCode = null;
+      return device;
     }
+
   }
 };
