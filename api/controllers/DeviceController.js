@@ -121,7 +121,7 @@ var DeviceController = {
         device.retryCount = 0;
         device.save();
 
-        return response.send(200, device.user);
+        return response.send(200, device);
       }
     );
   },
