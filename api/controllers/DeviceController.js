@@ -124,6 +124,45 @@ var DeviceController = {
         return response.send(200, device.user);
       }
     );
+  },
+
+  resendVerificationCode: function (request, response) {
+    var userId = request.params.parentid;
+    var deviceId = request.params.id;
+
+    if (!userId) {
+      return response.send(400, new MugError('Missing parameter [User Id]'));
+    }
+
+    if (!deviceId) {
+      return response.send(400, new MugError('Missing parameter [Device Id]'));
+    }
+
+    Device.findOne(deviceId)
+      .populate('user')
+      .exec(function (error, device) {
+
+        if (error) {
+          var errmsg = new MugError('Error retrieving the device.', error.details);
+          logger.error(errmsg);
+          return response.send(500, errmsg);
+        }
+
+        if (!device) {
+          return response.send(404, new MugError('Device not found.', 'Device id = ' + deviceId));
+        }
+
+        // just ensure that the device is related to user parameter
+        if (userId != device.user.id) {
+          return response.send(403, new MugError('This device does not belong to you'));
+        }
+
+        sendVerificationCode(device);
+
+        return response.send(200, device);
+      }
+    );
+
   }
 	
 };

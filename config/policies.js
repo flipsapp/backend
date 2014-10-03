@@ -51,7 +51,8 @@ module.exports.policies = {
   DeviceController: {
     findOne: ['passport', 'owner', 'deviceOwner'],
     create : ['passport', 'owner'],
-    verify : ['passport']
+    verify : ['passport'],
+    resendVerificationCode: ['passport', 'owner', 'deviceOwner']
   },
 
   RoomController: {
