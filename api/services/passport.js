@@ -24,6 +24,9 @@ passport.facebook = function(request, response, next) {
   var accessToken = request.headers['access_token'];
   var facebookConfig = sails.config.passport.facebook.options;
 
+  logger.info('Trying to authenticate with Facebook using token ['+accessToken+']');
+  logger.info('Headers ['+JSON.stringify(request.headers)+']');
+
   if (!accessToken) {
     return response.send(400, new MugError('access_token header not defined.'));
   }
