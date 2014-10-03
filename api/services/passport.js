@@ -1,6 +1,7 @@
 var path     = require('path')
   , url      = require('url')
   , passport = require('passport')
+  , moment = require('moment')
   , FB       = require('fb');
 
 // Load authentication protocols
@@ -23,12 +24,15 @@ passport.facebook = function(request, response, next) {
   var accessToken = request.headers['access_token'];
   var facebookConfig = sails.config.passport.facebook.options;
 
+  logger.info('Trying to authenticate with Facebook using token ['+accessToken+']');
+  logger.info('Headers ['+JSON.stringify(request.headers)+']');
+
   if (!accessToken) {
     return response.send(400, new MugError('access_token header not defined.'));
   }
 
   FB.api('/me', {
-    fields: ['id', 'first_name', 'last_name', 'birthday', 'email', 'picture.width(160)'],
+    fields: ['id', 'first_name', 'last_name', 'birthday', 'age_range', 'email', 'picture.width(160)'],
     access_token: accessToken,
     client_id: facebookConfig.clientID,
     client_secret: facebookConfig.clientSecret
@@ -139,7 +143,7 @@ var createFacebookUser = function(fbProfile, next) {
     facebookID: fbProfile.id,
     firstName : fbProfile.first_name,
     lastName  : fbProfile.last_name,
-    birthday : fbProfile.birthday,
+    birthday : fbProfile.birthday || moment().subtract(fbProfile.age_range.min, 'years'),
     photoUrl  : fbProfile.picture.data.url
   };
 
