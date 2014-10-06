@@ -46,8 +46,16 @@ var AuthController = {
       if (err || !user) {
         return response.send(400, new MugError('Error signing up user', err));
       }
+      request.login(user, function (loginErr) {
 
-      return response.send(201, user);
+        if (loginErr) {
+          return response.send(400, new MugError('Error logging in user', loginErr));
+        }
+
+        // Upon successful login, send the user to the homepage
+        // were req.user will available.
+        return response.send(200, user);
+      });
     });
   },
 
