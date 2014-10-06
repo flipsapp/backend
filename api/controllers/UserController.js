@@ -90,7 +90,7 @@ var UserController = {
 
             sendVerificationCode(device);
 
-            return response.send(200);
+            return response.json(200, {});
 
           }
         );
