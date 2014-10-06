@@ -23,7 +23,7 @@ describe('MugController', function () {
           throw err;
         }
         userId = createdUser.id;
-        assert.equal(res.status, 201);
+        assert.equal(res.status, 200);
         assert.equal(createdUser.username, 'devtest@arctouch.com');
         assert.equal(createdUser.password, 'Password1');
         assert.equal(createdUser.firstName, 'Dev');
@@ -52,7 +52,7 @@ describe('MugController', function () {
                   throw err;
                 }
                 user2Id = createdUser.id;
-                assert.equal(res.status, 201);
+                assert.equal(res.status, 200);
                 assert.equal(createdUser.username, 'devtest1@arctouch.com');
                 assert.equal(createdUser.password, 'Password1');
                 assert.equal(createdUser.firstName, 'Dev1');
