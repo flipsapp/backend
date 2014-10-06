@@ -21,30 +21,9 @@ module.exports.sockets = {
    * automatically.                                                           *
    *                                                                          *
    ***************************************************************************/
-  onConnect: function (session, socket) {
+  onConnect: function(session, socket) {
 
-//    console.log("SOCKETS\n======");
-//    console.log(sails.sockets);
-//
-    console.log("SESSION\n======");
-    console.log(JSON.stringify(session));
-//
-//    console.log("SOCKET\n======");
-//    console.log(socket);
-
-    socket.send(JSON.stringify(
-      {type: 'serverMessage',
-        message: 'Welcome to the most interesting chat room on earth!'}
-    ));
-
-    socket.on('message', function (message) {
-      message = JSON.parse(message);
-      if (message.type === "userMessage") {
-        socket.broadcast.send(JSON.stringify(message));
-        message.type = "myMessage";
-        socket.send(JSON.stringify(message));
-      }
-    });
+    // By default, do nothing.
 
   },
 
@@ -55,10 +34,10 @@ module.exports.sockets = {
    * disconnects                                                              *
    *                                                                          *
    ***************************************************************************/
-  onDisconnect: function (session, socket) {
+  onDisconnect: function(session, socket) {
 
     // By default: do nothing.
-  },
+  }
 
 
   /***************************************************************************
@@ -70,12 +49,12 @@ module.exports.sockets = {
    * flashsockets by adding 'flashsocket' to this list:                       *
    *                                                                          *
    ***************************************************************************/
-  transports: [
-     'websocket',
-     'htmlfile',
-     'xhr-polling',
-     'jsonp-polling'
-  ],
+  // transports: [
+  //   'websocket',
+  //   'htmlfile',
+  //   'xhr-polling',
+  //   'jsonp-polling'
+  // ],
 
   /***************************************************************************
    *                                                                          *
@@ -84,7 +63,7 @@ module.exports.sockets = {
    *                                                                          *
    ***************************************************************************/
 
-  adapter: 'memory',
+  // adapter: 'memory',
 
   /***************************************************************************
    *                                                                          *
@@ -167,7 +146,7 @@ module.exports.sockets = {
    *                                                                          *
    ***************************************************************************/
 
-  authorization: false,
+  // authorization: false,
 
   /***************************************************************************
    *                                                                          *
@@ -180,7 +159,7 @@ module.exports.sockets = {
    *                                                                          *
    ***************************************************************************/
 
-  'backwardsCompatibilityFor0.9SocketClients': false,
+  // 'backwardsCompatibilityFor0.9SocketClients': false,
 
   /***************************************************************************
    *                                                                          *
@@ -195,7 +174,7 @@ module.exports.sockets = {
    *                                                                          *
    ***************************************************************************/
 
-  grant3rdPartyCookie: true,
+  // grant3rdPartyCookie: true,
 
   /***************************************************************************
    *                                                                          *
@@ -204,6 +183,6 @@ module.exports.sockets = {
    *                                                                          *
    ***************************************************************************/
 
-  origins: '*:*'
+  // origins: '*:*',
 
 };
