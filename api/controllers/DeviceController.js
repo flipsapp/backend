@@ -138,7 +138,6 @@ var DeviceController = {
     }
 
     Device.findOne(deviceId)
-      .populate('user')
       .exec(function (error, device) {
 
         if (error) {
@@ -152,7 +151,7 @@ var DeviceController = {
         }
 
         // just ensure that the device is related to user parameter
-        if (userId != device.user.id) {
+        if (userId != device.user) {
           return response.send(403, new MugError('This device does not belong to you'));
         }
 
