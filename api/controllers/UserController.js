@@ -163,11 +163,12 @@ var UserController = {
         if (!device) {
           return response.send(404, new MugError('Device not found.', 'device number = ' + phoneNumber));
         }
-
+        logger.info("device.verificationCode = " + device.verificationCode);
+        logger.info("verificationCode = " + verificationCode);
         if (device.verificationCode != verificationCode) {
           //if the verification code is wrong, it's probably an attack - so the code should be changed to avoid brute-force update
-          var verificationCode = Math.floor(Math.random() * 8999) + 1000;
-          device.verificationCode = verificationCode;
+          var newVerificationCode = Math.floor(Math.random() * 8999) + 1000;
+          device.verificationCode = newVerificationCode;
           device.save();
           return response.send(400, new MugError('Wrong verification code.'));
         }
@@ -182,7 +183,9 @@ var UserController = {
           return response.send(400, new MugError('Password must have at least eight characters, one uppercase letter and one lowercase letter and one number.'));
         }
 
-        Passport.update({user: device.user.id}, {password: password}, function(error, affectedUsers) {
+        var whereClause = {user: device.user.id}
+        var updateColumns = {password: password}
+        Passport.update(whereClause, updateColumns, function(error, affectedUsers) {
           if (error) {
             var errmsg = new MugError('Error updating passport.');
             logger.error(errmsg);

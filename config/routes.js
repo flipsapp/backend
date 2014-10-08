@@ -36,7 +36,7 @@ module.exports.routes = {
                                                                                // /mugs/stock?category=Toon&owner=123
   'POST   /user/forgot'                           : 'UserController.forgot',
   'POST   /user/verify'                           : 'UserController.verify',
-  'POST   /user/password'                         : 'UserController.updatePassword',
+  'PUT    /user/password'                         : 'UserController.updatePassword',
   'POST   /user/:user_id/mugs'                    : 'MugController.create',
   'PUT    /user/:user_id/mugs/:mug_id/background' : 'MugController.updateBackground',
   'PUT    /user/:user_id/mugs/:mug_id/sound'      : 'MugController.updateSound',
