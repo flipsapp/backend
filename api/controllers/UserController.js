@@ -164,12 +164,12 @@ var UserController = {
           return response.send(404, new MugError('Device not found.', 'device number = ' + phoneNumber));
         }
 
-        if (device.phoneNumber != phoneNumber) {
-          return response.send(400, new MugError('Wrong phone number'));
-        }
-
         if (device.verificationCode != verificationCode) {
-          return response.send(400, new MugError('Wrong validation code.'));
+          //if the verification code is wrong, it's probably an attack - so the code should be changed to avoid brute-force update
+          var verificationCode = Math.floor(Math.random() * 8999) + 1000;
+          device.verificationCode = verificationCode;
+          device.save();
+          return response.send(400, new MugError('Wrong verification code.'));
         }
 
         if (device.user.username != email) {
