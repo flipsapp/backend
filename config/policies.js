@@ -31,6 +31,7 @@ module.exports.policies = {
   UserController: {
     forgot: true,
     verify: true,
+    updatePassword: true,
     uploadPhoto: ['passport', 'owner'],
     update: ['passport', 'owner'],
     findOne: ['passport', 'owner'],

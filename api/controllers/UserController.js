@@ -139,7 +139,69 @@ var UserController = {
 
       }
     );
+  },
+
+  updatePassword: function (request, response) {
+    var email = request.param('email');
+    var phoneNumber = request.param('phone_number');
+    var verificationCode = request.param('verification_code');
+    var password = request.param('password');
+
+    if (!email || !phoneNumber || !verificationCode || !password) {
+      return response.send(400, new MugError('Error requesting to update password.', 'Missing parameters.'));
+    }
+
+    Device.findOne({ phoneNumber: phoneNumber })
+      .populate('user')
+      .exec(function (error, device) {
+        if (error) {
+          var errmsg = new MugError('Error retrieving the user.');
+          logger.error(errmsg);
+          return response.send(500, errmsg);
+        }
+
+        if (!device) {
+          return response.send(404, new MugError('Device not found.', 'device number = ' + phoneNumber));
+        }
+        logger.info("device.verificationCode = " + device.verificationCode);
+        logger.info("verificationCode = " + verificationCode);
+        if (device.verificationCode != verificationCode) {
+          //if the verification code is wrong, it's probably an attack - so the code should be changed to avoid brute-force update
+          var newVerificationCode = Math.floor(Math.random() * 8999) + 1000;
+          device.verificationCode = newVerificationCode;
+          device.save();
+          return response.send(400, new MugError('Wrong verification code.'));
+        }
+
+        if (device.user.username != email) {
+          return response.send(400, new MugError('Wrong username'));
+        }
+
+        var PASSWORD_REGEX = '^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9]).{8,}$';
+
+        if (!password.match(PASSWORD_REGEX)) {
+          return response.send(400, new MugError('Password must have at least eight characters, one uppercase letter and one lowercase letter and one number.'));
+        }
+
+        var whereClause = {user: device.user.id}
+        var updateColumns = {password: password}
+        Passport.update(whereClause, updateColumns, function(error, affectedUsers) {
+          if (error) {
+            var errmsg = new MugError('Error updating passport.');
+            logger.error(errmsg);
+            return response.send(500, errmsg);
+          }
+
+          if (!affectedUsers || affectedUsers.length < 1) {
+            return response.send(400, new MugError("No rows affected while updating passport"));
+          }
+
+          return response.json(200, {});
+        })
+
+      })
   }
+
 };
 
 module.exports = UserController;
