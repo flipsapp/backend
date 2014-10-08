@@ -139,7 +139,66 @@ var UserController = {
 
       }
     );
+  },
+
+  updatePassword: function (request, response) {
+    var email = request.param('email');
+    var phoneNumber = request.param('phone_number');
+    var verificationCode = request.param('verification_code');
+    var password = request.param('password');
+
+    if (!email || !phoneNumber || !verificationCode || !password) {
+      return response.send(400, new MugError('Error requesting to update password.', 'Missing parameters.'));
+    }
+
+    Device.findOne({ phoneNumber: phoneNumber })
+      .populate('user')
+      .exec(function (error, device) {
+        if (error) {
+          var errmsg = new MugError('Error retrieving the user.');
+          logger.error(errmsg);
+          return response.send(500, errmsg);
+        }
+
+        if (!device) {
+          return response.send(404, new MugError('Device not found.', 'device number = ' + phoneNumber));
+        }
+
+        if (device.phoneNumber != phoneNumber) {
+          return response.send(400, new MugError('Wrong phone number'));
+        }
+
+        if (device.verificationCode != verificationCode) {
+          return response.send(400, new MugError('Wrong validation code.'));
+        }
+
+        if (device.user.username != email) {
+          return response.send(400, new MugError('Wrong username'));
+        }
+
+        var PASSWORD_REGEX = '^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9]).{8,}$';
+
+        if (!password.match(PASSWORD_REGEX)) {
+          return response.send(400, new MugError('Password must have at least eight characters, one uppercase letter and one lowercase letter and one number.'));
+        }
+
+        Passport.update({user: device.user.id}, {password: password}, function(error, affectedUsers) {
+          if (error) {
+            var errmsg = new MugError('Error updating passport.');
+            logger.error(errmsg);
+            return response.send(500, errmsg);
+          }
+
+          if (!affectedUsers || affectedUsers.length < 1) {
+            return response.send(400, new MugError("No rows affected while updating passport"));
+          }
+
+          return response.json(200, {});
+        })
+
+      })
   }
+
 };
 
 module.exports = UserController;
