@@ -82,8 +82,8 @@ exports.login = function (req, identifier, password, next) {
     }
 
     Passport.findOne({
-      protocol : 'local'
-    , user     : user.id
+      protocol : 'local',
+      user     : user.id
     }, function (err, passport) {
       if (passport) {
         passport.validatePassword(password, function (err, res) {
@@ -120,9 +120,9 @@ exports.createUser = function(userModel, next) {
       }
 
       Passport.create({
-        protocol : 'local'
-        , password : userModel.password
-        , user     : user.id
+        protocol : 'local',
+        password : userModel.password,
+        user     : user.id
       }, function (err, passport) {
         if (err) {
           if (err.code === 'E_VALIDATION') {
