@@ -63,15 +63,10 @@ var User = {
     },
 
     contacts: {
-      collection: 'User',
-      via: 'hasMeAsContact',
-      dominant: true
-    },
-
-    hasMeAsContact: {
-      collection: 'User',
-      via: 'contacts'
+      collection: 'Contact',
+      via: 'owner'
     }
+
   },
 
   beforeCreate: function (user, next) {

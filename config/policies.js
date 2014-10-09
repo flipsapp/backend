@@ -56,6 +56,10 @@ module.exports.policies = {
     resendVerificationCode: ['passport', 'owner', 'deviceOwner']
   },
 
+  ContactController: {
+    uploadContacts: ['passport', 'owner']
+  },
+
   RoomController: {
     create: ['passport', 'owner'],
     updateParticipants: ['passport', 'owner'],
