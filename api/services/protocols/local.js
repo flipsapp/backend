@@ -34,21 +34,20 @@ var MINIMAL_AGE = 13;
 var PASSWORD_REGEX = '^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9]).{8,}$';
 
 exports.register = function (request, response, next) {
+  var photo = request.file('photo');
   var userModel = actionUtil.parseValues(request);
+  userModel.photo = photo;
 
   if (!userModel.username) {
-    request.flash('error', 'Error.Passport.Username.Missing');
     return next('No username was entered.');
   }
 
   var password = userModel.password;
 
   if (!password) {
-    request.flash('error', 'Error.Passport.Password.Missing');
     return next('No password was entered.');
   }
   if (!password.match(PASSWORD_REGEX)) {
-    request.flash('error', 'Error.Passport.Password.Missing');
     return next('Password must have at least eight characters, one uppercase letter and one lowercase letter and one number.');
   }
 
@@ -108,7 +107,9 @@ exports.login = function (req, identifier, password, next) {
 };
 
 exports.createUser = function(userModel, next) {
-  checkAge(userModel, function(err, age) {
+  var photo = userModel.photo;
+  delete userModel.photo;
+  checkAge(userModel, function (err, age) {
 
     if (err) {
       return next(err);
@@ -120,9 +121,7 @@ exports.createUser = function(userModel, next) {
       }
 
       Passport.create({
-        protocol : 'local',
-        password : userModel.password,
-        user     : user.id
+        protocol: 'local', password: userModel.password, user: user.id
       }, function (err, passport) {
         if (err) {
           if (err.code === 'E_VALIDATION') {
@@ -134,7 +133,46 @@ exports.createUser = function(userModel, next) {
           });
         }
 
-        return next(null, user);
+        if (photo) {
+          s3service.upload(photo, s3service.PICTURES_BUCKET, function (err, uploadedFiles) {
+            if (err) {
+              var errmsg = 'Error uploading picture';
+              logger.error(errmsg);
+              return user.destroy(function (destroyErr) {
+                next(destroyErr || errmsg);
+              });
+            }
+
+            if (!uploadedFiles || uploadedFiles.length < 1) {
+              return user.destroy(function (destroyErr) {
+                next(destroyErr || errmsg);
+              });
+            }
+
+            var uploadedFile = uploadedFiles[0];
+
+            User.update(user.id, { photoUrl: uploadedFile.extra.Location })
+              .exec(function (err, updatedUser) {
+                if (err) {
+                  var errmsg = 'Error updating user';
+                  logger.error(errmsg);
+                  return user.destroy(function (destroyErr) {
+                    next(destroyErr || errmsg);
+                  });
+                }
+
+                if (!updatedUser || updatedUser.length < 1) {
+                  return user.destroy(function (destroyErr) {
+                    next(destroyErr || 'Error updating user with photo url');
+                  });
+                }
+
+                return next(null, updatedUser[0]);
+              });
+          });
+        } else {
+          return next(null, user);
+        }
       });
     });
   });

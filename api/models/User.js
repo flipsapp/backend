@@ -60,17 +60,6 @@ var User = {
     rooms: {
       collection: 'Room',
       via: 'participants'
-    },
-
-    contacts: {
-      collection: 'User',
-      via: 'hasMeAsContact',
-      dominant: true
-    },
-
-    hasMeAsContact: {
-      collection: 'User',
-      via: 'contacts'
     }
   },
 

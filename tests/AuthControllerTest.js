@@ -11,7 +11,7 @@ describe('AuthController - Using correct params', function () {
 
   it('Should create a user', function (done) {
     var aUser = {
-      username: 'devtest@arctouch.com',
+      username: 'polictytest@arctouch.com',
       password: 'Password1',
       firstName: 'Dev',
       lastName: 'Test',
@@ -26,10 +26,9 @@ describe('AuthController - Using correct params', function () {
         }
 
         var createdUser = res.body;
-
         userId = createdUser.id;
         assert.equal(res.status, 200);
-        assert.equal(createdUser.username, 'devtest@arctouch.com');
+        assert.equal(createdUser.username, 'polictytest@arctouch.com');
         assert.equal(createdUser.password, 'Password1');
         assert.equal(createdUser.firstName, 'Dev');
         assert.equal(createdUser.lastName, 'Test');
@@ -59,7 +58,7 @@ describe('AuthController - Signing up with wrong requests', function () {
 
   it('Requesting with missing password, should receive an error message', function (done) {
     var aUser = {
-      username: 'devtest@arctouch.com',
+      username: 'wrongrequests@arctouch.com',
       firstName: 'Dev',
       lastName: 'Test',
       birthday: '1968-12-02'
