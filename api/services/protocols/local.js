@@ -150,7 +150,7 @@ exports.createUser = function(userModel, next) {
           if (userModel.photo) {
             s3service.upload(userModel.photo, s3service.PICTURES_BUCKET, function(err, uploadedFiles) {
               if (err) {
-                var errmsg = new MugError('Error uploading picture', err);
+                var errmsg = 'Error uploading picture';
                 logger.error(errmsg);
                 return user.destroy(function (destroyErr) {
                   next(destroyErr || errmsg);
@@ -168,7 +168,7 @@ exports.createUser = function(userModel, next) {
               User.update(user.id, { photoUrl: uploadedFile.extra.Location })
                 .exec(function(err, updatedUser) {
                   if (err) {
-                    var errmsg = new MugError('Error updating user', err);
+                    var errmsg = 'Error updating user';
                     logger.error(errmsg);
                     return user.destroy(function (destroyErr) {
                       next(destroyErr || errmsg);
