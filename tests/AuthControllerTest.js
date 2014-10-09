@@ -11,7 +11,7 @@ describe('AuthController - Using correct params', function () {
 
   it('Should create a user', function (done) {
     var aUser = {
-      username: 'polictytest@arctouch.com',
+      username: 'policytest@arctouch.com',
       password: 'Password1',
       firstName: 'Dev',
       lastName: 'Test',
@@ -28,7 +28,7 @@ describe('AuthController - Using correct params', function () {
         var createdUser = res.body;
         userId = createdUser.id;
         assert.equal(res.status, 200);
-        assert.equal(createdUser.username, 'polictytest@arctouch.com');
+        assert.equal(createdUser.username, 'policytest@arctouch.com');
         assert.equal(createdUser.password, 'Password1');
         assert.equal(createdUser.firstName, 'Dev');
         assert.equal(createdUser.lastName, 'Test');
