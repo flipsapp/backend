@@ -43,7 +43,7 @@ module.exports.routes = {
   'GET    /user/:user_id/mugs/:mug_id'            : 'MugController.mugById',
   'GET    /user/:user_id/mugs'                    : 'MugController.myMugs',  // all mugs or filtered by word -> /user/:user_id/mugs?word='San Francisco'
 
-  'PUT    /user/:parentid/photo'                  : 'UserController.uploadPhoto',
+  'POST   /user/:parentid/photo'                  : 'UserController.uploadPhoto',
   'POST   /user/:parentid/devices'                : 'DeviceController.create',
   'GET    /user/:parentid/devices/:id'            : 'DeviceController.findOne',
   'POST   /user/:parentid/devices/:id/verify'     : 'DeviceController.verify',

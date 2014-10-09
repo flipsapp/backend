@@ -52,7 +52,7 @@ describe('User Controller', function () {
   describe('Uploading a file', function () {
 
     it('Uploading correctly, should receive the user with photoURL', function (done) {
-      user1.put(BASE_URL + '/user/' + userId + "/photo")
+      user1.post(BASE_URL + '/user/' + userId + "/photo")
         .attach('photo', './tests/fixtures/me.jpg')
         .end(function (err, res) {
           if (err) {
@@ -70,7 +70,7 @@ describe('User Controller', function () {
     });
 
     it('Uploading to another account, must receive an error message', function (done) {
-      user1.put(BASE_URL + '/user/' + (userId + 1 ) + "/photo")
+      user1.post(BASE_URL + '/user/' + (userId + 1 ) + "/photo")
         .attach('photo', './tests/fixtures/me.jpg')
         .end(function (err, res) {
           if (err) {
@@ -85,7 +85,7 @@ describe('User Controller', function () {
     });
 
     it('Uploading without a picture, must receive an error message', function (done) {
-      user1.put(BASE_URL + '/user/' + userId + "/photo")
+      user1.post(BASE_URL + '/user/' + userId + "/photo")
         .end(function (err, res) {
           if (err) {
             throw err;
