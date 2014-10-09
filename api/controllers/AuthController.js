@@ -46,9 +46,11 @@ var AuthController = {
       if (err || !user) {
         return response.send(400, new MugError('Error signing up user', err));
       }
+
       request.login(user, function (loginErr) {
 
         if (loginErr) {
+          logger.error('Error logging user after creation: ' + loginErr);
           return response.send(400, new MugError('Error logging in user', loginErr));
         }
 

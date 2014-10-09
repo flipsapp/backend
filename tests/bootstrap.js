@@ -42,6 +42,10 @@ var start = function () {
 
       models: {
         connection: 'memory'
+      },
+
+      session: {
+        adapter: 'memory'
       }
 
     }, function (err, sails) {
