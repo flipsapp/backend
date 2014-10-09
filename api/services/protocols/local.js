@@ -152,11 +152,15 @@ exports.createUser = function(userModel, next) {
               if (err) {
                 var errmsg = new MugError('Error uploading picture', err);
                 logger.error(errmsg);
-                return next(errmsg);
+                return user.destroy(function (destroyErr) {
+                  next(destroyErr || errmsg);
+                });
               }
 
               if (!uploadedFiles || uploadedFiles.length < 1){
-                return next(new MugError('Error uploading file'));
+                return user.destroy(function (destroyErr) {
+                  next(destroyErr || errmsg);
+                });
               }
 
               var uploadedFile = uploadedFiles[0];
@@ -166,11 +170,15 @@ exports.createUser = function(userModel, next) {
                   if (err) {
                     var errmsg = new MugError('Error updating user', err);
                     logger.error(errmsg);
-                    return next(errmsg);
+                    return user.destroy(function (destroyErr) {
+                      next(destroyErr || errmsg);
+                    });
                   }
 
                   if (!updatedUser || updatedUser.length < 1){
-                    return next(new MugError('Error updating user with photo url'));
+                    return user.destroy(function (destroyErr) {
+                      next(destroyErr || 'Error updating user with photo url');
+                    });
                   }
 
                   return next(null, updatedUser[0]);
