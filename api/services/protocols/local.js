@@ -34,7 +34,9 @@ var MINIMAL_AGE = 13;
 var PASSWORD_REGEX = '^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9]).{8,}$';
 
 exports.register = function (request, response, next) {
+  var photo = request.file('photo');
   var userModel = actionUtil.parseValues(request);
+  userModel.photo = photo;
 
   if (!userModel.username) {
     request.flash('error', 'Error.Passport.Username.Missing');
@@ -83,7 +85,7 @@ exports.login = function (req, identifier, password, next) {
 
     Passport.findOne({
       protocol : 'local'
-    , user     : user.id
+      , user     : user.id
     }, function (err, passport) {
       if (passport) {
         passport.validatePassword(password, function (err, res) {
@@ -108,36 +110,80 @@ exports.login = function (req, identifier, password, next) {
 };
 
 exports.createUser = function(userModel, next) {
-  checkAge(userModel, function(err, age) {
 
-    if (err) {
-      return next(err);
+  User.findOne({username: userModel.username}, function(error, user) {
+
+    if (error) {
+      return next(error);
     }
 
-    User.create(userModel, function (err, user) {
+    if (user) {
+      return next("Username already in use");
+    }
+
+    checkAge(userModel, function(err, age) {
+
       if (err) {
         return next(err);
       }
 
-      Passport.create({
-        protocol : 'local'
-        , password : userModel.password
-        , user     : user.id
-      }, function (err, passport) {
+      User.create(userModel, function (err, user) {
         if (err) {
-          if (err.code === 'E_VALIDATION') {
-            request.flash('error', 'Error.Passport.Password.Invalid');
-          }
-
-          return user.destroy(function (destroyErr) {
-            next(destroyErr || err);
-          });
+          return next(err);
         }
 
-        return next(null, user);
+        Passport.create({
+          protocol : 'local'
+          , password : userModel.password
+          , user     : user.id
+        }, function (err, passport) {
+          if (err) {
+            if (err.code === 'E_VALIDATION') {
+              request.flash('error', 'Error.Passport.Password.Invalid');
+            }
+
+            return user.destroy(function (destroyErr) {
+              next(destroyErr || err);
+            });
+          }
+
+          if (userModel.photo) {
+            s3service.upload(userModel.photo, s3service.PICTURES_BUCKET, function(err, uploadedFiles) {
+              if (err) {
+                var errmsg = new MugError('Error uploading picture', err);
+                logger.error(errmsg);
+                return next(errmsg);
+              }
+
+              if (!uploadedFiles || uploadedFiles.length < 1){
+                return next(new MugError('Error uploading file'));
+              }
+
+              var uploadedFile = uploadedFiles[0];
+
+              User.update(user.id, { photoUrl: uploadedFile.extra.Location })
+                .exec(function(err, updatedUser) {
+                  if (err) {
+                    var errmsg = new MugError('Error updating user', err);
+                    logger.error(errmsg);
+                    return next(errmsg);
+                  }
+
+                  if (!updatedUser || updatedUser.length < 1){
+                    return next(new MugError('Error updating user with photo url'));
+                  }
+
+                  return next(null, updatedUser[0]);
+                });
+            });
+          } else {
+            return next(null, user);
+          }
+        });
       });
     });
   });
+
 };
 
 var checkAge = function(userModel, callback) {
