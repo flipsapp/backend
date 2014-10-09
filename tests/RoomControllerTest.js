@@ -185,7 +185,7 @@ describe('Room Controller', function () {
           var error = res.body;
 
           assert.equal(res.status, 403);
-          assert.equal(error.error, 'You can not access this resource..');
+          assert.equal(error.error, 'You can not access this resource.');
 
           done();
         });
