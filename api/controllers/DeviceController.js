@@ -168,7 +168,7 @@ module.exports = DeviceController;
 
 var sendVerificationCode = function(device) {
   var verificationCode = Math.floor(Math.random() * 8999) + 1000;
-  var message = 'Your MugChat validation code: ' + verificationCode;
+  var message = 'Your MugChat verification code: ' + verificationCode;
 
   device.verificationCode = verificationCode;
   device.retryCount = 0;

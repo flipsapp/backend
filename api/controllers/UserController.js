@@ -163,8 +163,6 @@ var UserController = {
         if (!device) {
           return response.send(404, new MugError('Device not found.', 'device number = ' + phoneNumber));
         }
-        logger.info("device.verificationCode = " + device.verificationCode);
-        logger.info("verificationCode = " + verificationCode);
         if (device.verificationCode != verificationCode) {
           //if the verification code is wrong, it's probably an attack - so the code should be changed to avoid brute-force update
           var newVerificationCode = Math.floor(Math.random() * 8999) + 1000;
