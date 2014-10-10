@@ -18,7 +18,7 @@ module.exports = {
     }
 
     if (!contacts) {
-      return response.send(400, new MugError('Error trying to parse request body'));
+      return response.send(400, new MugError('Error trying to parse request body', 'No contacts were uploaded or malformed request'));
     }
 
     response.send(200, {});
