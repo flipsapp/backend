@@ -60,7 +60,13 @@ var User = {
     rooms: {
       collection: 'Room',
       via: 'participants'
+    },
+
+    contacts: {
+      collection: 'Contact',
+      via: 'owner'
     }
+
   },
 
   beforeCreate: function (user, next) {

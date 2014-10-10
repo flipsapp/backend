@@ -9,5 +9,5 @@ module.exports = function (request, response, next) {
     return next();
   }
 
-  return response.send(403, new MugError('You can not access this resource..'));
+  return response.send(403, new MugError('You can not access this resource.'));
 };

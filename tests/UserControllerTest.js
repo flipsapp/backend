@@ -78,7 +78,7 @@ describe('User Controller', function () {
           }
 
           assert.equal(res.status, 403);
-          assert.equal(res.body.error, 'You can not access this resource..');
+          assert.equal(res.body.error, 'You can not access this resource.');
 
           done();
         });

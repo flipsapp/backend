@@ -36,6 +36,10 @@ var start = function () {
         }
       },
 
+      session: {
+        adapter: 'memory'
+      },
+
       models: {
         connection: 'memory'
       },

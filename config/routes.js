@@ -54,6 +54,8 @@ module.exports.routes = {
   'PUT    /user/:parentid/rooms/:id/participants' : 'RoomController.updateParticipants',
   'PUT    /user/:parentid/rooms/:id'              : 'RoomController.update',
 
+  'POST   /user/:parentid/contacts'               : 'ContactController.uploadContacts',
+
   'POST   /background'                            : 'MugController.uploadBackground',
   'POST   /sound'                                 : 'MugController.uploadSound'
 
