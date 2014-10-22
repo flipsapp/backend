@@ -1,7 +1,7 @@
 var request = require('superagent'),
   assert = require('assert');
 
-describe('MugController', function () {
+describe('FlipController', function () {
 
   var user1 = request.agent();
   var user2 = request.agent();
@@ -73,125 +73,125 @@ describe('MugController', function () {
       });
   });
 
-  it('should create a mug', function (done) {
-    var aMug = {
+  it('should create a flip', function (done) {
+    var aFlip = {
       word: "I",
       background_url: "url1",
       sound_url: "url2",
       is_private: "true"
     };
-    user1.post('http://localhost:1337/user/' + userId + '/mugs')
-      .send(aMug)
+    user1.post('http://localhost:1337/user/' + userId + '/flips')
+      .send(aFlip)
       .end(function (err, res) {
         if (err) {
           throw err;
         }
-        var mug = res.body;
+        var flip = res.body;
         assert.equal(res.status, 201, 'Response status is ' + res.status + ' and should be 201');
-        assert.equal(mug.word, aMug.word, 'Mug word is ' + mug.word + ' and should be ' + aMug.word);
-        assert.equal(mug.backgroundURL, aMug.background_url, 'Mug background URL is ' + mug.backgroundURL + ' and should be ' + aMug.background_url);
-        assert.equal(mug.soundURL, aMug.sound_url, 'Mug sound URL is ' + mug.soundURL + ' and should be ' + aMug.sound_url);
-        assert.equal(mug.isPrivate, true, 'Mug privacy is set to ' + mug.isPrivate + ' and should be set to ' + true);
+        assert.equal(flip.word, aFlip.word, 'Flip word is ' + flip.word + ' and should be ' + aFlip.word);
+        assert.equal(flip.backgroundURL, aFlip.background_url, 'Flip background URL is ' + flip.backgroundURL + ' and should be ' + aFlip.background_url);
+        assert.equal(flip.soundURL, aFlip.sound_url, 'Flip sound URL is ' + flip.soundURL + ' and should be ' + aFlip.sound_url);
+        assert.equal(flip.isPrivate, true, 'Flip privacy is set to ' + flip.isPrivate + ' and should be set to ' + true);
         done();
       });
   });
 
-  it('should create a private mug by default', function (done) {
-    var aMug = {
+  it('should create a private flip by default', function (done) {
+    var aFlip = {
       word: "I"
     };
-    user1.post('http://localhost:1337/user/' + userId + '/mugs')
-      .send(aMug)
+    user1.post('http://localhost:1337/user/' + userId + '/flips')
+      .send(aFlip)
       .end(function (err, res) {
         if (err) {
           throw err;
         }
-        var mug = res.body;
+        var flip = res.body;
         assert.equal(res.status, 201, 'Response status is ' + res.status + ' and should be 201');
-        assert.equal(mug.isPrivate, true, 'Mug should be private');
+        assert.equal(flip.isPrivate, true, 'Flip should be private');
         done();
       });
   });
 
-  it('should not create a mug without a word', function (done) {
-    var aMug = {
+  it('should not create a flip without a word', function (done) {
+    var aFlip = {
       sound_url: 'someurl'
     };
-    user1.post('http://localhost:1337/user/' + userId + '/mugs')
-      .send(aMug)
+    user1.post('http://localhost:1337/user/' + userId + '/flips')
+      .send(aFlip)
       .end(function (err, res) {
         if (err) {
           throw err;
         }
         var data = res.body;
         assert.equal(res.status, 400, 'Response status is ' + res.status + ' and should be 400');
-        assert.equal(data.error, 'Error trying to create mug', 'Error message is ' + data.error + ' and should be "Error trying to create mug"');
+        assert.equal(data.error, 'Error trying to create flip', 'Error message is ' + data.error + ' and should be "Error trying to create flip"');
         done();
       });
   });
 
-  it('should retrieve stock mugs', function (done) {
-    var aMug = {
-      word: "non stock mug",
+  it('should retrieve stock flips', function (done) {
+    var aFlip = {
+      word: "non stock flip",
       is_private: "true",
       category: "test"
     };
-    user1.post('http://localhost:1337/user/' + userId + '/mugs')
-      .send(aMug)
+    user1.post('http://localhost:1337/user/' + userId + '/flips')
+      .send(aFlip)
       .end(function (err, res) {
         if (err) {
           throw err;
         }
-        aMug = {
-          word: "stock mug 1",
+        aFlip = {
+          word: "stock flip 1",
           is_private: "false",
           category: "test"
         };
-        user1.post('http://localhost:1337/user/' + userId + '/mugs')
-          .send(aMug)
+        user1.post('http://localhost:1337/user/' + userId + '/flips')
+          .send(aFlip)
           .end(function (err, res) {
             if (err) {
               throw err;
             }
-            aMug = {
-              word: "stock mug 2",
+            aFlip = {
+              word: "stock flip 2",
               is_private: "false",
               category: "test"
             };
-            user1.post('http://localhost:1337/user/' + userId + '/mugs')
-              .send(aMug)
+            user1.post('http://localhost:1337/user/' + userId + '/flips')
+              .send(aFlip)
               .end(function (err, res) {
                 if (err) {
                   throw err;
                 }
-                aMug = {
-                  word: "stock mug 3",
+                aFlip = {
+                  word: "stock flip 3",
                   is_private: "false",
                   category: "anothercategory"
                 };
-                user1.post('http://localhost:1337/user/' + userId + '/mugs')
-                  .send(aMug)
+                user1.post('http://localhost:1337/user/' + userId + '/flips')
+                  .send(aFlip)
                   .end(function (err, res) {
                     if (err) {
                       throw err;
                     }
-                    user1.get('http://localhost:1337/mugs/stock')
+                    user1.get('http://localhost:1337/flips/stock')
                       .end(function (err, res) {
                         if (err) {
                           throw err;
                         }
-                        mugs = res.body;
+                        flips = res.body;
                         assert.equal(res.status, 200, 'Response status is ' + res.status + ' and should be 200');
-                        assert.equal(mugs.length, 3, 'There are ' + mugs.length + ' total stock mugs mugs and there should be 3');
+                        assert.equal(flips.length, 3, 'There are ' + flips.length + ' total stock flips flips and there should be 3');
 
-                        user1.get('http://localhost:1337/mugs/stock?category=test')
+                        user1.get('http://localhost:1337/flips/stock?category=test')
                           .end(function (err, res) {
                             if (err) {
                               throw err;
                             }
-                            mugs = res.body;
+                            flips = res.body;
                             assert.equal(res.status, 200, 'Response status is ' + res.status + ' and should be 200');
-                            assert.equal(mugs.length, 2, 'There are ' + mugs.length + ' stock mugs in category "test" and there should be 2');
+                            assert.equal(flips.length, 2, 'There are ' + flips.length + ' stock flips in category "test" and there should be 2');
 
                             done();
                           });
@@ -202,49 +202,49 @@ describe('MugController', function () {
       });
   });
 
-  it('should retrieve all my mugs and only my mugs', function (done) {
-    var aMug = {
-      word: 'a mug by user 2'
+  it('should retrieve all my flips and only my flips', function (done) {
+    var aFlip = {
+      word: 'a flip by user 2'
     };
-    user2.post('http://localhost:1337/user/' + user2Id + '/mugs')
-      .send(aMug)
+    user2.post('http://localhost:1337/user/' + user2Id + '/flips')
+      .send(aFlip)
       .end(function (err, res) {
         if (err) {
           throw err;
         }
         assert.equal(res.status, 201, 'Response status is ' + res.status + ' and should be 201');
-        user1.get('http://localhost:1337/user/' + userId + '/mugs')
+        user1.get('http://localhost:1337/user/' + userId + '/flips')
           .end(function (err, res) {
             if (err) {
               throw err;
             }
-            var mugs = res.body;
+            var flips = res.body;
             assert.equal(res.status, 200, 'Response status is ' + res.status + ' and should be 200');
-            assert.equal(mugs.length, 6, 'There are ' + mugs.length + ' mugs that belong to me and there should be 6');
+            assert.equal(flips.length, 6, 'There are ' + flips.length + ' flips that belong to me and there should be 6');
             done();
           });
       });
   });
 
-  it('should retrieve my mugs by word', function (done) {
-    user1.get('http://localhost:1337/user/' + userId + '/mugs?word=i')
+  it('should retrieve my flips by word', function (done) {
+    user1.get('http://localhost:1337/user/' + userId + '/flips?word=i')
       .end(function (err, res) {
         if (err) {
           throw err;
         }
-        var mugs = res.body;
+        var flips = res.body;
         assert.equal(res.status, 200, 'Response status is ' + res.status + ' and should be 200');
-        assert.equal(mugs.length, 2, 'There are ' + mugs.length + ' mugs with word "I" and there should be 2');
+        assert.equal(flips.length, 2, 'There are ' + flips.length + ' flips with word "I" and there should be 2');
         done();
       });
   });
 
-  it('should not let a user create a mug on behalf of another user', function (done) {
-    var aMug = {
-      word: 'a mug by user 2'
+  it('should not let a user create a flip on behalf of another user', function (done) {
+    var aFlip = {
+      word: 'a flip by user 2'
     };
-    user2.post('http://localhost:1337/user/' + userId + '/mugs')
-      .send(aMug)
+    user2.post('http://localhost:1337/user/' + userId + '/flips')
+      .send(aFlip)
       .end(function (err, res) {
         if (err) {
           throw err;
@@ -254,38 +254,38 @@ describe('MugController', function () {
       });
   });
 
-  it('should let me retrieve a mug by id that belongs to me', function (done) {
-    var aMug = {
-      word: 'a mug by user 2'
+  it('should let me retrieve a flip by id that belongs to me', function (done) {
+    var aFlip = {
+      word: 'a flip by user 2'
     };
-    user2.post('http://localhost:1337/user/' + user2Id + '/mugs')
-      .send(aMug)
+    user2.post('http://localhost:1337/user/' + user2Id + '/flips')
+      .send(aFlip)
       .end(function (err, res) {
         if (err) {
           throw err;
         }
-        var mug = res.body;
+        var flip = res.body;
         assert.equal(res.status, 201, 'Response status is ' + res.status + ' and should be 201');
-        user2.get('http://localhost:1337/user/' + user2Id + '/mugs/' + mug.id)
+        user2.get('http://localhost:1337/user/' + user2Id + '/flips/' + flip.id)
           .end(function (err, res) {
             if (err) {
               throw err;
             }
-            var addedMug = res.body;
+            var addedFlip = res.body;
             assert.equal(res.status, 200, 'Response status is ' + res.status + ' and should be 200');
-            assert.equal(addedMug.id, mug.id, 'Mug id is ' + addedMug.id + ' and should be ' + mug.id);
+            assert.equal(addedFlip.id, flip.id, 'Flip id is ' + addedFlip.id + ' and should be ' + flip.id);
             done();
           })
       });
   });
 
-  it('should not let me retrieve a mug by id that does not belong to me', function (done) {
-    user2.get('http://localhost:1337/user/' + user2Id + '/mugs/1')
+  it('should not let me retrieve a flip by id that does not belong to me', function (done) {
+    user2.get('http://localhost:1337/user/' + user2Id + '/flips/1')
       .end(function (err, res) {
         if (err) {
           throw err;
         }
-        var addedMug = res.body;
+        var addedFlip = res.body;
         assert.equal(res.status, 404, 'Response status is ' + res.status + ' and should be 404');
         done();
       })
@@ -345,14 +345,14 @@ describe('MugController', function () {
   });
 
   it('should update a background file', function (done) {
-    user1.put('http://localhost:1337/user/' + userId + '/mugs/1/background')
+    user1.put('http://localhost:1337/user/' + userId + '/flips/1/background')
       .attach('background', './tests/fixtures/me.jpg')
       .end(function (err, res) {
         if (err) {
           throw err;
         }
-        var mug = res.body;
-        var fileExtension = mug.backgroundURL.split('.').slice(-1)[0].toLowerCase();
+        var flip = res.body;
+        var fileExtension = flip.backgroundURL.split('.').slice(-1)[0].toLowerCase();
         assert.equal(res.status, 200, 'Response status is ' + res.status + ' and should be 200');
         assert.equal(fileExtension, 'jpg', 'File extension is ' + fileExtension + ' and should be "jpg"');
         done();
@@ -360,14 +360,14 @@ describe('MugController', function () {
   });
 
   it('should update a sound file', function (done) {
-    user1.put('http://localhost:1337/user/' + userId + '/mugs/1/sound')
+    user1.put('http://localhost:1337/user/' + userId + '/flips/1/sound')
       .attach('sound', './tests/fixtures/arctouch.wav')
       .end(function (err, res) {
         if (err) {
           throw err;
         }
-        var mug = res.body;
-        var fileExtension = mug.soundURL.split('.').slice(-1)[0].toLowerCase();
+        var flip = res.body;
+        var fileExtension = flip.soundURL.split('.').slice(-1)[0].toLowerCase();
         assert.equal(res.status, 200, 'Response status is ' + res.status + ' and should be 200');
         assert.equal(fileExtension, 'wav', 'File extension is ' + fileExtension + ' and should be "wav"');
         done();

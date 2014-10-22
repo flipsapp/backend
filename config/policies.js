@@ -38,15 +38,15 @@ module.exports.policies = {
     populate: ['passport', 'owner']
   },
 
-	MugController: {
-    create: ['passport', 'mugOwner'],
+	FlipController: {
+    create: ['passport', 'flipOwner'],
     uploadBackground: ['passport'],
     uploadSound: ['passport'],
-    updateBackground: ['passport', 'mugOwner'],
-    updateSound: ['passport', 'mugOwner'],
-    myMugs: ['passport', 'mugOwner'],
-    mugById: ['passport', 'mugOwner'],
-    stockMugs: ['passport']
+    updateBackground: ['passport', 'flipOwner'],
+    updateSound: ['passport', 'flipOwner'],
+    myFlips: ['passport', 'flipOwner'],
+    flipById: ['passport', 'flipOwner'],
+    stockFlips: ['passport']
   },
 
   DeviceController: {

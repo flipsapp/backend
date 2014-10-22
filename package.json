@@ -1,10 +1,10 @@
 {
-  "name": "mugchat-backend",
+  "name": "flips-backend",
   "private": true,
   "version": "0.0.0",
-  "description": "Mugchat is a video chatting application where users can compose their own short videos based on the message words.",
+  "description": "Flips is a video chatting application where users can compose their own short videos based on the message words.",
   "keywords": [
-    "mugchat",
+    "flips",
     "chat",
     "video"
   ],
@@ -49,9 +49,9 @@
   "author": "ArcTouch Inc.",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/arctouch/mugchat-backend/issues"
+    "url": "https://github.com/arctouch/flips-backend/issues"
   },
-  "homepage": "https://github.com/arctouch/mugchat-backend",
+  "homepage": "https://github.com/arctouch/flips-backend",
   "scripts": {
     "start": "node app.js --prod",
     "debug": "node debug app.js --prod",
@@ -60,7 +60,7 @@
   "main": "app.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/arctouch/mugchat-backend.git"
+    "url": "https://github.com/arctouch/flips-backend.git"
   },
   "devDependencies": {
     "grunt": "^0.4.2",

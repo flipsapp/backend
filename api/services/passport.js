@@ -28,7 +28,7 @@ passport.facebook = function(request, response, next) {
   logger.info('Headers ['+JSON.stringify(request.headers)+']');
 
   if (!access_token) {
-    return response.send(400, new MugError('access_token header not defined.'));
+    return response.send(400, new FlipsError('access_token header not defined.'));
   }
 
   FB.api('/me', {
@@ -39,7 +39,7 @@ passport.facebook = function(request, response, next) {
   }, function (fbProfile) {
 
     if (!fbProfile) {
-      return next(new MugError('Unable to retrieve Facebook Account.'));
+      return next(new FlipsError('Unable to retrieve Facebook Account.'));
     }
 
     if (fbProfile.error) {
@@ -49,7 +49,7 @@ passport.facebook = function(request, response, next) {
     User.findOne({ username: fbProfile.email})
       .exec(function(err, user) {
         if (err) {
-          return next(new MugError('Error retrieving User.'));
+          return next(new FlipsError('Error retrieving User.'));
         }
 
         if (!user) {
@@ -69,11 +69,11 @@ passport.facebook = function(request, response, next) {
           User.update(whereClause, updateColumns)
             .exec(function(err, affectedUsers) {
               if (err) {
-                return next(new MugError('Error updating User.'));
+                return next(new FlipsError('Error updating User.'));
               }
 
               if (!affectedUsers || affectedUsers.length < 1) {
-                return next(new MugError('Error updating User.'));
+                return next(new FlipsError('Error updating User.'));
               }
 
               return next(null, affectedUsers[0]);
@@ -153,7 +153,7 @@ var createFacebookUser = function(fbProfile, next) {
     }
 
     if (!user) {
-      return next(new MugError('Error creating user.'));
+      return next(new FlipsError('Error creating user.'));
     }
 
     return next(null, user);

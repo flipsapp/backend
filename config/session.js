@@ -70,10 +70,10 @@ module.exports.session = {
   adapter: 'mongo',
   host: 'ds035270.mongolab.com',
   port: 35270,
-  db: 'mugchat-session',
+  db: 'flips-session',
   collection: 'sessions',
-  username: 'mugchat',
-  password: 'mugchat'
+  username: 'flips',
+  password: 'flips'
 
 
 

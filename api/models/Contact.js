@@ -27,7 +27,7 @@ module.exports = {
       via: 'contact'
     },
 
-    isMugchatUserWithId: {
+    isFlipsUserWithId: {
       model: 'User'
     }
 

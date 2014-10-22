@@ -1,7 +1,5 @@
-var accountSid = 'AC122d0c9f32d2d138c4681d0c7f7cae27';
-var authToken = '6f55e3ed1837f91cafbc593e262b533a';
-var client = require('twilio')(accountSid, authToken);
-var from = '+17743077021';
+var client = require('twilio')(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
+var from = '+18587035477';
 
 var TwilioService = {
 

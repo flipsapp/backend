@@ -47,8 +47,8 @@ var User = {
       type: 'string'
     },
 
-    mugs: {
-      collection: 'Mug',
+    flips: {
+      collection: 'Flip',
       via: 'owner'
     },
 

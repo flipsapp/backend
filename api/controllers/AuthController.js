@@ -13,25 +13,25 @@ var AuthController = {
     var password = request.body.password;
 
     if (!username || !password) {
-      return response.send(400, new MugError('Username and password are required'));
+      return response.send(400, new FlipsError('Username and password are required'));
     }
 
     passport.signin(request, response, function(err, user) {
 
       if (err) {
-        var errmsg = new MugError('Error signing in user', err);
+        var errmsg = new FlipsError('Error signing in user', err);
         logger.error(errmsg);
         return response.send(500, errmsg);
       }
 
       if (!user) {
-        return response.send(404, new MugError('Username or password not found'));
+        return response.send(404, new FlipsError('Username or password not found'));
       }
 
       request.login(user, function (loginErr) {
 
         if (loginErr) {
-          return response.send(400, new MugError('Error logging in user', loginErr));
+          return response.send(400, new FlipsError('Error logging in user', loginErr));
         }
 
         // Upon successful login, send the user to the homepage were req.user
@@ -44,14 +44,14 @@ var AuthController = {
   signup: function(request, response) {
     passport.signup(request, response, function(err, user) {
       if (err || !user) {
-        return response.send(400, new MugError('Error signing up user', err));
+        return response.send(400, new FlipsError('Error signing up user', err));
       }
 
       request.login(user, function (loginErr) {
 
         if (loginErr) {
           logger.error('Error logging user after creation: ' + loginErr);
-          return response.send(400, new MugError('Error logging in user', loginErr));
+          return response.send(400, new FlipsError('Error logging in user', loginErr));
         }
 
         // Upon successful login, send the user to the homepage
@@ -64,19 +64,19 @@ var AuthController = {
   facebook: function(request, response) {
     passport.facebook(request, response, function(err, user) {
       if (err) {
-        var errmsg = new MugError('Error retrieving user', err);
+        var errmsg = new FlipsError('Error retrieving user', err);
         logger.error(errmsg);
         return response.send(500, errmsg);
       }
 
       if (!user) {
-        return response.send(404, new MugError('Username not found'));
+        return response.send(404, new FlipsError('Username not found'));
       }
 
       request.login(user, function (loginErr) {
 
         if (loginErr) {
-          return response.send(400, new MugError('Error logging in user', loginErr));
+          return response.send(400, new FlipsError('Error logging in user', loginErr));
         }
 
         // Upon successful login, send the user to the homepage

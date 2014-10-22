@@ -30,18 +30,18 @@ module.exports.routes = {
   'POST   /signup'                                : 'AuthController.signup',
   'POST   /signin/facebook'                       : 'AuthController.facebook',
 
-  'GET    /mugs/stock'                            : 'MugController.stockMugs', // all stock mugs or filtered by category or owner or both
-                                                                               // /mugs/stock?category=Toon
-                                                                               // /mugs/stock?owner=123
-                                                                               // /mugs/stock?category=Toon&owner=123
+  'GET    /flips/stock'                            : 'FlipController.stockFlips', // all stock flips or filtered by category or owner or both
+                                                                               // /flips/stock?category=Toon
+                                                                               // /flips/stock?owner=123
+                                                                               // /flips/stock?category=Toon&owner=123
   'POST   /user/forgot'                           : 'UserController.forgot',
   'POST   /user/verify'                           : 'UserController.verify',
   'PUT    /user/password'                         : 'UserController.updatePassword',
-  'POST   /user/:user_id/mugs'                    : 'MugController.create',
-  'PUT    /user/:user_id/mugs/:mug_id/background' : 'MugController.updateBackground',
-  'PUT    /user/:user_id/mugs/:mug_id/sound'      : 'MugController.updateSound',
-  'GET    /user/:user_id/mugs/:mug_id'            : 'MugController.mugById',
-  'GET    /user/:user_id/mugs'                    : 'MugController.myMugs',  // all mugs or filtered by word -> /user/:user_id/mugs?word='San Francisco'
+  'POST   /user/:user_id/flips'                    : 'FlipController.create',
+  'PUT    /user/:user_id/flips/:flip_id/background' : 'FlipController.updateBackground',
+  'PUT    /user/:user_id/flips/:flip_id/sound'      : 'FlipController.updateSound',
+  'GET    /user/:user_id/flips/:flip_id'            : 'FlipController.flipById',
+  'GET    /user/:user_id/flips'                    : 'FlipController.myFlips',  // all flips or filtered by word -> /user/:user_id/flips?word='San Francisco'
 
   'POST   /user/:parentid/photo'                  : 'UserController.uploadPhoto',
   'POST   /user/:parentid/devices'                : 'DeviceController.create',
@@ -56,7 +56,7 @@ module.exports.routes = {
 
   'POST   /user/:parentid/contacts'               : 'ContactController.uploadContacts',
 
-  'POST   /background'                            : 'MugController.uploadBackground',
-  'POST   /sound'                                 : 'MugController.uploadSound'
+  'POST   /background'                            : 'FlipController.uploadBackground',
+  'POST   /sound'                                 : 'FlipController.uploadSound'
 
 };
