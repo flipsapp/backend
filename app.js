@@ -23,7 +23,7 @@
 process.chdir(__dirname);
 
 GLOBAL.requires = require('r').r;
-GLOBAL.MugError = requires('>/api/utilities/MugError');
+GLOBAL.FlipsError = requires('>/api/utilities/FlipsError');
 
 // CREATE AND LOAD ENVIRONMENT VARIABLES
 var dotenv_path;

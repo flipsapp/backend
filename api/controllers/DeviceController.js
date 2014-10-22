@@ -14,19 +14,19 @@ var DeviceController = {
     var deviceId = request.params.id;
 
     if (!deviceId) {
-      return response.send(400, new MugError('Missing parameter [id]'));
+      return response.send(400, new FlipsError('Missing parameter [id]'));
     }
 
     Device.findOne(deviceId)
       .exec(function (error, device) {
         if (error) {
-          var errmsg = new MugError('Error retrieving the device.', error.details);
+          var errmsg = new FlipsError('Error retrieving the device.', error.details);
           logger.error(errmsg);
           return response.send(500, errmsg);
         }
 
         if (!device) {
-          return response.send(404, new MugError('Device not found', 'Id='+deviceId));
+          return response.send(404, new FlipsError('Device not found', 'Id='+deviceId));
         }
 
         return response.send(200, device);
@@ -38,29 +38,29 @@ var DeviceController = {
     var user = request.params.parentid;
     var device = actionUtil.parseValues(request);
     if (!user) {
-      return response.send(400, new MugError('Missing parameter [User Id].'));
+      return response.send(400, new FlipsError('Missing parameter [User Id].'));
     }
     if (!device.platform) {
-      return response.send(400, new MugError('Missing parameter [Device platform].'));
+      return response.send(400, new FlipsError('Missing parameter [Device platform].'));
     }
     if (!device.phoneNumber) {
-      return response.send(400, new MugError('Missing parameter [Device phone number].'));
+      return response.send(400, new FlipsError('Missing parameter [Device phone number].'));
     }
     device.user = user;
     Device.create(device)
       .exec(function (err, device) {
         if (err) {
-          var errmsg = new MugError('Error creating device.', err.details);
+          var errmsg = new FlipsError('Error creating device.', err.details);
           logger.error(errmsg);
           return response.send(500, errmsg);
         }
         if (!device) {
-          return response.send(400, new MugError('Error creating device.', 'Device returned empty.'));
+          return response.send(400, new FlipsError('Error creating device.', 'Device returned empty.'));
         }
         sendVerificationCode(device);
         PubnubGateway.addDeviceToPushNotification(device.uuid, device.uuid, device.platform, function(err, channel) {
           if (err) {
-            logger.error(new MugError(err));
+            logger.error(new FlipsError(err));
           }
         });
         return response.send(201, device);
@@ -74,33 +74,33 @@ var DeviceController = {
     var verificationCode = request.param('verification_code');
 
     if (!userId) {
-      return response.send(400, new MugError('Missing parameter [User Id]'));
+      return response.send(400, new FlipsError('Missing parameter [User Id]'));
     }
 
     if (!deviceId) {
-      return response.send(400, new MugError('Missing parameter [Device Id]'));
+      return response.send(400, new FlipsError('Missing parameter [Device Id]'));
     }
 
     if (!verificationCode) {
-      return response.send(400, new MugError('Missing parameter [Verification Code]'));
+      return response.send(400, new FlipsError('Missing parameter [Verification Code]'));
     }
 
     Device.findOne(deviceId)
       .exec(function (error, device) {
 
         if (error) {
-          var errmsg = new MugError('Error retrieving the device.', error.details);
+          var errmsg = new FlipsError('Error retrieving the device.', error.details);
           logger.error(errmsg);
           return response.send(500, errmsg);
         }
 
         if (!device) {
-          return response.send(404, new MugError('Device not found.', 'Device id = ' + deviceId));
+          return response.send(404, new FlipsError('Device not found.', 'Device id = ' + deviceId));
         }
 
         // just ensure that the device is related to user parameter
         if (userId != device.user) {
-          return response.send(403, new MugError('This device does not belong to you'));
+          return response.send(403, new FlipsError('This device does not belong to you'));
         }
 
         if (device.verificationCode != verificationCode) {
@@ -112,7 +112,7 @@ var DeviceController = {
           }
 
           device.save();
-          return response.send(400, new MugError('Wrong validation code.'));
+          return response.send(400, new FlipsError('Wrong validation code.'));
         }
 
         device.isVerified = true;
@@ -129,29 +129,29 @@ var DeviceController = {
     var deviceId = request.params.id;
 
     if (!userId) {
-      return response.send(400, new MugError('Missing parameter [User Id]'));
+      return response.send(400, new FlipsError('Missing parameter [User Id]'));
     }
 
     if (!deviceId) {
-      return response.send(400, new MugError('Missing parameter [Device Id]'));
+      return response.send(400, new FlipsError('Missing parameter [Device Id]'));
     }
 
     Device.findOne(deviceId)
       .exec(function (error, device) {
 
         if (error) {
-          var errmsg = new MugError('Error retrieving the device.', error.details);
+          var errmsg = new FlipsError('Error retrieving the device.', error.details);
           logger.error(errmsg);
           return response.send(500, errmsg);
         }
 
         if (!device) {
-          return response.send(404, new MugError('Device not found.', 'Device id = ' + deviceId));
+          return response.send(404, new FlipsError('Device not found.', 'Device id = ' + deviceId));
         }
 
         // just ensure that the device is related to user parameter
         if (userId != device.user) {
-          return response.send(403, new MugError('This device does not belong to you'));
+          return response.send(403, new FlipsError('This device does not belong to you'));
         }
 
         sendVerificationCode(device);
@@ -168,7 +168,7 @@ module.exports = DeviceController;
 
 var sendVerificationCode = function(device) {
   var verificationCode = Math.floor(Math.random() * 8999) + 1000;
-  var message = 'Your MugChat verification code: ' + verificationCode;
+  var message = 'Your Flips verification code: ' + verificationCode;
 
   device.verificationCode = verificationCode;
   device.retryCount = 0;

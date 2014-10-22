@@ -1,10 +1,10 @@
 AWS_S3_KEY            = AKIAILGTT2X6FTUAFI6Q
 AWS_S3_SECRET         = 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
-RDS_HOSTNAME          = aa1ot4gcqtb7cjt.cuc047pruo5n.us-west-2.rds.amazonaws.com
+RDS_HOSTNAME          = aa4jr69qs07gsy.cuc047pruo5n.us-west-2.rds.amazonaws.com
 RDS_USERNAME          = root
 RDS_PASSWORD          = sdv13rn97x0ftw313
 RDS_PORT              = 3306
-RDS_DB_NAME           = mugchat
+RDS_DB_NAME           = flips
 PUBNUB_SUB_KEY        = sub-c-8047a8dc-3853-11e4-8736-02ee2ddab7fe
 PUBNUB_PUB_KEY        = pub-c-0f705157-1c76-450a-99e9-59342f271f12
 JWT_SECRET            = U868D8e6zUfKes8w3Ye6WBq8426u2c5Tnn788A64p7876mRIZx

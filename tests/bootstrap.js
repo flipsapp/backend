@@ -1,5 +1,5 @@
 GLOBAL.requires = require('r').r;
-GLOBAL.MugError = requires('>/api/utilities/MugError');
+GLOBAL.FlipsError = requires('>/api/utilities/FlipsError');
 
 // CREATE AND LOAD ENVIRONMENT VARIABLES
 
@@ -56,12 +56,12 @@ var start = function () {
       });
 
       sinon.stub(app.services.s3service, 'upload', function(file, bucket, callback) {
-        if (bucket === 'mugchat-sound') {
-          callback(null, [{ extra: {Location: "https://mugchat-sound.s3.amazonaws.com/43346217-6b53-484d-980c-6cca226f16f0.wav"} }]);
-        } else if (bucket === 'mugchat-background') {
-          callback(null, [{ extra: {Location: "https://mugchat-background.s3.amazonaws.com/43346217-6b53-484d-980c-6cca226f16f0.jpg"} }]);
+        if (bucket === 'flips-sound') {
+          callback(null, [{ extra: {Location: "https://flips-sound.s3.amazonaws.com/43346217-6b53-484d-980c-6cca226f16f0.wav"} }]);
+        } else if (bucket === 'flips-background') {
+          callback(null, [{ extra: {Location: "https://flips-background.s3.amazonaws.com/43346217-6b53-484d-980c-6cca226f16f0.jpg"} }]);
         } else {
-          callback(null, [{ extra: {Location: "https://mugchat-pictures.s3.amazonaws.com/43346217-6b53-484d-980c-6cca226f16f0.jpg"} }]);
+          callback(null, [{ extra: {Location: "https://flips-pictures.s3.amazonaws.com/43346217-6b53-484d-980c-6cca226f16f0.jpg"} }]);
         }
       });
 

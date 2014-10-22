@@ -1,11 +1,11 @@
 /**
- * MugController
+ * FlipController
  *
- * @description :: Server-side logic for managing Mugs
+ * @description :: Server-side logic for managing Flips
  * @help        :: See http://links.sailsjs.org/docs/controllers
  */
 
-var MugController = {
+var FlipController = {
 
   create: function (request, response) {
     var values = {
@@ -26,26 +26,26 @@ var MugController = {
     if (request.body.category) {
       values.category = request.body.category
     }
-    Mug.create(values).exec(function (err, mug) {
-      if (err || !mug) {
-        return response.send(400, new MugError('Error trying to create mug', err));
+    Flip.create(values).exec(function (err, flip) {
+      if (err || !flip) {
+        return response.send(400, new FlipsError('Error trying to create flip', err));
       }
-      return response.send(201, mug);
+      return response.send(201, flip);
     });
   },
 
   uploadBackground: function (request, response) {
     if (!request.file('background') || request.file('background')._files.length < 1) {
-      return response.send(400, new MugError('No background file to upload'));
+      return response.send(400, new FlipsError('No background file to upload'));
     }
     s3service.upload(request.file('background'), s3service.BACKGROUND_BUCKET, function (err, uploadedFiles) {
       if (err) {
-        var errmsg = new MugError('Error trying to upload background file to S3', err);
+        var errmsg = new FlipsError('Error trying to upload background file to S3', err);
         logger.error(errmsg);
         return response.send(500, errmsg);
       }
       if (!uploadedFiles || uploadedFiles.length < 1) {
-        return response.send(400, new MugError('Error trying to upload background file to S3', err));
+        return response.send(400, new FlipsError('Error trying to upload background file to S3', err));
       }
       return response.send(201, {background_url: uploadedFiles[0].extra.Location});
     });
@@ -53,16 +53,16 @@ var MugController = {
 
   uploadSound: function (request, response) {
     if (!request.file('sound') || request.file('sound')._files.length < 1) {
-      return response.send(400, new MugError('No sound file to upload'));
+      return response.send(400, new FlipsError('No sound file to upload'));
     }
     s3service.upload(request.file('sound'), s3service.SOUND_BUCKET, function (err, uploadedFiles) {
       if (err) {
-        var errmsg = new MugError('Error trying to upload audio file to S3', err);
+        var errmsg = new FlipsError('Error trying to upload audio file to S3', err);
         logger.error(errmsg);
         return response.send(500, errmsg);
       }
       if (!uploadedFiles || uploadedFiles.length < 1) {
-        return response.send(400, new MugError('Error trying to upload audio file to S3', err));
+        return response.send(400, new FlipsError('Error trying to upload audio file to S3', err));
       }
       return response.send(201, {sound_url: uploadedFiles[0].extra.Location});
     });
@@ -70,37 +70,37 @@ var MugController = {
 
   updateBackground: function (request, response) {
     if (!request.file('background') || request.file('background')._files.length < 1) {
-      return response.send(400, new MugError('No background file to upload'));
+      return response.send(400, new FlipsError('No background file to upload'));
     }
     s3service.upload(request.file('background'), s3service.BACKGROUND_BUCKET, function (err, uploadedFiles) {
       if (err) {
-        var errmsg = new MugError('Error trying to upload background file to S3', err);
+        var errmsg = new FlipsError('Error trying to upload background file to S3', err);
         logger.error(errmsg);
         return response.send(500, errmsg);
       }
       if (!uploadedFiles || uploadedFiles.length < 1) {
-        return response.send(400, new MugError('Error trying to upload background file to S3', err));
+        return response.send(400, new FlipsError('Error trying to upload background file to S3', err));
       }
-      Mug.findOne(request.params.mug_id).populate('owner').exec(function (err, mug) {
+      Flip.findOne(request.params.flip_id).populate('owner').exec(function (err, flip) {
         if (err) {
-          var errmsg = new MugError('Error trying to retrieve Mug', err);
+          var errmsg = new FlipsError('Error trying to retrieve flip', err);
           logger.error(errmsg);
           return response.send(500, errmsg);
         }
-        if (!mug) {
-          return response.send(404, new MugError('Mug not found'));
+        if (!flip) {
+          return response.send(404, new FlipsError('Flip not found'));
         }
-        if (mug.owner && mug.owner.id != request.params.user_id) {
-          return response.send(403, new MugError('This mug does not belong to this user'));
+        if (flip.owner && flip.owner.id != request.params.user_id) {
+          return response.send(403, new FlipsError('This flip does not belong to this user'));
         }
-        mug.backgroundURL = uploadedFiles[0].extra.Location;
-        mug.save(function (err) {
+        flip.backgroundURL = uploadedFiles[0].extra.Location;
+        flip.save(function (err) {
           if (err) {
-            var errmsg = new MugError('Error trying to save Mug', err);
+            var errmsg = new FlipsError('Error trying to save flip', err);
             logger.error(errmsg);
             return response.send(500, errmsg);
           }
-          return response.send(200, mug);
+          return response.send(200, flip);
         });
       })
     });
@@ -108,78 +108,78 @@ var MugController = {
 
   updateSound: function (request, response) {
     if (!request.file('sound') || request.file('sound')._files.length < 1) {
-      return response.send(400, new MugError('No sound file to upload'));
+      return response.send(400, new FlipsError('No sound file to upload'));
     }
     s3service.upload(request.file('sound'), s3service.SOUND_BUCKET, function (err, uploadedFiles) {
       if (err) {
-        var errmsg = new MugError('Error trying to upload audio file to S3', err);
+        var errmsg = new FlipsError('Error trying to upload audio file to S3', err);
         logger.error(errmsg);
         return response.send(500, errmsg);
       }
       if (!uploadedFiles || uploadedFiles.length < 1) {
-        return response.send(400, new MugError('Error trying to upload audio file to S3', err));
+        return response.send(400, new FlipsError('Error trying to upload audio file to S3', err));
       }
-      Mug.findOne(request.params.mug_id).populate('owner').exec(function (err, mug) {
+      Flip.findOne(request.params.flip_id).populate('owner').exec(function (err, flip) {
         if (err) {
-          var errmsg = new MugError('Error trying to retrieve Mug', err);
+          var errmsg = new FlipsError('Error trying to retrieve flip', err);
           logger.error(errmsg);
           return response.send(500, errmsg);
         }
-        if (!mug) {
-          return response.send(404, new MugError('Mug not found'));
+        if (!flip) {
+          return response.send(404, new FlipsError('Flip not found'));
         }
-        if (mug.owner && mug.owner.id != request.params.user_id) {
+        if (flip.owner && flip.owner.id != request.params.user_id) {
 
-          return response.send(403, new MugError('This mug does not belong to this user'));
+          return response.send(403, new FlipsError('This flip does not belong to this user'));
         }
-        mug.soundURL = uploadedFiles[0].extra.Location;
-        mug.save(function (err) {
+        flip.soundURL = uploadedFiles[0].extra.Location;
+        flip.save(function (err) {
           if (err) {
-            var errmsg = new MugError('Error trying to save Mug', err);
+            var errmsg = new FlipsError('Error trying to save flip', err);
             logger.error(errmsg);
             return response.send(500, errmsg);
           }
-          return response.send(200, mug);
+          return response.send(200, flip);
         });
       })
     });
   },
 
-  myMugs: function (request, response) {
+  myFlips: function (request, response) {
     var whereClause = {
       owner: request.params.user_id
     };
     if (request.param('word')) {
       whereClause.word = request.param('word');
     }
-    Mug.find(whereClause).exec(function (err, mugs) {
+    Flip.find(whereClause).exec(function (err, flips) {
       if (err) {
-        var errmsg = new MugError('Error trying to retrieve mugs', err);
+        var errmsg = new FlipsError('Error trying to retrieve flips', err);
         logger.error(errmsg);
         return response.send(500, errmsg);
       }
-      if (!mugs) {
-        return response.send(404, new MugError('Mugs not found'));
+      if (!flips) {
+        return response.send(404, new FlipsError('Flips not found'));
       }
-      return response.send(200, mugs);
+      return response.send(200, flips);
     })
   },
 
-  mugById: function (request, response) {
-    Mug.findOne({id: request.params.mug_id, owner: request.params.user_id}).exec(function (err, mug) {
+  flipById: function (request, response) {
+    Flip.findOne({id: request.params.flip_id, owner: request.params.user_id}).exec(function (err, flip) {
       if (err) {
-        var errmsg = new MugError('Error trying to retrieve mugs', err);
+        var errmsg = new FlipsError('Error trying to retrieve flips', err);
         logger.error(errmsg);
         return response.send(500, errmsg);
       }
-      if (!mug) {
-        return response.send(404, new MugError('Mug not found'));
+      if (!flip) {
+        return response.send(404, new FlipsError('Flip not found'));
       }
-      return response.send(200, mug);
+      return response.send(200, flip);
     })
   },
 
-  stockMugs: function (request, response) {
+  stockFlips: function (request, response) {
     var whereClause = {
       isPrivate: false
     };
@@ -189,19 +189,19 @@ var MugController = {
     if (request.param('category')) {
       whereClause.category = request.param('category');
     }
-    Mug.find(whereClause).exec(function (err, mugs) {
+    Flip.find(whereClause).exec(function (err, flips) {
       if (err) {
-        var errmsg = new MugError('Error trying to retrieve mugs', err);
+        var errmsg = new FlipsError('Error trying to retrieve flips', err);
         logger.error(errmsg);
         return response.send(500, errmsg);
       }
-      if (!mugs) {
-        return response.send(404, new MugError('Mugs not found'));
+      if (!flips) {
+        return response.send(404, new FlipsError('Flips not found'));
       }
-      return response.send(200, mugs);
+      return response.send(200, flips);
     })
   }
 
 };
 
-module.exports = MugController;
+module.exports = FlipController;

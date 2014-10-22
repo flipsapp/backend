@@ -9,9 +9,9 @@ var S3Service = {
     }, callback);
   },
 
-  PICTURES_BUCKET: 'mugchat-pictures',
-  BACKGROUND_BUCKET: 'mugchat-background',
-  SOUND_BUCKET: 'mugchat-sound'
+  PICTURES_BUCKET: 'flips-pictures',
+  BACKGROUND_BUCKET: 'flips-background',
+  SOUND_BUCKET: 'flips-sound'
 
 };
 

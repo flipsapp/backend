@@ -14,11 +14,11 @@ module.exports = {
     var contacts = actionUtil.parseValues(request).contacts;
 
     if (!userId) {
-      return response.send(400, new MugError('Missing user id'));
+      return response.send(400, new FlipsError('Missing user id'));
     }
 
     if (!contacts) {
-      return response.send(400, new MugError('Error trying to parse request body', 'No contacts were uploaded or malformed request'));
+      return response.send(400, new FlipsError('Error trying to parse request body', 'No contacts were uploaded or malformed request'));
     }
 
     response.send(200, {});
