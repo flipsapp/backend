@@ -68,8 +68,8 @@ module.exports.session = {
   ***************************************************************************/
 
   adapter: 'mongo',
-  host: 'ds035270.mongolab.com',
-  port: 35270,
+  host: 'ds047930.mongolab.com',
+  port: 47930,
   db: 'flips-session',
   collection: 'sessions',
   username: 'flips',

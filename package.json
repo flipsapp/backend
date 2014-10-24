@@ -44,7 +44,9 @@
     "validator": "^3.17.1",
     "winston": "~0.7.3",
     "pubnub": "~3.6.7",
-    "request": "~2.44.0"
+    "request": "~2.44.0",
+    "goo.gl": "~0.1.2",
+    "node-uuid": "~1.4.1"
   },
   "author": "ArcTouch Inc.",
   "license": "ISC",

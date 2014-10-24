@@ -133,7 +133,7 @@ exports.createUser = function(userModel, next) {
           });
         }
 
-        if (photo) {
+        if (photo._files.length > 0) {
           s3service.upload(photo, s3service.PICTURES_BUCKET, function (err, uploadedFiles) {
             if (err) {
               var errmsg = 'Error uploading picture';

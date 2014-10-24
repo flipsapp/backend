@@ -5,6 +5,9 @@
  * @help        :: See http://links.sailsjs.org/docs/controllers
  */
 var MAX_RETRY_COUNT = 2;
+var actionUtil = requires('>/node_modules/sails/lib/hooks/blueprints/actionUtil');
+var googl = require('goo.gl');
+var uuid = require('node-uuid');
 
 var UserController = {
 
@@ -198,6 +201,27 @@ var UserController = {
         })
 
       })
+  },
+
+  inviteContacts: function (request, response) {
+    var values = actionUtil.parseValues(request);
+    var userId = values.parentid;
+    var contacts = values.contacts;
+
+    User.findOne(userId).exec(function (err, user) {
+      if (err) {
+        return response.send(500, new FlipsError('Error trying to find user', err));
+      }
+      if (!user) {
+        return response.send(404, new FlipsError('User not found'));
+      }
+      for (var i=0; i < contacts.length; i++) {
+        contacts[i].user = user;
+      }
+      async.concat(contacts, inviteContact, function(err, invitedContacts) {
+        return response.send(200, invitedContacts);
+      })
+    });
   }
 
 };
@@ -216,3 +240,39 @@ var sendVerificationCode = function(device) {
     logger.info(err || message);
   });
 };
+
+var inviteContact = function(contact, callback) {
+  var code = uuid() + uuid(); // generate a unique invitation code
+  Invitation.findOne({phoneNumber: contact.phoneNumber, invitedBy: contact.user.id}).exec(function(err, invitation) {
+    if (!err && !invitation) {
+      Invitation.create({code: code, phoneNumber: contact.phoneNumber, invitedBy: contact.user.id}).exec(function(err, newInvitation) {
+        if (newInvitation) {
+          sendInvitationBySMS(newInvitation.code, contact.phoneNumber, contact.user, function(err, number) {
+            callback(err, number);
+          });
+        }
+      });
+    }
+  });
+};
+
+var sendInvitationBySMS = function(invitationCode, toNumber, fromUser, callback) {
+  var url = 'https://' + request.get('host') + '/clickedInvitation/' + invitationCode;
+  googl.shorten(url)
+    .then(function (shortenURL) {
+      var msg ="You've been Flipped by {{firstname}} {{lastname}}! Download Flips within 30 days to view your message.  {{url}}";
+      msg = msg.replace("{{firstname}}", fromUser.firstName);
+      msg = msg.replace("{{lastname}}", fromUser.lastName);
+      msg = msg.replace("{{url}}", shortenURL);
+      console.log(msg);
+      (function (number) {
+        twilioService.sendSms(number, msg, function (err, message) {
+          callback(err, number);
+        });
+      })(toNumber);
+    })
+    .catch(function (err) {
+      callback(err);
+    });
+
+}

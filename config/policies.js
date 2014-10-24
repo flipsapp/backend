@@ -35,7 +35,8 @@ module.exports.policies = {
     uploadPhoto: ['passport', 'owner'],
     update: ['passport', 'owner'],
     findOne: ['passport', 'owner'],
-    populate: ['passport', 'owner']
+    populate: ['passport', 'owner'],
+    inviteContacts: ['passport']
   },
 
 	FlipController: {
