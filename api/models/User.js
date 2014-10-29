@@ -65,6 +65,10 @@ var User = {
     contacts: {
       collection: 'Contact',
       via: 'owner'
+    },
+
+    phoneNumber: {
+      type: 'string'
     }
 
   },

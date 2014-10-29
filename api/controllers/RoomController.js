@@ -6,68 +6,90 @@
  */
 
 var actionUtil = requires('>/node_modules/sails/lib/hooks/blueprints/actionUtil');
-var jwt = require('jwt-simple');
+var uuid = require('node-uuid');
+var googl = require('goo.gl');
 
 var RoomController = {
 
-  create: function(request, response) {
-    var room = actionUtil.parseValues(request);
+  create: function (request, response) {
+    var params = actionUtil.parseValues(request);
+    var room = {};
 
-    if (!room) {
+    if (!params) {
       return response.send(400, new FlipsError('Error creating Room', 'Missing parameters.'));
     }
 
-    var admin = room.parentid;
-
-    if (!admin) {
+    if (!params.parentid) {
       return response.send(400, new FlipsError('Error creating Room', 'No admin found for room.'));
     }
 
-    if (!room.name) {
+    if (!params.name) {
       return response.send(400, new FlipsError('Error creating Room', 'No name found for room.'));
     }
 
-    room.admin = admin;
-    room.pubnubId = jwt.encode({ name: room.name, admin: admin, timestamp: new Date() }, process.env.JWT_SECRET);
+    var admin = params.parentid;
 
-    var participants = room.participants;
+    User.findOne(admin).exec(function(err, adminUser) {
+      if (err) {
+        return response.send(400, new FlipsError('Error retrieving user from database', err));
+      }
+      if (!adminUser) {
+        return response.send(404, new FlipsError('User not found'));
+      }
 
-    if (!participants || participants.length < 1) {
-      participants = [request.user.id];
-    } else {
-      participants += "," + request.user.id;
-    }
-
-    room.participants = participants;
-
-    Room.create(room)
-      .exec(function(error, newRoom) {
-        if (error) {
-          return response.send(500, new FlipsError('Server error creating Room', error.details));
+      createUsersForUnknownParticipants(params, function (err, createdUsers) {
+        var users = params.users;
+        if (createdUsers) {
+          users = users + "," + createdUsers;
         }
 
-        if (!newRoom) {
-          return response.send(400, new FlipsError('Request error creating Room', 'Room returned empty'));
+        room.admin = admin;
+        room.pubnubId = uuid();
+
+        if (!users || users.length < 1) {
+          users = [admin];
+        } else {
+          users += "," + admin;
         }
 
-        Room.findOne(newRoom.id)
-          .populate('participants')
-          .exec(function(error, populatedRoom) {
-            if (error) {
-              return response.send(500, new FlipsError('Error retrieving the room after created.', error.details));
+        room.participants = users;
+
+        (function (roomAdmin, phoneNumbersToInvite) {
+          Room.create(room)
+            .exec(function (error, newRoom) {
+              if (error) {
+                return response.send(500, new FlipsError('Server error creating Room', error.details));
+              }
+
+              if (!newRoom) {
+                return response.send(400, new FlipsError('Request error creating Room', 'Room returned empty'));
+              }
+
+              Room.findOne(newRoom.id)
+                .populate('participants')
+                .exec(function (error, populatedRoom) {
+                  if (error) {
+                    return response.send(500, new FlipsError('Error retrieving the room after created.', error.details));
+                  }
+
+                  if (!populatedRoom) {
+                    return response.send(404, new FlipsError('Error retrieving the room after created.', 'Room id = ' + params.id));
+                  }
+                  var invitedNumberList = Array.prototype.slice.call(phoneNumbersToInvite);
+                  for (var i = 0; i < invitedNumberList.length; i++) {
+                    sendInvitationBySMS(phoneNumbersToInvite[i], roomAdmin, function(err, toNumber) {});
+                  }
+                  return response.send(201, populatedRoom);
+                });
             }
+          );
+        })(adminUser, params.phoneNumbers);
+      });
 
-            if (!populatedRoom) {
-              return response.send(404, new FlipsError('Error retrieving the room after created.', 'Room id = ' + room.id));
-            }
-
-            return response.send(201, populatedRoom);
-          });
-        }
-    );
+    });
   },
 
-  findOne: function(request, response) {
+  findOne: function (request, response) {
     var roomId = request.params.id;
 
     if (!roomId) {
@@ -76,7 +98,7 @@ var RoomController = {
 
     Room.findOne(roomId)
       .populate('participants')
-      .exec(function(error, room) {
+      .exec(function (error, room) {
         if (error) {
           return response.send(500, new FlipsError('Server error', err.details));
         }
@@ -90,12 +112,12 @@ var RoomController = {
     )
   },
 
-  update: function(request, response) {
+  update: function (request, response) {
     var roomId = request.params.id;
     var whereClause = { id: roomId };
     var updateColumns = request.body;
 
-    Room.update(whereClause, updateColumns, function(error, affectedRooms) {
+    Room.update(whereClause, updateColumns, function (error, affectedRooms) {
       if (error) {
         return response.send(500, new FlipsError('Error updating room.', err.details));
       }
@@ -106,7 +128,7 @@ var RoomController = {
 
       Room.findOne(affectedRooms[0].id)
         .populate('participants')
-        .exec(function(error, room) {
+        .exec(function (error, room) {
           if (error) {
             return response.send(500, new FlipsError('Server error', err.details));
           }
@@ -120,7 +142,7 @@ var RoomController = {
     });
   },
 
-  updateParticipants: function(request, response) {
+  updateParticipants: function (request, response) {
     var newParticipantsParam = request.param('participants');
 
     if (!newParticipantsParam) {
@@ -132,7 +154,7 @@ var RoomController = {
 
     var roomId = request.params.id;
     var whereClause = { id: roomId };
-    Room.update(whereClause, { participants: participants }, function(err, affectedRooms) {
+    Room.update(whereClause, { participants: participants }, function (err, affectedRooms) {
       if (err) {
         return response.send(500, new FlipsError('Error updating room.', err.details));
       }
@@ -143,7 +165,7 @@ var RoomController = {
 
       Room.findOne(affectedRooms[0].id)
         .populate('participants')
-        .exec(function(error, room) {
+        .exec(function (error, room) {
           if (error) {
             return response.send(500, new FlipsError('Server error', err.details));
           }
@@ -158,6 +180,47 @@ var RoomController = {
     });
   }
 };
+
+var createUsersForUnknownParticipants = function (params, callback) {
+  var phoneNumbers = params.phoneNumbers;
+  async.concat(phoneNumbers,
+    function (phoneNumber, callback) {
+      var user = {};
+      var uid = uuid();
+      user.username = uid;
+      user.firstName = uid;
+      user.lastName = uid;
+      user.birthday = "01/01/1970";
+      user.phoneNumber = phoneNumber;
+      User.create(user).exec(function (err, createdUser) {
+        if (err) {
+          callback(err);
+        }
+        if (createdUser) {
+          callback(null, createdUser.id);
+        }
+      })
+    },
+    function (err, createdUsers) {
+      callback(err, createdUsers);
+    }
+  )
+};
+
+var sendInvitationBySMS = function (toNumber, fromUser, callback) {
+  var msg = "You've been Flipped by {{firstname}} {{lastname}}! Download Flips within 30 days to view your message.  {{url}}";
+  msg = msg.replace("{{firstname}}", fromUser.firstName);
+  msg = msg.replace("{{lastname}}", fromUser.lastName);
+  msg = msg.replace("{{url}}", process.env.APP_STORE_URL);
+  twilioService.sendSms(toNumber, msg, function (err, message) {
+    if (err) {
+      logger.error('Error sending SMS', err);
+    }
+    callback(err, toNumber);
+  });
+
+
+}
 
 module.exports = RoomController;
 
