@@ -2,6 +2,8 @@ var request = require('superagent');
 var assert = require('assert');
 var BASE_URL = 'http://localhost:1337';
 
+var flipsUser;
+
 describe('Device Controller', function () {
   var user1 = request.agent();
   var userId;
@@ -15,25 +17,36 @@ describe('Device Controller', function () {
   };
 
   before(function(done) {
-    user1.post(BASE_URL + '/signup')
-      .send(aUser)
-      .end(function (err, res) {
-        if (err) {
-          throw err;
-        }
+    var flipBoysUser = {
+      username: 'flipboys@flips.com',
+      password: 'Password1',
+      firstName: 'Dev',
+      lastName: 'Test',
+      birthday: '1968-12-02'
+    };
+    User.create(flipBoysUser).exec(function (err, user) {
+      flipsUser = user;
+      user1.post(BASE_URL + '/signup')
+        .send(aUser)
+        .end(function (err, res) {
+          if (err) {
+            throw err;
+          }
 
-        userId = res.body.id;
+          userId = res.body.id;
 
-        user1.post(BASE_URL + '/signin')
-          .send({ username: aUser.username, password: aUser.password})
-          .end(function (err, res) {
-            if (err) {
-              throw err;
-            }
+          user1.post(BASE_URL + '/signin')
+            .send({ username: aUser.username, password: aUser.password})
+            .end(function (err, res) {
+              if (err) {
+                throw err;
+              }
 
-            done();
-          });
-      });
+              done();
+            });
+        });
+    });
+
   });
 
   after(function (done) {
@@ -43,7 +56,6 @@ describe('Device Controller', function () {
         if (err) {
           throw err;
         }
-
         done();
       });
   });
