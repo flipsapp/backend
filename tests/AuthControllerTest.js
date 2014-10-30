@@ -4,12 +4,34 @@ var bootstrap = require('./bootstrap')();
 var BASE_URL = 'http://localhost:1337';
 var moment = require('moment');
 
+var flipsUser;
+
 describe('AuthController - Using correct params', function () {
 
   var user1 = request.agent();
   var userId;
 
+  before(function (done) {
+    var flipBoysUser = {
+      username: 'flipboys@flips.com',
+      password: 'Password1',
+      firstName: 'Dev',
+      lastName: 'Test',
+      birthday: '1968-12-02'
+    };
+    User.create(flipBoysUser).exec(function (err, user) {
+      flipsUser = user;
+      done()
+    });
+  });
+
+  after(function (done) {
+    flipsUser.destroy();
+    done();
+  });
+
   it('Should create a user', function (done) {
+
     var aUser = {
       username: 'policytest@arctouch.com',
       password: 'Password1',
@@ -270,23 +292,39 @@ describe('AuthController - Sign in', function () {
     birthday: '1968-12-02'
   };
 
-  before(function(done) {
+  before(function (done) {
 
-    user1.post(BASE_URL + '/signup')
-      .send(aUser)
-      .end(function (err, res) {
-        if (err) {
-          throw err;
-        }
+    var flipBoysUser = {
+      username: 'flipboys@flips.com',
+      password: 'Password1',
+      firstName: 'Dev',
+      lastName: 'Test',
+      birthday: '1968-12-02'
+    };
+    User.create(flipBoysUser).exec(function (err, user) {
+      flipsUser = user;
 
-        var createdUser = res.body;
+      user1.post(BASE_URL + '/signup')
+        .send(aUser)
+        .end(function (err, res) {
+          if (err) {
+            throw err;
+          }
 
-        userId = createdUser.id;
-        done();
-      });
+          var createdUser = res.body;
+          console.log(createdUser);
+          userId = createdUser.id;
+          done();
+        });
+
+    });
+
+
   });
 
   after(function (done) {
+
+    flipsUser.destroy();
 
     user1.del(BASE_URL + '/user/' + userId)
       .end(function (err, res) {
@@ -406,43 +444,54 @@ describe('AuthController - Policy test', function () {
 
   before(function (done) {
 
-    user1.post(BASE_URL + '/signup')
-      .send(aUser)
-      .end(function (err, res) {
-        if (err) {
-          throw err;
-        }
+    var flipBoysUser = {
+      username: 'flipboys@flips.com',
+      password: 'Password1',
+      firstName: 'Dev',
+      lastName: 'Test',
+      birthday: '1968-12-02'
+    };
+    User.create(flipBoysUser).exec(function (err, user) {
+      flipsUser = user;
 
-        user1Id = res.body.id;
+      user1.post(BASE_URL + '/signup')
+        .send(aUser)
+        .end(function (err, res) {
+          if (err) {
+            throw err;
+          }
 
-        user1.post(BASE_URL + '/signin')
-          .send({ username: aUser.username, password: aUser.password})
-          .end(function (err, res) {
-            if (err) {
-              throw err;
-            }
+          user1Id = res.body.id;
 
-            user2.post(BASE_URL + '/signup')
-              .send(bUser)
-              .end(function (err, res) {
-                if (err) {
-                  throw err;
-                }
+          user1.post(BASE_URL + '/signin')
+            .send({ username: aUser.username, password: aUser.password})
+            .end(function (err, res) {
+              if (err) {
+                throw err;
+              }
 
-                user2Id = res.body.id;
+              user2.post(BASE_URL + '/signup')
+                .send(bUser)
+                .end(function (err, res) {
+                  if (err) {
+                    throw err;
+                  }
 
-                user2.post(BASE_URL + '/signin')
-                  .send({ username: bUser.username, password: bUser.password})
-                  .end(function (err, res) {
-                    if (err) {
-                      throw err;
-                    }
+                  user2Id = res.body.id;
 
-                    done();
-                  });
-              });
-          });
-      });
+                  user2.post(BASE_URL + '/signin')
+                    .send({ username: bUser.username, password: bUser.password})
+                    .end(function (err, res) {
+                      if (err) {
+                        throw err;
+                      }
+
+                      done();
+                    });
+                });
+            });
+        });
+    });
   });
 
   after(function (done) {
@@ -458,7 +507,7 @@ describe('AuthController - Policy test', function () {
             if (err) {
               throw err;
             }
-
+            flipsUser.destroy();
             done();
           });
       });

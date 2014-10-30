@@ -75,9 +75,11 @@ var RoomController = {
                   if (!populatedRoom) {
                     return response.send(404, new FlipsError('Error retrieving the room after created.', 'Room id = ' + params.id));
                   }
-                  var invitedNumberList = Array.prototype.slice.call(phoneNumbersToInvite);
-                  for (var i = 0; i < invitedNumberList.length; i++) {
-                    sendInvitationBySMS(phoneNumbersToInvite[i], roomAdmin, function(err, toNumber) {});
+                  if (phoneNumbersToInvite) {
+                    var invitedNumberList = Array.prototype.slice.call(phoneNumbersToInvite);
+                    for (var i = 0; i < invitedNumberList.length; i++) {
+                      sendInvitationBySMS(phoneNumbersToInvite[i], roomAdmin, function(err, toNumber) {});
+                    }
                   }
                   return response.send(201, populatedRoom);
                 });
@@ -183,6 +185,9 @@ var RoomController = {
 
 var createUsersForUnknownParticipants = function (params, callback) {
   var phoneNumbers = params.phoneNumbers;
+  if (!phoneNumbers) {
+    return callback(null, null);
+  };
   async.concat(phoneNumbers,
     function (phoneNumber, callback) {
       var user = {};
@@ -194,15 +199,15 @@ var createUsersForUnknownParticipants = function (params, callback) {
       user.phoneNumber = phoneNumber;
       User.create(user).exec(function (err, createdUser) {
         if (err) {
-          callback(err);
+          return callback(err);
         }
         if (createdUser) {
-          callback(null, createdUser.id);
+          return callback(null, createdUser.id);
         }
       })
     },
     function (err, createdUsers) {
-      callback(err, createdUsers);
+      return callback(err, createdUsers);
     }
   )
 };
@@ -216,7 +221,7 @@ var sendInvitationBySMS = function (toNumber, fromUser, callback) {
     if (err) {
       logger.error('Error sending SMS', err);
     }
-    callback(err, toNumber);
+    return callback(err, toNumber);
   });
 
 

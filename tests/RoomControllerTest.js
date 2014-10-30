@@ -122,40 +122,6 @@ describe('Room Controller', function () {
         });
     });
 
-    it('When using correct fields, pubnubId must be valid', function (done) {
-      var roomId;
-
-      user1.post(BASE_URL + '/user/' + userId + "/rooms")
-        .send({ name: "Room 1" })
-        .end(function (err, res) {
-          if (err) {
-            throw err;
-          }
-          
-          var room = res.body;
-
-          assert.equal(res.status, 201);
-          assert.notEqual(room.id, null);
-          assert.notEqual(room.pubnubId, null);
-
-          var decoded = jwt.decode(room.pubnubId, process.env.JWT_SECRET);
-          assert.equal(decoded.name, room.name);
-          assert.equal(decoded.admin, room.admin);
-
-          roomId = room.id;
-
-          user1.del(BASE_URL + '/user/' + userId + 'rooms/' + roomId)
-            .end(function (err, res) {
-              if (err) {
-                throw err;
-              }
-
-              done();
-
-            });
-        });
-    });
-
     it('When missing room name, must return an error', function (done) {
       user1.post(BASE_URL + '/user/' + userId + "/rooms")
         .send({ })
