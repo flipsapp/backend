@@ -1,6 +1,7 @@
 var validator = require('validator')
   , actionUtil = requires('>/node_modules/sails/lib/hooks/blueprints/actionUtil')
-  , moment    = require('moment');
+  , moment    = require('moment')
+  , uuid = require('node-uuid');
 
 /**
  * Local Authentication Protocol
@@ -133,46 +134,79 @@ exports.createUser = function(userModel, next) {
           });
         }
 
-        if (photo._files.length > 0) {
-          s3service.upload(photo, s3service.PICTURES_BUCKET, function (err, uploadedFiles) {
+        User.findOne({username: process.env.FLIPBOYS_USERNAME}).exec(function(err, flipboysUser) {
+          if (err) {
+            return user.destroy(function (destroyErr) {
+              next(destroyErr || err);
+            });
+          }
+          if (!flipboysUser) {
+            return user.destroy(function (destroyErr) {
+              next(destroyErr || new FlipsError('Flipboys user not found'));
+            });
+          }
+
+          var participants = [user.id, flipboysUser.id];
+
+          Room.create({
+            admin: user.id,
+            participants: participants,
+            pubnubId: uuid()
+          }).exec(function(err, room) {
             if (err) {
-              var errmsg = 'Error uploading picture';
-              logger.error(errmsg);
               return user.destroy(function (destroyErr) {
-                next(destroyErr || errmsg);
+                next(destroyErr || new FlipsError('Error trying to create Flipboys room for this user', err, ErrorCodes.ROOM_CREATION_INTERNAL_SERVER_ERROR));
+              });
+            }
+            if (!room) {
+              return user.destroy(function (destroyErr) {
+                next(destroyErr || new FlipsError('No Flipboys room created for this user.', null, ErrorCodes.ROOM_CREATION_BAD_REQUEST_ERROR));
               });
             }
 
-            if (!uploadedFiles || uploadedFiles.length < 1) {
-              return user.destroy(function (destroyErr) {
-                next(destroyErr || errmsg);
-              });
-            }
+            User.findOne(user.id).populate('rooms').exec(function(err, populatedUser) {
+              if (err) {
+                return user.destroy(function (destroyErr) {
+                  next(destroyErr || new FlipsError('Error trying the newly created user', err, ErrorCodes.USER_FIND_INTERNAL_ERROR));
+                });
+              }
+              if (!room) {
+                return user.destroy(function (destroyErr) {
+                  next(destroyErr || new FlipsError('Error trying to create Flipboys room for this user', err, ErrorCodes.USER_NOT_FOUND));
+                });
+              }
 
-            var uploadedFile = uploadedFiles[0];
+              if (photo._files.length > 0) {
+                s3service.upload(photo, s3service.PICTURES_BUCKET, function (err, uploadedFiles) {
+                  if (err) {
+                    var errmsg = 'Error uploading picture';
+                    logger.error(errmsg);
+                    return user.destroy(function (destroyErr) {
+                      next(destroyErr || errmsg);
+                    });
+                  }
 
-            User.update(user.id, { photoUrl: uploadedFile.extra.Location })
-              .exec(function (err, updatedUser) {
-                if (err) {
-                  var errmsg = 'Error updating user';
-                  logger.error(errmsg);
-                  return user.destroy(function (destroyErr) {
-                    next(destroyErr || errmsg);
-                  });
-                }
+                  if (!uploadedFiles || uploadedFiles.length < 1) {
+                    return user.destroy(function (destroyErr) {
+                      next(destroyErr || errmsg);
+                    });
+                  }
 
-                if (!updatedUser || updatedUser.length < 1) {
-                  return user.destroy(function (destroyErr) {
-                    next(destroyErr || 'Error updating user with photo url');
-                  });
-                }
+                  var uploadedFile = uploadedFiles[0];
 
-                return next(null, updatedUser[0]);
-              });
+                  populatedUser.photoUrl = uploadedFile.extra.Location;
+                  populatedUser.save();
+
+                  return next(null, populatedUser);
+
+                });
+              } else {
+                return next(null, populatedUser);
+              }
+
+            });
           });
-        } else {
-          return next(null, user);
-        }
+        });
       });
     });
   });

@@ -4,7 +4,7 @@
  * @description :: TODO: You might write a short summary of how this model works and what it represents here.
  * @docs        :: http://sailsjs.org/#!documentation/models
  */
-var bcrypt = require('bcrypt');
+var uuid = require('node-uuid');
 
 var User = {
 
@@ -74,10 +74,8 @@ var User = {
   },
 
   beforeCreate: function (user, next) {
-    bcrypt.hash(user.username, 10, function (err, hash) {
-      user.pubnubId = hash.replace("/", "");
-      next();
-    });
+    user.pubnubId = uuid();
+    next();
   }
 };
 

@@ -11,3 +11,4 @@ JWT_SECRET            = U868D8e6zUfKes8w3Ye6WBq8426u2c5Tnn788A64p7876mRIZx
 TWILIO_ACCOUNT_SID    = ACa74afac8dba30dfe3be33628980f18c6
 TWILIO_AUTH_TOKEN     = 8f7b763fc9a5866d2ed18d640117c459
 APP_STORE_URL         = appstore.com/flips
+FLIPBOYS_USERNAME     = flipboys@flips.com
