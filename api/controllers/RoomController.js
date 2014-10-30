@@ -191,10 +191,10 @@ var createUsersForUnknownParticipants = function (params, callback) {
   async.concat(phoneNumbers,
     function (phoneNumber, callback) {
       var user = {};
-      var uid = uuid();
-      user.username = uid;
-      user.firstName = uid;
-      user.lastName = uid;
+      var anythingTemporary = uuid();
+      user.username = anythingTemporary;
+      user.firstName = anythingTemporary;
+      user.lastName = anythingTemporary;
       user.birthday = "01/01/1970";
       user.phoneNumber = phoneNumber;
       User.create(user).exec(function (err, createdUser) {
@@ -202,6 +202,10 @@ var createUsersForUnknownParticipants = function (params, callback) {
           return callback(err);
         }
         if (createdUser) {
+          createdUser.username = createdUser.pubnubId;
+          createdUser.firstName = createdUser.pubnubId;
+          createdUser.lastName = createdUser.pubnubId;
+          createdUser.save();
           return callback(null, createdUser.id);
         }
       })
