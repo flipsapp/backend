@@ -5,6 +5,7 @@
  * @help        :: See http://links.sailsjs.org/docs/controllers
  */
 var MAX_RETRY_COUNT = 2;
+var actionUtil = requires('>/node_modules/sails/lib/hooks/blueprints/actionUtil');
 
 var UserController = {
 
@@ -198,6 +199,27 @@ var UserController = {
         })
 
       })
+  },
+
+  inviteContacts: function (request, response) {
+    var values = actionUtil.parseValues(request);
+    var userId = values.parentid;
+    var contacts = values.contacts;
+
+    User.findOne(userId).exec(function (err, user) {
+      if (err) {
+        return response.send(500, new FlipsError('Error trying to find user', err));
+      }
+      if (!user) {
+        return response.send(404, new FlipsError('User not found'));
+      }
+      for (var i=0; i < contacts.length; i++) {
+        contacts[i].user = user;
+      }
+      async.concat(contacts, inviteContact, function(err, invitedContacts) {
+        return response.send(200, invitedContacts);
+      })
+    });
   }
 
 };
