@@ -36,7 +36,8 @@ module.exports.policies = {
     update: ['passport', 'owner'],
     findOne: ['passport', 'owner'],
     populate: ['passport', 'owner'],
-    inviteContacts: ['passport']
+    inviteContacts: ['passport'],
+    myRooms: ['passport', 'owner']
   },
 
 	FlipController: {
