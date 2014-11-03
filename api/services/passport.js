@@ -47,6 +47,7 @@ passport.facebook = function(request, response, next) {
     }
 
     User.findOne({ username: fbProfile.email})
+      .populate('devices')
       .exec(function(err, user) {
         if (err) {
           return next(new FlipsError('Error retrieving User.'));
@@ -55,29 +56,15 @@ passport.facebook = function(request, response, next) {
         if (!user) {
           createFacebookUser(fbProfile, next);
         } else {
-          var updateColumns = {
-            facebookID: fbProfile.id,
-            firstName : fbProfile.first_name,
-            lastName  : fbProfile.last_name,
-            photoUrl  : fbProfile.picture.data.url
-          };
 
-          var whereClause = {
-            id: user.id
-          };
+          user.facebookID = fbProfile.id;
+          user.firstName = fbProfile.first_name;
+          user.lastName = fbProfile.last_name;
+          user.photoUrl = fbProfile.picture.data.url;
 
-          User.update(whereClause, updateColumns)
-            .exec(function(err, affectedUsers) {
-              if (err) {
-                return next(new FlipsError('Error updating User.'));
-              }
+          user.save();
 
-              if (!affectedUsers || affectedUsers.length < 1) {
-                return next(new FlipsError('Error updating User.'));
-              }
-
-              return next(null, affectedUsers[0]);
-            });
+          next(null, user)
         }
       }
     );

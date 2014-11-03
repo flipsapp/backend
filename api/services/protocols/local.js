@@ -71,39 +71,41 @@ exports.login = function (req, identifier, password, next) {
   var query = {};
   query.username = identifier;
 
-  User.findOne(query, function (err, user) {
-    if (err) {
-      return next(err);
-    }
-
-    if (!user) {
-      req.flash('error', 'Error.Passport.Username.NotFound');
-      return next(null, false);
-    }
-
-    Passport.findOne({
-      protocol : 'local',
-      user     : user.id
-    }, function (err, passport) {
-      if (passport) {
-        passport.validatePassword(password, function (err, res) {
-          if (err) {
-            return next(err);
-          }
-
-          if (!res) {
-            req.flash('error', 'Error.Passport.Password.Wrong');
-            return next(null, false);
-          } else {
-            return next(null, user);
-          }
-        });
+  User.findOne(query)
+    .populate('devices')
+    .exec(function (err, user) {
+      if (err) {
+        return next(err);
       }
-      else {
-        req.flash('error', 'Error.Passport.Password.NotSet');
+
+      if (!user) {
+        req.flash('error', 'Error.Passport.Username.NotFound');
         return next(null, false);
       }
-    });
+
+      Passport.findOne({
+        protocol : 'local',
+        user     : user.id
+      }, function (err, passport) {
+        if (passport) {
+          passport.validatePassword(password, function (err, res) {
+            if (err) {
+              return next(err);
+            }
+
+            if (!res) {
+              req.flash('error', 'Error.Passport.Password.Wrong');
+              return next(null, false);
+            } else {
+              return next(null, user);
+            }
+          });
+        }
+        else {
+          req.flash('error', 'Error.Passport.Password.NotSet');
+          return next(null, false);
+        }
+      });
   });
 };
 
@@ -176,7 +178,7 @@ exports.createUser = function(userModel, next) {
                 });
               }
 
-              if (photo._files.length > 0) {
+              if (photo && photo._files.length > 0) {
                 s3service.upload(photo, s3service.PICTURES_BUCKET, function (err, uploadedFiles) {
                   if (err) {
                     var errmsg = 'Error uploading picture';
