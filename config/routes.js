@@ -51,12 +51,13 @@ module.exports.routes = {
 
   'POST   /user/:parentid/rooms'                    : 'RoomController.create',
   'GET    /user/:parentid/rooms/:id'                : 'RoomController.findOne',
+  'GET    /user/:parentid/rooms'                    : 'UserController.myRooms',
   'PUT    /user/:parentid/rooms/:id/participants'   : 'RoomController.updateParticipants',
   'PUT    /user/:parentid/rooms/:id'                : 'RoomController.update',
 
-  'POST   /user/:parentid/contacts'               : 'ContactController.uploadContacts',
+  'POST   /user/:parentid/contacts'                 : 'ContactController.uploadContacts',
 
-  'POST   /background'                            : 'FlipController.uploadBackground',
-  'POST   /sound'                                 : 'FlipController.uploadSound'
+  'POST   /background'                              : 'FlipController.uploadBackground',
+  'POST   /sound'                                   : 'FlipController.uploadSound'
 
 };

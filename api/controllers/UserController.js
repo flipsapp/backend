@@ -199,6 +199,19 @@ var UserController = {
         })
 
       })
+  },
+
+  myRooms: function (request, response) {
+    var userId = request.params.parentid;
+    Room.query('select * from room where admin = ' + userId + ' union select a.* from room a, room_participants__user_rooms b where a.id = b.room_participants and b.user_rooms = ' + userId, function(err, rooms) {
+      if (err) {
+        return response.send(500, new FlipsError('Error when trying to retrieve rooms'));
+      }
+      if (!rooms) {
+        return reponse.send(404, new FlipsError('Rooms not found'))
+      }
+      return response.send(200, rooms);
+    });
   }
 
 };
