@@ -37,7 +37,8 @@ module.exports.policies = {
     findOne: ['passport', 'owner'],
     populate: ['passport', 'owner'],
     inviteContacts: ['passport'],
-    myRooms: ['passport', 'owner']
+    myRooms: ['passport', 'owner'],
+    verifyContacts: ['passport']
   },
 
 	FlipController: {

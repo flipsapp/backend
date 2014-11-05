@@ -212,6 +212,13 @@ var UserController = {
       }
       return response.send(200, rooms);
     });
+  },
+
+  verifyContacts: function (request, response) {
+    var contacts = request.param("phoneNumbers");
+    User.find({phoneNumber: contacts}).exec(function(err, users) {
+      return response.send(200, users);
+    })
   }
 
 };
