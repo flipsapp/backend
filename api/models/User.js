@@ -5,6 +5,7 @@
  * @docs        :: http://sailsjs.org/#!documentation/models
  */
 var uuid = require('node-uuid');
+var Krypto = requires('>/api/utilities/Krypto');
 
 var User = {
 
@@ -70,6 +71,10 @@ var User = {
 
   beforeCreate: function (user, next) {
     user.pubnubId = uuid();
+    user.username = Krypto.encrypt(user.username);
+    user.firstName = Krypto.encrypt(user.firstName);
+    user.lastName = Krypto.encrypt(user.lastName);
+    user.phoneNumber = Krypto.encrypt(user.phoneNumber);
     next();
   }
 };
