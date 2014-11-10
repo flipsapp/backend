@@ -219,6 +219,73 @@ var UserController = {
     User.find({phoneNumber: contacts}).exec(function(err, users) {
       return response.send(200, users);
     })
+  },
+
+  update: function (request, response) {
+    var userId = request.params.parentid;
+    var updatedValues = actionUtil.parseValues(request);
+    var photo = request.file('photo');
+
+    //TODO update password too
+
+    console.log('aqui');
+
+    if (!userId) {
+      return response.send(400, new FlipsError('Missing parameter: [User Id]'));
+    }
+
+    User.findOne(userId).exec(function(err, user) {
+      if (err) {
+        return response.send(500, new FlipsError('Error when trying to retrieve user'));
+      }
+      if (!user) {
+        return response.send(404, new FlipsError('User not found'));
+      }
+      user.firstName = updatedValues.firstName || user.firstName;
+      user.lastName = updatedValues.lastName || user.lastName;
+      user.birthday = updatedValues.birthday || user.birthday;
+      user.phoneNumber = updatedValues.phoneNumber || user.phoneNumber;
+      user.save(function(err) {
+        if (err) {
+          var errmsg = new FlipsError('Error trying to update user');
+          logger.error(errmsg, err);
+          return response.send(500, errmsg);
+        }
+        if (photo && photo._files.length >= 1) {
+          s3service.upload(photo, s3service.PICTURES_BUCKET, function(err, uploadedFiles) {
+            if (err) {
+              var errmsg = new FlipsError('Error uploading picture', err);
+              logger.error(errmsg);
+              return response.send(500, errmsg);
+            }
+
+            if (!uploadedFiles || uploadedFiles.length < 1){
+              return response.send(400, new FlipsError('Error uploading file'));
+            }
+
+            var uploadedFile = uploadedFiles[0];
+
+            user.photoUrl = uploadedFile.extra.Location;
+            user.save(function(err) {
+              if (err) {
+                var errmsg = new FlipsError('Error updating user', err);
+                logger.error(errmsg);
+                return response.send(500, errmsg);
+              }
+
+              if (!updatedUser || updatedUser.length < 1){
+                return response.send(400, new FlipsError('Error updating user with photo url'));
+              }
+
+              return response.send(200, updatedUser[0]);
+            });
+          });
+        } else {
+          return response.send(200, user);
+        }
+      });
+    });
+
   }
 
 };
