@@ -6,6 +6,7 @@
  */
 var MAX_RETRY_COUNT = 2;
 var actionUtil = requires('>/node_modules/sails/lib/hooks/blueprints/actionUtil');
+var Krypto = requires('>/api/utilities/Krypto');
 
 var UserController = {
 
@@ -60,7 +61,7 @@ var UserController = {
       return response.send(400, new FlipsError('Error requesting to reset password.', 'Phone Number or email is empty.'));
     }
 
-    User.findOne({ username: email })
+    User.findOne({ username: Krypto.encrypt(email) })
       .exec(function(err, user) {
         if (err) {
           var errmsg = new FlipsError('Error retrieving the user.');
@@ -216,6 +217,9 @@ var UserController = {
 
   verifyContacts: function (request, response) {
     var contacts = request.param("phoneNumbers");
+    for (var i=0; i<contacts.length; i++) {
+      contacts[i] = Krypto.encrypt(contacts[i]);
+    }
     User.find({phoneNumber: contacts}).exec(function(err, users) {
       return response.send(200, users);
     })
