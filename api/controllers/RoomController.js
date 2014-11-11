@@ -8,6 +8,7 @@
 var actionUtil = requires('>/node_modules/sails/lib/hooks/blueprints/actionUtil');
 var uuid = require('node-uuid');
 var googl = require('goo.gl');
+var PubNub = requires('>/api/utilities/PubNub');
 
 var RoomController = {
 
@@ -81,6 +82,7 @@ var RoomController = {
                       sendInvitationBySMS(phoneNumbersToInvite[i], roomAdmin, function(err, toNumber) {});
                     }
                   }
+                  subscribeUsersToRoom(populatedRoom);
                   return response.send(201, populatedRoom);
                 });
             }
@@ -202,10 +204,6 @@ var createUsersForUnknownParticipants = function (params, callback) {
           return callback(err);
         }
         if (createdUser) {
-          createdUser.username = createdUser.pubnubId;
-          createdUser.firstName = createdUser.pubnubId;
-          createdUser.lastName = createdUser.pubnubId;
-          createdUser.save();
           return callback(null, createdUser.id);
         }
       })
@@ -227,9 +225,22 @@ var sendInvitationBySMS = function (toNumber, fromUser, callback) {
     }
     return callback(err, toNumber);
   });
+};
 
-
-}
+var subscribeUsersToRoom = function (room) {
+  for (var i=0; i<room.participants.length; i++) {
+    var participant = room.participants[i];
+    var message = {type : 1, content: {room_id : room.id, room_pubnubid : room.pubnubId}};
+    (function (aParticipant, aRoom, aMessage) {
+      PubNub.publish({
+        channel   : aParticipant.pubnubId,
+        message   : aMessage,
+        callback  : function(e) {logger.info('User %s subscribed to room %s on channel %s', aParticipant.id, aRoom.id, aRoom.pubnubId)},
+        error     : function(e) {logger.error('Error when trying to subscribe user %s to room %s on channel %s. Details: %s', aParticipant.id, aRoom.id, aRoom.pubnubId, e)}
+      });
+    })(participant, room, message);
+  }
+};
 
 module.exports = RoomController;
 

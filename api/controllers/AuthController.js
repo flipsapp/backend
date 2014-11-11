@@ -6,6 +6,8 @@
  * the basics of Passport.js to work.
  */
 
+var Krypto = requires('>/api/utilities/Krypto');
+
 var AuthController = {
 
   signin: function(request, response) {

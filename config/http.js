@@ -72,18 +72,17 @@ module.exports.http = {
       limit: 10485760
     })
 
+    /***************************************************************************
+     *                                                                          *
+     * The number of seconds to cache flat files on disk being served by        *
+     * Express static middleware (by default, these files are in `.tmp/public`) *
+     *                                                                          *
+     * The HTTP static cache is only active in a 'production' environment,      *
+     * since that's the only time Express will cache flat-files.                *
+     *                                                                          *
+     ***************************************************************************/
 
+    // cache: 31557600000
   }
 
-  /***************************************************************************
-   *                                                                          *
-   * The number of seconds to cache flat files on disk being served by        *
-   * Express static middleware (by default, these files are in `.tmp/public`) *
-   *                                                                          *
-   * The HTTP static cache is only active in a 'production' environment,      *
-   * since that's the only time Express will cache flat-files.                *
-   *                                                                          *
-   ***************************************************************************/
-
-  // cache: 31557600000
 };

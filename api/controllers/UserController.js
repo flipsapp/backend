@@ -6,10 +6,11 @@
  */
 var MAX_RETRY_COUNT = 2;
 var actionUtil = requires('>/node_modules/sails/lib/hooks/blueprints/actionUtil');
+var Krypto = requires('>/api/utilities/Krypto');
 
 var UserController = {
 
-  uploadPhoto: function(request, response) {
+  uploadPhoto: function (request, response) {
     var userId = request.params.parentid;
     var photo = request.file('photo');
 
@@ -21,21 +22,21 @@ var UserController = {
       return response.send(400, new FlipsError('Missing parameter: [User Photo]'));
     }
 
-    s3service.upload(photo, s3service.PICTURES_BUCKET, function(err, uploadedFiles) {
+    s3service.upload(photo, s3service.PICTURES_BUCKET, function (err, uploadedFiles) {
       if (err) {
         var errmsg = new FlipsError('Error uploading picture', err);
         logger.error(errmsg);
         return response.send(500, errmsg);
       }
 
-      if (!uploadedFiles || uploadedFiles.length < 1){
+      if (!uploadedFiles || uploadedFiles.length < 1) {
         return response.send(400, new FlipsError('Error uploading file'));
       }
 
       var uploadedFile = uploadedFiles[0];
 
       User.update(userId, { photoUrl: uploadedFile.extra.Location })
-        .exec(function(err, updatedUser) {
+        .exec(function (err, updatedUser) {
 
           if (err) {
             var errmsg = new FlipsError('Error updating user', err);
@@ -43,16 +44,16 @@ var UserController = {
             return response.send(500, errmsg);
           }
 
-          if (!updatedUser || updatedUser.length < 1){
+          if (!updatedUser || updatedUser.length < 1) {
             return response.send(400, new FlipsError('Error updating user with photo url'));
           }
 
           return response.send(200, updatedUser[0]);
-      });
+        });
     });
   },
 
-  forgot: function(request, response) {
+  forgot: function (request, response) {
     var phoneNumber = request.param('phone_number');
     var email = request.param('email');
 
@@ -60,8 +61,8 @@ var UserController = {
       return response.send(400, new FlipsError('Error requesting to reset password.', 'Phone Number or email is empty.'));
     }
 
-    User.findOne({ username: email })
-      .exec(function(err, user) {
+    User.findOne({ username: Krypto.encrypt(email) })
+      .exec(function (err, user) {
         if (err) {
           var errmsg = new FlipsError('Error retrieving the user.');
           logger.error(errmsg);
@@ -184,7 +185,7 @@ var UserController = {
 
         var whereClause = {user: device.user.id}
         var updateColumns = {password: password}
-        Passport.update(whereClause, updateColumns, function(error, affectedUsers) {
+        Passport.update(whereClause, updateColumns, function (error, affectedUsers) {
           if (error) {
             var errmsg = new FlipsError('Error updating passport.');
             logger.error(errmsg);
@@ -203,7 +204,7 @@ var UserController = {
 
   myRooms: function (request, response) {
     var userId = request.params.parentid;
-    Room.query('select * from room where admin = ' + userId + ' union select a.* from room a, room_participants__user_rooms b where a.id = b.room_participants and b.user_rooms = ' + userId, function(err, rooms) {
+    Room.query('select * from room where admin = ' + userId + ' union select a.* from room a, room_participants__user_rooms b where a.id = b.room_participants and b.user_rooms = ' + userId, function (err, rooms) {
       if (err) {
         return response.send(500, new FlipsError('Error when trying to retrieve rooms'));
       }
@@ -216,7 +217,10 @@ var UserController = {
 
   verifyContacts: function (request, response) {
     var contacts = request.param("phoneNumbers");
-    User.find({phoneNumber: contacts}).exec(function(err, users) {
+    for (var i = 0; i < contacts.length; i++) {
+      contacts[i] = Krypto.encrypt(contacts[i]);
+    }
+    User.find({phoneNumber: contacts}).exec(function (err, users) {
       return response.send(200, users);
     })
   },
@@ -226,63 +230,118 @@ var UserController = {
     var updatedValues = actionUtil.parseValues(request);
     var photo = request.file('photo');
 
-    //TODO update password too
-
-    console.log('aqui');
-
     if (!userId) {
       return response.send(400, new FlipsError('Missing parameter: [User Id]'));
     }
 
-    User.findOne(userId).exec(function(err, user) {
+    var PASSWORD_REGEX = '^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9]).{8,}$';
+    var password = updatedValues.password;
+
+    if (password && !password.match(PASSWORD_REGEX)) {
+      return response.send(400, new FlipsError('Password must have at least eight characters, one uppercase letter and one lowercase letter and one number.'));
+    }
+
+    User.findOne(userId).exec(function (err, user) {
       if (err) {
         return response.send(500, new FlipsError('Error when trying to retrieve user'));
       }
       if (!user) {
         return response.send(404, new FlipsError('User not found'));
       }
-      user.firstName = updatedValues.firstName || user.firstName;
-      user.lastName = updatedValues.lastName || user.lastName;
-      user.birthday = updatedValues.birthday || user.birthday;
-      user.phoneNumber = updatedValues.phoneNumber || user.phoneNumber;
-      user.save(function(err) {
+      if (updatedValues.firstName) {
+        user.firstName = Krypto.encrypt(updatedValues.firstName);
+      }
+      if (updatedValues.lastName) {
+        user.lastName = Krypto.encrypt(updatedValues.lastName);
+      }
+      if (updatedValues.username) {
+        user.username = Krypto.encrypt(updatedValues.username);
+      }
+      if (updatedValues.phoneNumber) {
+        user.phoneNumber = Krypto.encrypt(updatedValues.phoneNumber);
+      }
+      user.save(function (err) {
         if (err) {
           var errmsg = new FlipsError('Error trying to update user');
           logger.error(errmsg, err);
           return response.send(500, errmsg);
         }
-        if (photo && photo._files.length >= 1) {
-          s3service.upload(photo, s3service.PICTURES_BUCKET, function(err, uploadedFiles) {
-            if (err) {
-              var errmsg = new FlipsError('Error uploading picture', err);
+
+        if (password) {
+          var whereClause = {user: user.id}
+          var updateColumns = {password: password}
+          Passport.update(whereClause, updateColumns, function (error, affectedUsers) {
+            if (error) {
+              var errmsg = new FlipsError('Error updating passport.');
               logger.error(errmsg);
               return response.send(500, errmsg);
             }
 
-            if (!uploadedFiles || uploadedFiles.length < 1){
-              return response.send(400, new FlipsError('Error uploading file'));
+            if (!affectedUsers || affectedUsers.length < 1) {
+              return response.send(400, new FlipsError("No rows affected while updating passport"));
             }
 
-            var uploadedFile = uploadedFiles[0];
+            if (photo && photo._files.length >= 1) {
+              s3service.upload(photo, s3service.PICTURES_BUCKET, function (err, uploadedFiles) {
+                if (err) {
+                  var errmsg = new FlipsError('Error uploading picture', err);
+                  logger.error(errmsg);
+                  return response.send(500, errmsg);
+                }
 
-            user.photoUrl = uploadedFile.extra.Location;
-            user.save(function(err) {
+                if (!uploadedFiles || uploadedFiles.length < 1) {
+                  return response.send(400, new FlipsError('Error uploading file'));
+                }
+
+                var uploadedFile = uploadedFiles[0];
+
+                user.photoUrl = uploadedFile.extra.Location;
+                user.save(function (err) {
+                  if (err) {
+                    var errmsg = new FlipsError('Error updating user', err);
+                    logger.error(errmsg);
+                    return response.send(500, errmsg);
+                  }
+                  return response.send(200, user);
+                });
+              });
+            } else {
+              return response.send(200, user);
+            }
+
+          });
+        } else {
+
+          if (photo && photo._files.length >= 1) {
+            s3service.upload(photo, s3service.PICTURES_BUCKET, function (err, uploadedFiles) {
               if (err) {
-                var errmsg = new FlipsError('Error updating user', err);
+                var errmsg = new FlipsError('Error uploading picture', err);
                 logger.error(errmsg);
                 return response.send(500, errmsg);
               }
 
-              if (!updatedUser || updatedUser.length < 1){
-                return response.send(400, new FlipsError('Error updating user with photo url'));
+              if (!uploadedFiles || uploadedFiles.length < 1) {
+                return response.send(400, new FlipsError('Error uploading file'));
               }
 
-              return response.send(200, updatedUser[0]);
+              var uploadedFile = uploadedFiles[0];
+
+              user.photoUrl = uploadedFile.extra.Location;
+              user.save(function (err) {
+                if (err) {
+                  var errmsg = new FlipsError('Error updating user', err);
+                  logger.error(errmsg);
+                  return response.send(500, errmsg);
+                }
+                return response.send(200, user);
+              });
             });
-          });
-        } else {
-          return response.send(200, user);
+          } else {
+            return response.send(200, user);
+          }
+
         }
+
       });
     });
 
@@ -292,7 +351,7 @@ var UserController = {
 
 module.exports = UserController;
 
-var sendVerificationCode = function(device) {
+var sendVerificationCode = function (device) {
   var verificationCode = Math.floor(Math.random() * 8999) + 1000;
   var message = 'Your Flips verification code: ' + verificationCode;
 

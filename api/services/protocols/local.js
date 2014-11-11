@@ -1,7 +1,8 @@
 var validator = require('validator')
   , actionUtil = requires('>/node_modules/sails/lib/hooks/blueprints/actionUtil')
   , moment    = require('moment')
-  , uuid = require('node-uuid');
+  , uuid = require('node-uuid')
+  , Krypto = requires('>/api/utilities/Krypto');
 
 /**
  * Local Authentication Protocol
@@ -69,7 +70,7 @@ exports.register = function (request, response, next) {
  */
 exports.login = function (req, identifier, password, next) {
   var query = {};
-  query.username = identifier;
+  query.username = Krypto.encrypt(identifier);
 
   User.findOne(query)
     .populate('devices')
@@ -136,7 +137,7 @@ exports.createUser = function(userModel, next) {
           });
         }
 
-        User.findOne({username: process.env.FLIPBOYS_USERNAME}).exec(function(err, flipboysUser) {
+        User.findOne({username: Krypto.encrypt(process.env.FLIPBOYS_USERNAME)}).exec(function(err, flipboysUser) {
           if (err) {
             return user.destroy(function (destroyErr) {
               next(destroyErr || err);

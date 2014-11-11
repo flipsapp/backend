@@ -15,5 +15,14 @@ module.exports.bootstrap = function(cb) {
 
   // It's very important to trigger this callback method when you are finished
   // with the bootstrap!  (otherwise your server will never lift, since it's waiting on the bootstrap)
-  cb();
+
+  User.create({
+    username: 'flipboys@flips.com',
+    firstName: 'Flip',
+    lastName: 'Boys',
+    birthday: '1970-01-01',
+    phoneNumber: '+14155555555'
+  }).exec(function(err, user) {
+    cb();
+  });
 };
