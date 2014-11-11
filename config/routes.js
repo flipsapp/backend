@@ -36,6 +36,7 @@ module.exports.routes = {
                                                                                     // /flips/stock?category=Toon&owner=123
   'POST   /user/forgot'                             : 'UserController.forgot',
   'POST   /user/:parentid/update'                   : 'UserController.update',
+  'PUT    /user/:parentid'                          : 'UserController.update',
   'POST   /user/verify'                             : 'UserController.verify',
   'PUT    /user/password'                           : 'UserController.updatePassword',
   'POST   /user/:user_id/flips'                     : 'FlipController.create',
