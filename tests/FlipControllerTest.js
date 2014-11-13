@@ -26,14 +26,14 @@ describe('FlipController', function () {
         }
         userId = createdUser.id;
         assert.equal(res.status, 200);
-        assert.equal(createdUser.username, Krypto.encrypt('devtest@arctouch.com'));
+        assert.equal(createdUser.username, 'devtest@arctouch.com');
         assert.equal(createdUser.password, 'Password1');
-        assert.equal(createdUser.firstName, Krypto.encrypt('Dev'));
-        assert.equal(createdUser.lastName, Krypto.encrypt('Test'));
+        assert.equal(createdUser.firstName, 'Dev');
+        assert.equal(createdUser.lastName, 'Test');
         assert.equal(createdUser.birthday.substring(0, 10), '1968-12-02');
 
         user1.post('http://localhost:1337/signin')
-          .send({username: Krypto.decrypt(createdUser.username), password: createdUser.password})
+          .send({username: createdUser.username, password: createdUser.password})
           .end(function (err, res) {
             if (err) {
               throw err;
@@ -55,14 +55,14 @@ describe('FlipController', function () {
                 }
                 user2Id = createdUser.id;
                 assert.equal(res.status, 200);
-                assert.equal(createdUser.username, Krypto.encrypt('devtest1@arctouch.com'));
+                assert.equal(createdUser.username, 'devtest1@arctouch.com');
                 assert.equal(createdUser.password, 'Password1');
-                assert.equal(createdUser.firstName, Krypto.encrypt('Dev1'));
-                assert.equal(createdUser.lastName, Krypto.encrypt('Test1'));
+                assert.equal(createdUser.firstName, 'Dev1');
+                assert.equal(createdUser.lastName, 'Test1');
                 assert.equal(createdUser.birthday.substring(0, 10), '1968-12-02');
 
                 user2.post('http://localhost:1337/signin')
-                  .send({username: Krypto.decrypt(createdUser.username), password: createdUser.password})
+                  .send({username: createdUser.username, password: createdUser.password})
                   .end(function (err, res) {
                     if (err) {
                       throw err;

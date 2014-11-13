@@ -13,11 +13,6 @@ module.exports = {
       model: 'User'
     },
 
-    phoneNumber: {
-      type: 'string',
-      required: true
-    },
-
     platform: {
       type: 'string',
       required: true

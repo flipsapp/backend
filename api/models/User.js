@@ -67,23 +67,27 @@ var User = {
       type: 'string'
     },
 
-    toJSON: function () {
-      var user = this.toObject();
-      user.username = Krypto.decrypt(user.username);
-      user.firstName = Krypto.decrypt(user.firstName);
-      user.lastName = Krypto.decrypt(user.lastName);
-      user.phoneNumber = Krypto.decrypt(user.phoneNumber);
-      return user;
+    isTemporary: {
+      type: 'boolean',
+      defaultsTo: false
     }
 
   },
 
   beforeCreate: function (user, next) {
     user.pubnubId = uuid();
-    user.username = Krypto.encrypt(user.username);
-    user.firstName = Krypto.encrypt(user.firstName);
-    user.lastName = Krypto.encrypt(user.lastName);
-    user.phoneNumber = Krypto.encrypt(user.phoneNumber);
+    if (user.username) {
+      user.username = Krypto.encrypt(user.username);
+    }
+    if (user.firstName) {
+      user.firstName = Krypto.encrypt(user.firstName);
+    }
+    if (user.lastName) {
+      user.lastName = Krypto.encrypt(user.lastName);
+    }
+    if (user.phoneNumber) {
+      user.phoneNumber = Krypto.encrypt(user.phoneNumber);
+    }
     next(null, user);
   }
 

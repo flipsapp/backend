@@ -100,6 +100,7 @@ var FlipController = {
             logger.error(errmsg);
             return response.send(500, errmsg);
           }
+          printToConsole = true;
           return response.send(200, flip);
         });
       })

@@ -17,6 +17,40 @@ var Krypto = {
     var decrypted = decipher.update(text, 'hex', 'utf8');
     decrypted += decipher.final('utf8');
     return decrypted;
+  },
+
+  encryptUser: function(user) {
+    var encryptedUser = user;
+    if (user.username) {
+      encryptedUser.username = Krypto.encrypt(user.username);
+    }
+    if (user.firstName) {
+      encryptedUser.firstName = Krypto.encrypt(user.firstName);
+    }
+    if (user.lastName) {
+      encryptedUser.lastName = Krypto.encrypt(user.lastName);
+    }
+    if (user.phoneNumber) {
+      encryptedUser.phoneNumber = Krypto.encrypt(user.phoneNumber);
+    }
+    return encryptedUser;
+  },
+
+  decryptUser: function(user) {
+    var decryptedUser = user;
+    if (user.username) {
+      decryptedUser.username = Krypto.decrypt(user.username);
+    }
+    if (user.firstName) {
+      decryptedUser.firstName = Krypto.decrypt(user.firstName);
+    }
+    if (user.lastName) {
+      decryptedUser.lastName = Krypto.decrypt(user.lastName);
+    }
+    if (user.phoneNumber) {
+      decryptedUser.phoneNumber = Krypto.decrypt(user.phoneNumber);
+    }
+    return decryptedUser;
   }
 
 };

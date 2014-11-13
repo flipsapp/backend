@@ -6,7 +6,10 @@
  */
 
 var actionUtil = requires('>/node_modules/sails/lib/hooks/blueprints/actionUtil');
+var Krypto = requires('>/api/utilities/Krypto');
+
 var MAX_RETRY_COUNT = 2;
+
 
 var DeviceController = {
 
@@ -35,18 +38,16 @@ var DeviceController = {
   },
 
   create: function (request, response) {
-    var user = request.params.parentid;
+    var userId = request.params.parentid;
     var device = actionUtil.parseValues(request);
-    if (!user) {
+    if (!userId) {
       return response.send(400, new FlipsError('Missing parameter [User Id].'));
     }
     if (!device.platform) {
       return response.send(400, new FlipsError('Missing parameter [Device platform].'));
     }
-    if (!device.phoneNumber) {
-      return response.send(400, new FlipsError('Missing parameter [Device phone number].'));
-    }
-    device.user = user;
+
+    device.user = userId;
     Device.create(device)
       .exec(function (err, device) {
         if (err) {
@@ -57,13 +58,16 @@ var DeviceController = {
         if (!device) {
           return response.send(400, new FlipsError('Error creating device.', 'Device returned empty.'));
         }
-        sendVerificationCode(device);
-        PubnubGateway.addDeviceToPushNotification(device.uuid, device.uuid, device.platform, function(err, channel) {
-          if (err) {
-            logger.error(new FlipsError(err));
-          }
+        User.findOne(device.user).exec(function(err, user) {
+          device.user = user;
+          sendVerificationCode(device);
+          PubnubGateway.addDeviceToPushNotification(device.uuid, device.uuid, device.platform, function(err, channel) {
+            if (err) {
+              logger.error(new FlipsError(err));
+            }
+          });
+          return response.send(201, device);
         });
-        return response.send(201, device);
       }
     );
   },
@@ -86,6 +90,7 @@ var DeviceController = {
     }
 
     Device.findOne(deviceId)
+      .populate('user')
       .exec(function (error, device) {
 
         if (error) {
@@ -137,6 +142,7 @@ var DeviceController = {
     }
 
     Device.findOne(deviceId)
+      .populate('user')
       .exec(function (error, device) {
 
         if (error) {
@@ -174,7 +180,7 @@ var sendVerificationCode = function(device) {
   device.retryCount = 0;
   device.save();
 
-  twilioService.sendSms(device.phoneNumber, message, function (err, message) {
+  twilioService.sendSms(Krypto.decrypt(device.user.phoneNumber), message, function (err, message) {
     logger.info(err || message);
   });
 };

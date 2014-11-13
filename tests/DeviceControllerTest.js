@@ -13,7 +13,8 @@ describe('Device Controller', function () {
     password: 'Password1',
     firstName: 'Dev',
     lastName: 'Test',
-    birthday: '1968-12-02'
+    birthday: '1968-12-02',
+    phoneNumber: '+554898010707'
   };
 
   before(function(done) {
@@ -64,7 +65,6 @@ describe('Device Controller', function () {
     it('Should create a device related to user', function (done) {
 
       var aDevice = {
-        phoneNumber: '+554898010707',
         platform: 'ios',
         uuid: '0f744707bebcf74f9b7c25d48e3358945f6aa01da5ddb387462c7eaf61bbad78'
       };
@@ -79,7 +79,7 @@ describe('Device Controller', function () {
           var device = res.body;
 
           assert.equal(res.status, 201);
-          assert.equal(device.user, userId);
+          assert.equal(device.user.id, userId);
           assert.notEqual(device.id, null);
           assert.equal(device.platform, aDevice.platform);
           assert.equal(device.phoneNumber, aDevice.phoneNumber);
@@ -93,7 +93,6 @@ describe('Device Controller', function () {
     it('Should return a forbidden error', function (done) {
 
       var aDevice = {
-        phoneNumber: '+554898010707',
         platform: 'ios',
         uuid: 'ABCDEF-GHIJKL'
       };
@@ -116,7 +115,6 @@ describe('Device Controller', function () {
     it('Should receive a missing platform message', function (done) {
 
       var aDevice = {
-        phoneNumber: '+554898010707',
         uuid: 'ABCDEF-GHIJKL'
       };
 
@@ -133,24 +131,24 @@ describe('Device Controller', function () {
         });
     });
 
-    it('Should receive a missing phone number message', function (done) {
-
-      var aDevice = {
-        platform: 'ios',
-        uuid: 'ABCDEF-GHIJKL'
-      };
-
-      user1.post(BASE_URL + '/user/'+userId+"/devices")
-        .send(aDevice)
-        .end(function (err, res) {
-          if (err) {
-            throw err;
-          }
-          assert.equal(res.status, 400);
-          assert.equal(res.body.error, 'Missing parameter [Device phone number].');
-
-          done();
-        });
-    });
+//    it('Should receive a missing phone number message', function (done) {
+//
+//      var aDevice = {
+//        platform: 'ios',
+//        uuid: 'ABCDEF-GHIJKL'
+//      };
+//
+//      user1.post(BASE_URL + '/user/'+userId+"/devices")
+//        .send(aDevice)
+//        .end(function (err, res) {
+//          if (err) {
+//            throw err;
+//          }
+//          assert.equal(res.status, 400);
+//          assert.equal(res.body.error, 'Missing parameter [Device phone number].');
+//
+//          done();
+//        });
+//    });
   })
 });

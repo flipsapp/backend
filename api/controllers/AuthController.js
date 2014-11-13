@@ -38,7 +38,7 @@ var AuthController = {
 
         // Upon successful login, send the user to the homepage were req.user
         // will available.
-        return response.send(200, user);
+        return response.send(200, Krypto.decryptUser(user));
       });
     });
   },
@@ -49,7 +49,7 @@ var AuthController = {
         return response.send(400, new FlipsError('Error signing up user', err));
       }
 
-      request.login(user, function (loginErr) {
+      request.login(Krypto.encryptUser(user), function (loginErr) {
 
         if (loginErr) {
           logger.error('Error logging user after creation: ' + loginErr);
@@ -58,7 +58,7 @@ var AuthController = {
 
         // Upon successful login, send the user to the homepage
         // were req.user will available.
-        return response.send(200, user);
+        return response.send(200, Krypto.decryptUser(user));
       });
     });
   },
@@ -83,7 +83,7 @@ var AuthController = {
 
         // Upon successful login, send the user to the homepage
         // were req.user will available.
-        return response.send(200, user);
+        return response.send(200, Krypto.decryptUser(user));
       });
     });
   }

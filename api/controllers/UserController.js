@@ -48,7 +48,7 @@ var UserController = {
             return response.send(400, new FlipsError('Error updating user with photo url'));
           }
 
-          return response.send(200, updatedUser[0]);
+          return response.send(200, Krypto.decryptUser(updatedUser[0]));
         });
     });
   },
@@ -61,7 +61,7 @@ var UserController = {
       return response.send(400, new FlipsError('Error requesting to reset password.', 'Phone Number or email is empty.'));
     }
 
-    User.findOne({ username: Krypto.encrypt(email) })
+    User.findOne({ username: Krypto.encrypt(email), phoneNumber: Krypto.encrypt(phoneNumber) })
       .exec(function (err, user) {
         if (err) {
           var errmsg = new FlipsError('Error retrieving the user.');
@@ -73,7 +73,7 @@ var UserController = {
           return response.send(404, new FlipsError('User not found.', 'username = ' + email));
         }
 
-        Device.findOne({ phoneNumber: phoneNumber })
+        Device.findOne({user: user.id})
           .populate('user')
           .exec(function (error, device) {
             if (error) {
@@ -108,39 +108,47 @@ var UserController = {
       return response.send(400, new FlipsError('Error requesting to reset password.', 'Phone Number or verification code is empty.'));
     }
 
-    Device.findOne({ phoneNumber: phoneNumber })
-      .populate('user')
-      .exec(function (error, device) {
-        if (error) {
-          var errmsg = new FlipsError('Error retrieving the user.');
-          logger.error(errmsg);
-          return response.send(500, errmsg);
-        }
+    User.findOne({phoneNumber: Krypto.encrypt(phoneNumber)}).exec(function(err, user) {
+      if (err) {
+        return response.send(500, new FlipsError('Error retrieving user'));
+      }
+      if (!user) {
+        return response.send(404, new FlipsError('User not found'));
+      }
+      Device.findOne({ user: user.id })
+        .populate('user')
+        .exec(function (error, device) {
+          if (error) {
+            var errmsg = new FlipsError('Error retrieving device');
+            logger.error(errmsg);
+            return response.send(500, errmsg);
+          }
+          if (!device) {
+            return response.send(404, new FlipsError('Device not found'));
+          }
+          if (device.verificationCode != verificationCode) {
+            device.retryCount++;
+            device.isVerified = false;
 
-        if (!device) {
-          return response.send(404, new FlipsError('Device not found.', 'device number = ' + phoneNumber));
-        }
+            if (device.retryCount > MAX_RETRY_COUNT) {
+              sendVerificationCode(device);
+            }
 
-        if (device.verificationCode != verificationCode) {
-          device.retryCount++;
-          device.isVerified = false;
-
-          if (device.retryCount > MAX_RETRY_COUNT) {
-            sendVerificationCode(device);
+            device.save();
+            return response.send(400, new FlipsError('Wrong validation code'));
           }
 
+          device.isVerified = true;
+          device.retryCount = 0;
           device.save();
-          return response.send(400, new FlipsError('Wrong validation code.'));
+
+          device.user = Krypto.decryptUser(device.user);
+
+          return response.send(200, device);
+
         }
-
-        device.isVerified = true;
-        device.retryCount = 0;
-        device.save();
-
-        return response.send(200, device);
-
-      }
-    );
+      );
+    });
   },
 
   updatePassword: function (request, response) {
@@ -153,53 +161,59 @@ var UserController = {
       return response.send(400, new FlipsError('Error requesting to update password.', 'Missing parameters.'));
     }
 
-    Device.findOne({ phoneNumber: phoneNumber })
-      .populate('user')
-      .exec(function (error, device) {
-        if (error) {
-          var errmsg = new FlipsError('Error retrieving the user.');
-          logger.error(errmsg);
-          return response.send(500, errmsg);
-        }
-
-        if (!device) {
-          return response.send(404, new FlipsError('Device not found.', 'device number = ' + phoneNumber));
-        }
-        if (device.verificationCode != verificationCode) {
-          //if the verification code is wrong, it's probably an attack - so the code should be changed to avoid brute-force update
-          var newVerificationCode = Math.floor(Math.random() * 8999) + 1000;
-          device.verificationCode = newVerificationCode;
-          device.save();
-          return response.send(400, new FlipsError('Wrong verification code.'));
-        }
-
-        if (device.user.username != email) {
-          return response.send(400, new FlipsError('Wrong username'));
-        }
-
-        var PASSWORD_REGEX = '^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9]).{8,}$';
-
-        if (!password.match(PASSWORD_REGEX)) {
-          return response.send(400, new FlipsError('Password must have at least eight characters, one uppercase letter and one lowercase letter and one number.'));
-        }
-
-        var whereClause = {user: device.user.id}
-        var updateColumns = {password: password}
-        Passport.update(whereClause, updateColumns, function (error, affectedUsers) {
+    User.findOne({username: Krypto.encrypt(email), phoneNumber: Krypto.encrypt(phoneNumber)}).exec(function(err, user) {
+      if (err) {
+        return response.send(500, new FlipsError('Error trying to retrieve user'));
+      }
+      if (!user) {
+        return response.send(404, new FlipsError('Username and/or phone number do not match any user'));
+      }
+      Device.findOne({ user: user.id })
+        .populate('user')
+        .exec(function (error, device) {
           if (error) {
-            var errmsg = new FlipsError('Error updating passport.');
+            var errmsg = new FlipsError('Error when trying to retrieve device info');
             logger.error(errmsg);
             return response.send(500, errmsg);
           }
-
-          if (!affectedUsers || affectedUsers.length < 1) {
-            return response.send(400, new FlipsError("No rows affected while updating passport"));
+          if (!device) {
+            return response.send(404, new FlipsError('Device not found.', 'device number = ' + phoneNumber));
+          }
+          if (device.verificationCode != verificationCode) {
+            //if the verification code is wrong, it's probably an attack - so the code should be changed to avoid brute-force update
+            var newVerificationCode = Math.floor(Math.random() * 8999) + 1000;
+            device.verificationCode = newVerificationCode;
+            device.save();
+            return response.send(400, new FlipsError('Wrong verification code.'));
           }
 
-          return response.json(200, {});
-        })
+          device.user = Krypto.decryptUser(device.user);
 
-      })
+          var PASSWORD_REGEX = '^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9]).{8,}$';
+
+          if (!password.match(PASSWORD_REGEX)) {
+            return response.send(400, new FlipsError('Password must have at least eight characters, one uppercase letter and one lowercase letter and one number.'));
+          }
+
+          var whereClause = {user: device.user.id}
+          var updateColumns = {password: password}
+          Passport.update(whereClause, updateColumns, function (error, affectedUsers) {
+            if (error) {
+              var errmsg = new FlipsError('Error updating passport.');
+              logger.error(errmsg);
+              return response.send(500, errmsg);
+            }
+
+            if (!affectedUsers || affectedUsers.length < 1) {
+              return response.send(400, new FlipsError("No rows affected while updating passport"));
+            }
+
+            return response.json(200, {});
+          })
+
+        })
+    });
+
   },
 
   myRooms: function (request, response) {
@@ -221,6 +235,9 @@ var UserController = {
       contacts[i] = Krypto.encrypt(contacts[i]);
     }
     User.find({phoneNumber: contacts}).exec(function (err, users) {
+      for (var i=0; i<users.length; i++) {
+        users[i] = Krypto.decrypt(users[i]);
+      }
       return response.send(200, users);
     })
   },
@@ -302,11 +319,11 @@ var UserController = {
                     logger.error(errmsg);
                     return response.send(500, errmsg);
                   }
-                  return response.send(200, user);
+                  return response.send(200, Krypto.decryptUser(user));
                 });
               });
             } else {
-              return response.send(200, user);
+              return response.send(200, Krypto.decryptUser(user));
             }
 
           });
@@ -333,11 +350,11 @@ var UserController = {
                   logger.error(errmsg);
                   return response.send(500, errmsg);
                 }
-                return response.send(200, user);
+                return response.send(200, Krypto.decryptUser(user));
               });
             });
           } else {
-            return response.send(200, user);
+            return response.send(200, Krypto.decryptUser(user));
           }
 
         }
@@ -345,6 +362,19 @@ var UserController = {
       });
     });
 
+  },
+
+  findById: function (request, response) {
+    var userId = request.params.parentid;
+    User.findOne(userId).exec(function(err, user) {
+      if (err) {
+        return response.send(500, new FlipsError('Error retrieving user'));
+      }
+      if (!user) {
+        return response.send(404, new FlipsError('User not found'));
+      }
+      return response.send(200, Krypto.decryptUser(user));
+    });
   }
 
 };

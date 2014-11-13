@@ -13,6 +13,7 @@ describe('AuthController - Using correct params', function () {
   var userId;
 
   before(function (done) {
+    User.destroy({}).exec(function(err) {});
     var flipBoysUser = {
       username: 'flipboys@flips.com',
       password: 'Password1',
@@ -27,7 +28,7 @@ describe('AuthController - Using correct params', function () {
   });
 
   after(function (done) {
-    flipsUser.destroy();
+    User.destroy({}).exec(function(err) {});
     done();
   });
 
@@ -51,10 +52,10 @@ describe('AuthController - Using correct params', function () {
         var createdUser = res.body;
         userId = createdUser.id;
         assert.equal(res.status, 200);
-        assert.equal(createdUser.username, Krypto.encrypt('policytest@arctouch.com'));
+        assert.equal(createdUser.username, 'policytest@arctouch.com');
         assert.equal(createdUser.password, 'Password1');
-        assert.equal(createdUser.firstName, Krypto.encrypt('Dev'));
-        assert.equal(createdUser.lastName, Krypto.encrypt('Test'));
+        assert.equal(createdUser.firstName, 'Dev');
+        assert.equal(createdUser.lastName, 'Test');
         assert.equal(createdUser.birthday.substring(0, 10), '1968-12-02');
 
         done();
@@ -294,7 +295,7 @@ describe('AuthController - Sign in', function () {
   };
 
   before(function (done) {
-
+    User.destroy({}).exec(function(err) {});
     var flipBoysUser = {
       username: 'flipboys@flips.com',
       password: 'Password1',
@@ -324,7 +325,7 @@ describe('AuthController - Sign in', function () {
 
   after(function (done) {
 
-    flipsUser.destroy();
+    User.destroy({}).exec(function(err) {});
 
     user1.del(BASE_URL + '/user/' + userId)
       .end(function (err, res) {
@@ -352,10 +353,10 @@ describe('AuthController - Sign in', function () {
         var user = res.body;
 
         assert.notEqual(user.id, null);
-        assert.equal(user.username, Krypto.encrypt(aUser.username));
+        assert.equal(user.username, aUser.username);
         assert.equal(user.password, aUser.password);
-        assert.equal(user.firstName, Krypto.encrypt(aUser.firstName));
-        assert.equal(user.lastName, Krypto.encrypt(aUser.lastName));
+        assert.equal(user.firstName, aUser.firstName);
+        assert.equal(user.lastName, aUser.lastName);
         done();
       });
   });
@@ -525,10 +526,10 @@ describe('AuthController - Policy test', function () {
 
         assert.equal(res.status, 200);
         assert.notEqual(user.id, null);
-        assert.equal(user.username, Krypto.encrypt(aUser.username));
+        assert.equal(user.username, aUser.username);
         assert.equal(user.password, aUser.password);
-        assert.equal(user.firstName, Krypto.encrypt(aUser.firstName));
-        assert.equal(user.lastName, Krypto.encrypt(aUser.lastName));
+        assert.equal(user.firstName, aUser.firstName);
+        assert.equal(user.lastName, aUser.lastName);
         done();
       });
   });
