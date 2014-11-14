@@ -66,7 +66,8 @@ describe('Device Controller', function () {
 
       var aDevice = {
         platform: 'ios',
-        uuid: '0f744707bebcf74f9b7c25d48e3358945f6aa01da5ddb387462c7eaf61bbad78'
+        uuid: '0f744707bebcf74f9b7c25d48e3358945f6aa01da5ddb387462c7eaf61bbad78',
+        phoneNumber: '+14155550000'
       };
 
       user1.post(BASE_URL + '/user/'+userId+"/devices")
@@ -79,10 +80,8 @@ describe('Device Controller', function () {
           var device = res.body;
 
           assert.equal(res.status, 201);
-          assert.equal(device.user.id, userId);
           assert.notEqual(device.id, null);
           assert.equal(device.platform, aDevice.platform);
-          assert.equal(device.phoneNumber, aDevice.phoneNumber);
 
           done();
         });

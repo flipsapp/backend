@@ -119,10 +119,10 @@ exports.createUser = function(userModel, next) {
     }
     checkExistingUser(userModel, function(err, existingUser) {
       if (existingUser) {
-        if (existingUser.username === userModel.username) {
+        if (existingUser.username === Krypto.encrypt(userModel.username)) {
           return next(err);
         }
-        if (existingUser.phoneNumber === userModel.phoneNumber) {
+        if (existingUser.phoneNumber === Krypto.encrypt(userModel.phoneNumber)) {
           if (existingUser.isTemporary) {
             // replace existing user information and make it a valid user
             if (userModel.username) {
@@ -143,7 +143,7 @@ exports.createUser = function(userModel, next) {
               if(err) {
                 return next('It was not possible to sign up this user');
               }
-              createPassportAndInitialRoom(existingUser, userModel.password, photo, next);
+              return createPassportAndInitialRoom(existingUser, userModel.password, photo, next);
             });
           } else {
             return next(err);
@@ -173,13 +173,13 @@ var checkAge = function(userModel, callback) {
 };
 
 var checkExistingUser = function(userModel, callback) {
-  User.findOne({username: userModel.username}).exec(function(err, userWithSameUsername) {
+  User.findOne({username: Krypto.encrypt(userModel.username)}).exec(function(err, userWithSameUsername) {
     if (userWithSameUsername) {
       return callback('This username is already a Flips user', userWithSameUsername);
     }
-    User.findOne({phoneNumber: userModel.phoneNumber}).exec(function(err, userWithSamePhoneNumber) {
+    User.findOne({phoneNumber: Krypto.encrypt(userModel.phoneNumber)}).exec(function(err, userWithSamePhoneNumber) {
       if (userWithSamePhoneNumber) {
-        return callback('This phone number is already taken by an existing Flips user', userWithSamePhoneNumber);
+        return callback('This phone number is already used by an existing Flips user', userWithSamePhoneNumber);
       }
       return callback(null, null);
     })
@@ -192,7 +192,7 @@ var insertUser = function(userModel, photo, next) {
     if (err) {
       return next(err);
     }
-    createPassportAndInitialRoom(user, userModel.password, photo, next);
+    return createPassportAndInitialRoom(user, userModel.password, photo, next);
   });
 };
 
@@ -255,6 +255,7 @@ var createPassportAndInitialRoom =  function(user, password, photo, next) {
           if (photo && photo._files.length > 0) {
             s3service.upload(photo, s3service.PICTURES_BUCKET, function (err, uploadedFiles) {
               if (err) {
+                console.log(err);
                 var errmsg = 'Error uploading picture';
                 logger.error(errmsg);
                 return user.destroy(function (destroyErr) {
@@ -284,4 +285,4 @@ var createPassportAndInitialRoom =  function(user, password, photo, next) {
       });
     });
   });
-}
+};

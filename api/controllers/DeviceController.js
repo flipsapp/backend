@@ -39,16 +39,19 @@ var DeviceController = {
 
   create: function (request, response) {
     var userId = request.params.parentid;
-    var device = actionUtil.parseValues(request);
+    var platform = request.param('platform');
+    var uuid = request.param('uuid');
+
     if (!userId) {
       return response.send(400, new FlipsError('Missing parameter [User Id].'));
     }
-    if (!device.platform) {
+
+    if (!platform) {
       return response.send(400, new FlipsError('Missing parameter [Device platform].'));
     }
 
-    device.user = userId;
-    Device.create(device)
+    Device
+      .create({user: userId, platform: platform, uuid: uuid})
       .exec(function (err, device) {
         if (err) {
           var errmsg = new FlipsError('Error creating device.', err.details);
@@ -104,7 +107,7 @@ var DeviceController = {
         }
 
         // just ensure that the device is related to user parameter
-        if (userId != device.user) {
+        if (userId != device.user.id) {
           return response.send(403, new FlipsError('This device does not belong to you'));
         }
 

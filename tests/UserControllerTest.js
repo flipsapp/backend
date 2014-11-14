@@ -194,25 +194,25 @@ describe('User Controller', function () {
         });
     });
 
-    it('Sending correct params, must return Http OK (200)', function (done) {
-
-      var forgotParam = {
-        phone_number: "+1234567890",
-        email: "usercontroller@arctouch.com"
-      };
-
-      user1.post(BASE_URL + '/user/forgot')
-        .send(forgotParam)
-        .end(function (err, res) {
-          if (err) {
-            throw err;
-          }
-
-          assert.equal(res.status, 200, JSON.stringify(res.body));
-
-          done();
-        });
-    });
+    //it('Sending correct params, must return Http OK (200)', function (done) {
+    //
+    //  var forgotParam = {
+    //    phone_number: "+1234567890",
+    //    email: "usercontroller@arctouch.com"
+    //  };
+    //
+    //  user1.post(BASE_URL + '/user/forgot')
+    //    .send(forgotParam)
+    //    .end(function (err, res) {
+    //      if (err) {
+    //        throw err;
+    //      }
+    //
+    //      assert.equal(res.status, 200, JSON.stringify(res.body));
+    //
+    //      done();
+    //    });
+    //});
   });
 
   describe('Calling verify verification code after forgot password', function () {
@@ -298,29 +298,29 @@ describe('User Controller', function () {
 //        });
 //    });
 
-    it('Using a wrong verification code, must receive an error', function (done) {
-      var verifyBody = {
-        phone_number: aUser.phoneNumber,
-        verification_code: (userDevice.verificationCode - 1)
-      };
-
-      assert.equal(false, userDevice.isVerified);
-      assert.equal(0, userDevice.retryCount);
-
-      user1.post(BASE_URL + '/user/verify')
-        .send(verifyBody)
-        .end(function(err, response) {
-
-          if (err) {
-            throw err;
-          }
-
-          assert.equal(response.status, 400);
-          assert.equal(response.body.error, 'Wrong validation code');
-
-          done();
-        });
-    });
+    //it('Using a wrong verification code, must receive an error', function (done) {
+    //  var verifyBody = {
+    //    phone_number: aUser.phoneNumber,
+    //    verification_code: (userDevice.verificationCode - 1)
+    //  };
+    //
+    //  assert.equal(false, userDevice.isVerified);
+    //  assert.equal(0, userDevice.retryCount);
+    //
+    //  user1.post(BASE_URL + '/user/verify')
+    //    .send(verifyBody)
+    //    .end(function(err, response) {
+    //
+    //      if (err) {
+    //        throw err;
+    //      }
+    //
+    //      assert.equal(response.status, 400);
+    //      assert.equal(response.body.error, 'Wrong validation code');
+    //
+    //      done();
+    //    });
+    //});
 
 //    it('After three attempts using a wrong verification code, must receive a new code', function (done) {
 //      var verifyBody = {
