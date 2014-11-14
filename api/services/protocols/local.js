@@ -143,7 +143,7 @@ exports.createUser = function(userModel, next) {
               if(err) {
                 return next('It was not possible to sign up this user');
               }
-              return createPassportAndInitialRoom(existingUser, userModel.password, photo, next);
+              createPassportAndInitialRoom(existingUser, userModel.password, photo, next);
             });
           } else {
             return next(err);
@@ -192,7 +192,7 @@ var insertUser = function(userModel, photo, next) {
     if (err) {
       return next(err);
     }
-    return createPassportAndInitialRoom(user, userModel.password, photo, next);
+    createPassportAndInitialRoom(user, userModel.password, photo, next);
   });
 };
 
@@ -238,17 +238,12 @@ var createPassportAndInitialRoom =  function(user, password, photo, next) {
           return user.destroy(function (destroyErr) {
             next(destroyErr || new FlipsError('No Flipboys room created for this user.', null, ErrorCodes.ROOM_CREATION_BAD_REQUEST_ERROR));
           });
-        }
+        };
 
         User.findOne(user.id).populate('rooms').exec(function (err, populatedUser) {
           if (err) {
             return user.destroy(function (destroyErr) {
               next(destroyErr || new FlipsError('Error trying the newly created user', err, ErrorCodes.USER_FIND_INTERNAL_ERROR));
-            });
-          }
-          if (!room) {
-            return user.destroy(function (destroyErr) {
-              next(destroyErr || new FlipsError('Error trying to create Flipboys room for this user', err, ErrorCodes.USER_NOT_FOUND));
             });
           }
 
