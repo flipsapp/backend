@@ -6,7 +6,10 @@
  */
 
 var actionUtil = requires('>/node_modules/sails/lib/hooks/blueprints/actionUtil');
+var Krypto = requires('>/api/utilities/Krypto');
+
 var MAX_RETRY_COUNT = 2;
+
 
 var DeviceController = {
 
@@ -35,19 +38,20 @@ var DeviceController = {
   },
 
   create: function (request, response) {
-    var user = request.params.parentid;
-    var device = actionUtil.parseValues(request);
-    if (!user) {
+    var userId = request.params.parentid;
+    var platform = request.param('platform');
+    var uuid = request.param('uuid');
+
+    if (!userId) {
       return response.send(400, new FlipsError('Missing parameter [User Id].'));
     }
-    if (!device.platform) {
+
+    if (!platform) {
       return response.send(400, new FlipsError('Missing parameter [Device platform].'));
     }
-    if (!device.phoneNumber) {
-      return response.send(400, new FlipsError('Missing parameter [Device phone number].'));
-    }
-    device.user = user;
-    Device.create(device)
+
+    Device
+      .create({user: userId, platform: platform, uuid: uuid})
       .exec(function (err, device) {
         if (err) {
           var errmsg = new FlipsError('Error creating device.', err.details);
@@ -57,13 +61,16 @@ var DeviceController = {
         if (!device) {
           return response.send(400, new FlipsError('Error creating device.', 'Device returned empty.'));
         }
-        sendVerificationCode(device);
-        PubnubGateway.addDeviceToPushNotification(device.uuid, device.uuid, device.platform, function(err, channel) {
-          if (err) {
-            logger.error(new FlipsError(err));
-          }
+        User.findOne(device.user).exec(function(err, user) {
+          device.user = user;
+          sendVerificationCode(device);
+          PubnubGateway.addDeviceToPushNotification(device.uuid, device.uuid, device.platform, function(err, channel) {
+            if (err) {
+              logger.error(new FlipsError(err));
+            }
+          });
+          return response.send(201, device);
         });
-        return response.send(201, device);
       }
     );
   },
@@ -86,6 +93,7 @@ var DeviceController = {
     }
 
     Device.findOne(deviceId)
+      .populate('user')
       .exec(function (error, device) {
 
         if (error) {
@@ -99,7 +107,7 @@ var DeviceController = {
         }
 
         // just ensure that the device is related to user parameter
-        if (userId != device.user) {
+        if (userId != device.user.id) {
           return response.send(403, new FlipsError('This device does not belong to you'));
         }
 
@@ -137,6 +145,7 @@ var DeviceController = {
     }
 
     Device.findOne(deviceId)
+      .populate('user')
       .exec(function (error, device) {
 
         if (error) {
@@ -174,7 +183,7 @@ var sendVerificationCode = function(device) {
   device.retryCount = 0;
   device.save();
 
-  twilioService.sendSms(device.phoneNumber, message, function (err, message) {
+  twilioService.sendSms(Krypto.decrypt(device.user.phoneNumber), message, function (err, message) {
     logger.info(err || message);
   });
 };

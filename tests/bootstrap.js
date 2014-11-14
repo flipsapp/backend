@@ -12,6 +12,8 @@ var dotenv = require('dotenv');
 dotenv._getKeysAndValuesFromEnvFilePath(dotenv_path);
 dotenv._setEnvs();
 
+printToConsole = false;
+
 // Instantiate the Sails app instance we'll be using
 // (note that we don't use `new`, just call it like a function)
 var start = function () {
@@ -42,10 +44,6 @@ var start = function () {
 
       models: {
         connection: 'memory'
-      },
-
-      session: {
-        adapter: 'memory'
       }
 
     }, function (err, sails) {

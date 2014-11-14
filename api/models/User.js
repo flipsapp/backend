@@ -65,18 +65,32 @@ var User = {
 
     phoneNumber: {
       type: 'string'
+    },
+
+    isTemporary: {
+      type: 'boolean',
+      defaultsTo: false
     }
 
   },
 
   beforeCreate: function (user, next) {
     user.pubnubId = uuid();
-    user.username = Krypto.encrypt(user.username);
-    user.firstName = Krypto.encrypt(user.firstName);
-    user.lastName = Krypto.encrypt(user.lastName);
-    user.phoneNumber = Krypto.encrypt(user.phoneNumber);
-    next();
+    if (user.username) {
+      user.username = Krypto.encrypt(user.username);
+    }
+    if (user.firstName) {
+      user.firstName = Krypto.encrypt(user.firstName);
+    }
+    if (user.lastName) {
+      user.lastName = Krypto.encrypt(user.lastName);
+    }
+    if (user.phoneNumber) {
+      user.phoneNumber = Krypto.encrypt(user.phoneNumber);
+    }
+    next(null, user);
   }
+
 };
 
 module.exports = User;

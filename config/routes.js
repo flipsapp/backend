@@ -35,8 +35,11 @@ module.exports.routes = {
                                                                                     // /flips/stock?owner=123
                                                                                     // /flips/stock?category=Toon&owner=123
   'POST   /user/forgot'                             : 'UserController.forgot',
+  'POST   /user/:parentid/update'                   : 'UserController.update',
+  'PUT    /user/:parentid'                          : 'UserController.update',
   'POST   /user/verify'                             : 'UserController.verify',
   'PUT    /user/password'                           : 'UserController.updatePassword',
+  'GET    /user/:parentid'                          : 'UserController.findById',
   'POST   /user/:user_id/flips'                     : 'FlipController.create',
   'PUT    /user/:user_id/flips/:flip_id/background' : 'FlipController.updateBackground',
   'PUT    /user/:user_id/flips/:flip_id/sound'      : 'FlipController.updateSound',
