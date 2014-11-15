@@ -69,6 +69,7 @@ var DeviceController = {
               logger.error(new FlipsError(err));
             }
           });
+          device.user = user.id;
           return response.send(201, device);
         });
       }
@@ -126,6 +127,8 @@ var DeviceController = {
         device.isVerified = true;
         device.retryCount = 0;
         device.save();
+
+        device.user = device.user.id;
 
         return response.send(200, device);
       }
