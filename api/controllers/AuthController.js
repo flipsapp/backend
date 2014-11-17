@@ -5,7 +5,6 @@
  * should look. It currently includes the minimum amount of functionality for
  * the basics of Passport.js to work.
  */
-
 var Krypto = requires('>/api/utilities/Krypto');
 
 var AuthController = {
