@@ -280,8 +280,8 @@ var createPassportAndInitialRoom = function (user, password, photo, next) {
           }
 
           logger.debug('9. populated user: ' + populatedUser.username);
-          logger.debug('9.1 files length: ' + photo._files.length);
           if (photo && photo._files.length > 0) {
+            logger.debug('9.1 files length: ' + photo._files.length);
             s3service.upload(photo, s3service.PICTURES_BUCKET, function (s3Err, uploadedFiles) {
               if (s3Err) {
                 logger.error(s3Err);
