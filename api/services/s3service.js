@@ -2,7 +2,7 @@ var S3Service = {
 
   upload: function(file, upload_bucket, callback) {
     file.upload({
-      adapter: require('skipper-s3'),
+      adapter: require('skipper-s3-alt'),
       bucket: upload_bucket,
       key: process.env.AWS_S3_KEY,
       secret: process.env.AWS_S3_SECRET
@@ -15,4 +15,4 @@ var S3Service = {
 
 };
 
-module.exports = S3Service;
+module.exports = S3Service;vou
