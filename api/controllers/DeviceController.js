@@ -63,8 +63,10 @@ var DeviceController = {
           return response.send(400, new FlipsError('Error creating device.', 'Device returned empty.'));
         }
         User.findOne(device.user).exec(function(err, user) {
-          user.phoneNumber = Krypto.encrypt(phoneNumber);
-          user.save();
+          if (!user.phoneNumber) {
+            user.phoneNumber = Krypto.encrypt(phoneNumber);
+            user.save();
+          }
           device.user = user;
 
           sendVerificationCode(device);
