@@ -41,6 +41,7 @@ var DeviceController = {
     var userId = request.params.parentid;
     var platform = request.param('platform');
     var uuid = request.param('uuid');
+    var phoneNumber = request.param('phoneNumber');
 
     if (!userId) {
       return response.send(400, new FlipsError('Missing parameter [User Id].'));
@@ -62,6 +63,8 @@ var DeviceController = {
           return response.send(400, new FlipsError('Error creating device.', 'Device returned empty.'));
         }
         User.findOne(device.user).exec(function(err, user) {
+          user.phoneNumber = Krypto.encrypt(phoneNumber);
+          user.save();
           device.user = user;
 
           sendVerificationCode(device);

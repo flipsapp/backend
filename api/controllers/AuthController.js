@@ -77,7 +77,7 @@ var AuthController = {
         return response.send(404, new FlipsError('Username not found'));
       }
 
-      request.login(user, function (loginErr) {
+      request.login(Krypto.encryptUser(user), function (loginErr) {
 
         if (loginErr) {
           return response.send(400, new FlipsError('Error logging in user', loginErr));
