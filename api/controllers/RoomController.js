@@ -243,4 +243,3 @@ var subscribeUsersToRoom = function (room) {
 };
 
 module.exports = RoomController;
-
