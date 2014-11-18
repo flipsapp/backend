@@ -88,6 +88,9 @@ var User = {
     if (user.phoneNumber) {
       user.phoneNumber = Krypto.encrypt(user.phoneNumber);
     }
+    if (user.nickname) {
+      user.nickname = Krypto.encrypt(user.nickname);
+    }
     next(null, user);
   }
 

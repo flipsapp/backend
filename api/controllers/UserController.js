@@ -277,6 +277,9 @@ var UserController = {
       if (updatedValues.phoneNumber) {
         user.phoneNumber = Krypto.encrypt(updatedValues.phoneNumber);
       }
+      if (updatedValues.nickname) {
+        user.nickname = Krypto.encrypt(updatedValues.nickname);
+      }
       user.save(function (err) {
         if (err) {
           var errmsg = new FlipsError('Error trying to update user');

@@ -33,6 +33,9 @@ var Krypto = {
     if (user.phoneNumber) {
       encryptedUser.phoneNumber = Krypto.encrypt(user.phoneNumber);
     }
+    if (user.nickname) {
+      encryptedUser.nickname = Krypto.encrypt(user.nickname);
+    }
     return encryptedUser;
   },
 
@@ -49,6 +52,9 @@ var Krypto = {
     }
     if (user.phoneNumber) {
       decryptedUser.phoneNumber = Krypto.decrypt(user.phoneNumber);
+    }
+    if (user.nickname) {
+      decryptedUser.nickname = Krypto.decrypt(user.nickname);
     }
     return decryptedUser;
   }

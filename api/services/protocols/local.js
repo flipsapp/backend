@@ -1,6 +1,6 @@
 var validator = require('validator')
   , actionUtil = requires('>/node_modules/sails/lib/hooks/blueprints/actionUtil')
-  , moment    = require('moment')
+  , moment = require('moment')
   , uuid = require('node-uuid')
   , Krypto = requires('>/api/utilities/Krypto');
 
@@ -80,13 +80,14 @@ exports.login = function (req, identifier, password, next) {
       }
 
       if (!user) {
+        logger.error('Error.Passport.Username.NotFound');
         req.flash('error', 'Error.Passport.Username.NotFound');
         return next(null, false);
       }
 
       Passport.findOne({
-        protocol : 'local',
-        user     : user.id
+        protocol: 'local',
+        user: user.id
       }, function (err, passport) {
         if (passport) {
           passport.validatePassword(password, function (err, res) {
@@ -95,6 +96,7 @@ exports.login = function (req, identifier, password, next) {
             }
 
             if (!res) {
+              logger.error('Error.Passport.Password.Wrong');
               req.flash('error', 'Error.Passport.Password.Wrong');
               return next(null, false);
             } else {
@@ -103,21 +105,23 @@ exports.login = function (req, identifier, password, next) {
           });
         }
         else {
+          logger.error('Error.Passport.Password.NotSet');
           req.flash('error', 'Error.Passport.Password.NotSet');
           return next(null, false);
         }
       });
-  });
+    });
 };
 
-exports.createUser = function(userModel, next) {
+exports.createUser = function (userModel, next) {
   var photo = userModel.photo;
   delete userModel.photo;
   checkAge(userModel, function (err, age) {
     if (err) {
+      logger.error(err);
       return next(err);
     }
-    checkExistingUser(userModel, function(err, existingUser) {
+    checkExistingUser(userModel, function (err, existingUser) {
       if (existingUser) {
         if (existingUser.username === Krypto.encrypt(userModel.username)) {
           return next(err);
@@ -125,6 +129,7 @@ exports.createUser = function(userModel, next) {
         if (existingUser.phoneNumber === Krypto.encrypt(userModel.phoneNumber)) {
           if (existingUser.isTemporary) {
             // replace existing user information and make it a valid user
+            logger.debug('replacing existing user information');
             if (userModel.username) {
               existingUser.username = Krypto.encrypt(userModel.username);
             }
@@ -137,26 +142,31 @@ exports.createUser = function(userModel, next) {
             if (userModel.phoneNumber) {
               existingUser.phoneNumber = Krypto.encrypt(userModel.phoneNumber);
             }
+            if (userModel.nickname) {
+              existingUser.nickname = Krypto.encrypt(userModel.nickname);
+            }
             existingUser.birthday = userModel.birthday;
             existingUser.isTemporary = false;
-            existingUser.save(function(err) {
-              if(err) {
+            existingUser.save(function (err) {
+              if (err) {
+                logger.error(err);
                 return next('It was not possible to sign up this user');
               }
-              createPassportAndInitialRoom(existingUser, userModel.password, photo, next);
+              return createPassportAndInitialRoom(existingUser, userModel.password, photo, next);
             });
           } else {
             return next(err);
           }
         }
       } else {
-        insertUser(userModel, photo, next);
+        logger.debug('1. insert user');
+        return insertUser(userModel, photo, next);
       }
     });
   });
 };
 
-var checkAge = function(userModel, callback) {
+var checkAge = function (userModel, callback) {
   try {
     var birthday = moment(userModel.birthday, "YYYY/MM/DD");
     var now = moment();
@@ -172,12 +182,12 @@ var checkAge = function(userModel, callback) {
   }
 };
 
-var checkExistingUser = function(userModel, callback) {
-  User.findOne({username: Krypto.encrypt(userModel.username)}).exec(function(err, userWithSameUsername) {
+var checkExistingUser = function (userModel, callback) {
+  User.findOne({username: Krypto.encrypt(userModel.username)}).exec(function (err, userWithSameUsername) {
     if (userWithSameUsername) {
       return callback('This username is already a Flips user', userWithSameUsername);
     }
-    User.findOne({phoneNumber: Krypto.encrypt(userModel.phoneNumber)}).exec(function(err, userWithSamePhoneNumber) {
+    User.findOne({phoneNumber: Krypto.encrypt(userModel.phoneNumber)}).exec(function (err, userWithSamePhoneNumber) {
       if (userWithSamePhoneNumber) {
         return callback('This phone number is already used by an existing Flips user', userWithSamePhoneNumber);
       }
@@ -187,33 +197,40 @@ var checkExistingUser = function(userModel, callback) {
 };
 
 
-var insertUser = function(userModel, photo, next) {
+var insertUser = function (userModel, photo, next) {
   User.create(userModel, function (err, user) {
     if (err) {
+      logger.error(err);
       return next(err);
     }
-    createPassportAndInitialRoom(user, userModel.password, photo, next);
+    logger.debug('2. user created')
+    return createPassportAndInitialRoom(user, userModel.password, photo, next);
   });
 };
 
-var createPassportAndInitialRoom =  function(user, password, photo, next) {
+var createPassportAndInitialRoom = function (user, password, photo, next) {
+  logger.debug('2.1 user: ' + user.id);
   Passport.create({
     protocol: 'local', password: password, user: user.id
-  }, function (err, passport) {
-    if (err) {
-      if (err.code === 'E_VALIDATION') {
+  }, function (passportError, passport) {
+    if (passportError) {
+      logger.error(passportError);
+      if (passportError.code === 'E_VALIDATION') {
+        logger.error('Error.Passport.Password.Invalid');
         request.flash('error', 'Error.Passport.Password.Invalid');
       }
 
       return user.destroy(function (destroyErr) {
-        next(destroyErr || err);
+        next(destroyErr || passportError);
       });
     }
+    logger.debug('3. passport created');
 
-    User.findOne({username: Krypto.encrypt(process.env.FLIPBOYS_USERNAME)}).exec(function (err, flipboysUser) {
-      if (err) {
+    User.findOne({username: Krypto.encrypt(process.env.FLIPBOYS_USERNAME)}).exec(function (flipBoysErr, flipboysUser) {
+      if (flipBoysErr) {
+        logger.error(flipBoysErr);
         return user.destroy(function (destroyErr) {
-          next(destroyErr || err);
+          next(destroyErr || flipBoysErr);
         });
       }
       if (!flipboysUser) {
@@ -222,57 +239,87 @@ var createPassportAndInitialRoom =  function(user, password, photo, next) {
         });
       }
 
+      logger.debug('4. Flipboys user found');
+      logger.debug('5. user id: ' + user.id);
+      logger.debug('6. flipboys id: ' + flipboysUser.id);
       var participants = [user.id, flipboysUser.id];
 
+      logger.debug('7. participants: ' + participants);
       Room.create({
         admin: user.id,
         participants: participants,
         pubnubId: uuid()
-      }).exec(function (err, room) {
-        if (err) {
+      }).exec(function (roomErr, room) {
+        if (roomErr) {
+          logger.error('DB Error when creating room: ' + roomErr);
           return user.destroy(function (destroyErr) {
-            next(destroyErr || new FlipsError('Error trying to create Flipboys room for this user', err, ErrorCodes.ROOM_CREATION_INTERNAL_SERVER_ERROR));
+            next(destroyErr || new FlipsError('Error trying to create Flipboys room for this user', roomErr, ErrorCodes.ROOM_CREATION_INTERNAL_SERVER_ERROR));
           });
         }
         if (!room) {
+          logger.error('Room not found');
           return user.destroy(function (destroyErr) {
             next(destroyErr || new FlipsError('No Flipboys room created for this user.', null, ErrorCodes.ROOM_CREATION_BAD_REQUEST_ERROR));
           });
-        };
+        }
 
-        User.findOne(user.id).populate('rooms').exec(function (err, populatedUser) {
-          if (err) {
+        logger.debug('8. room created' + room);
+        Room.findOne(room.id).populate('participants').exec(function(bla, aroom) {
+          logger.debug('8.1. room participants: ' + aroom.participants);
+
+        });
+
+        User.findOne(user.id).populate('rooms').exec(function (populatedUserErr, populatedUser) {
+          logger.debug('8.3 populatedUser: ' + populatedUser.username);
+          if (populatedUserErr) {
             return user.destroy(function (destroyErr) {
-              next(destroyErr || new FlipsError('Error trying the newly created user', err, ErrorCodes.USER_FIND_INTERNAL_ERROR));
+              next(destroyErr || new FlipsError('Error trying the newly created user', populatedUserErr, ErrorCodes.USER_FIND_INTERNAL_ERROR));
             });
           }
 
+          logger.debug('9. populated user: ' + populatedUser.username);
+          logger.debug('9.1 files length: ' + photo._files.length);
           if (photo && photo._files.length > 0) {
-            s3service.upload(photo, s3service.PICTURES_BUCKET, function (err, uploadedFiles) {
-              if (err) {
-                console.log(err);
-                var errmsg = 'Error uploading picture';
-                logger.error(errmsg);
+            s3service.upload(photo, s3service.PICTURES_BUCKET, function (s3Err, uploadedFiles) {
+              //if (s3Err) {
+              //  logger.error(s3Err);
+              //  var errmsg = 'Error uploading picture to S3';
+              //  logger.error(errmsg);
+              //  return user.destroy(function (destroyErr) {
+              //    next(destroyErr || errmsg);
+              //  });
+              //}
+
+              logger.debug('10. no error on upload picture');
+
+              if (!uploadedFiles || uploadedFiles.length < 1) {
+                logger.error('No files uploaded');
                 return user.destroy(function (destroyErr) {
-                  next(destroyErr || errmsg);
+                  next(destroyErr || 'No files uploaded');
                 });
               }
 
-              if (!uploadedFiles || uploadedFiles.length < 1) {
-                return user.destroy(function (destroyErr) {
-                  next(destroyErr || errmsg);
-                });
-              }
+              logger.debug('11. one or more pictures uploaded');
+              logger.debug('11.1 populatedUser: ' + populatedUser.username);
 
               var uploadedFile = uploadedFiles[0];
 
               populatedUser.photoUrl = uploadedFile.extra.Location;
-              populatedUser.save();
-
-              return next(null, Krypto.decryptUser(populatedUser));
+              populatedUser.save(function (saveErr) {
+                if (saveErr) {
+                  logger.error('DB Error when trying to save user');
+                  return user.destroy(function (destroyErr) {
+                    next(destroyErr || 'DB Error when trying to save user');
+                  });
+                }
+                logger.debug('12. user saved with thumbnail url');
+                logger.debug('13. populatedUser: ' + populatedUser.username);
+                return next(null, Krypto.decryptUser(populatedUser));
+              });
 
             });
           } else {
+            logger.debug('populatedUser: ' + populatedUser.username);
             return next(null, Krypto.decryptUser(populatedUser));
           }
 
