@@ -55,13 +55,12 @@ var UserController = {
 
   forgot: function (request, response) {
     var phoneNumber = request.param('phone_number');
-    var email = request.param('email');
 
-    if (!phoneNumber || !email) {
-      return response.send(400, new FlipsError('Error requesting to reset password.', 'Phone Number or email is empty.'));
+    if (!phoneNumber) {
+      return response.send(400, new FlipsError('Error requesting to reset password.', 'Phone Number is empty.'));
     }
 
-    User.findOne({ username: Krypto.encrypt(email), phoneNumber: Krypto.encrypt(phoneNumber) })
+    User.findOne({ phoneNumber: Krypto.encrypt(phoneNumber) })
       .exec(function (err, user) {
         if (err) {
           var errmsg = new FlipsError('Error retrieving the user.');
