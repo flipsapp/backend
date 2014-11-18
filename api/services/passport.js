@@ -2,6 +2,7 @@ var path     = require('path')
   , url      = require('url')
   , passport = require('passport')
   , moment = require('moment')
+  , Krypto = requires('>/api/utilities/Krypto')
   , FB       = require('fb');
 
 // Load authentication protocols
@@ -46,7 +47,9 @@ passport.facebook = function(request, response, next) {
       return next(fbProfile.error);
     }
 
-    User.findOne({ username: fbProfile.email})
+    var userEmail = Krypto.encrypt(fbProfile.email);
+
+    User.findOne({ username: userEmail })
       .populate('devices')
       .exec(function(err, user) {
         if (err) {
@@ -57,9 +60,9 @@ passport.facebook = function(request, response, next) {
           createFacebookUser(fbProfile, next);
         } else {
 
-          user.facebookID = fbProfile.id;
-          user.firstName = fbProfile.first_name;
-          user.lastName = fbProfile.last_name;
+          user.facebookID = Krypto.encrypt(fbProfile.id);
+          user.firstName = Krypto.encrypt(fbProfile.first_name);
+          user.lastName = Krypto.encrypt(fbProfile.last_name);
           user.photoUrl = fbProfile.picture.data.url;
 
           user.save();
@@ -129,7 +132,7 @@ var createFacebookUser = function(fbProfile, next) {
   var userModel = {
     username  : fbProfile.email,
     password  : fbProfile.password || '',
-    facebookID: fbProfile.id,
+    facebookID: Krypto.encrypt(fbProfile.id),
     firstName : fbProfile.first_name,
     lastName  : fbProfile.last_name,
     birthday : fbProfile.birthday || moment().subtract(fbProfile.age_range.min, 'years'),
