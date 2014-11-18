@@ -148,26 +148,7 @@ describe('User Controller', function () {
 
           assert.equal(res.status, 400);
           assert.equal(res.body.error, 'Error requesting to reset password.');
-          assert.equal(res.body.details, 'Phone Number or email is empty.');
-
-          done();
-        });
-    });
-
-    it('Missing email parameter, must return an error message', function (done) {
-      var forgotParam = {
-        phone_number: "+123456789"
-      };
-      user1.post(BASE_URL + '/user/forgot')
-        .send(forgotParam)
-        .end(function (err, res) {
-          if (err) {
-            throw err;
-          }
-
-          assert.equal(res.status, 400);
-          assert.equal(res.body.error, 'Error requesting to reset password.');
-          assert.equal(res.body.details, 'Phone Number or email is empty.');
+          assert.equal(res.body.details, 'Phone Number is empty.');
 
           done();
         });
@@ -188,7 +169,6 @@ describe('User Controller', function () {
 
           assert.equal(res.status, 404);
           assert.equal(res.body.error, 'User not found.');
-          assert.equal(res.body.details, 'username = device@arctouch.com');
 
           done();
         });
