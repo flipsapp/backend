@@ -157,6 +157,8 @@ exports.createUser = function (userModel, next) {
           } else {
             return next(err);
           }
+        } else {
+          return next(err);
         }
       } else {
         logger.debug('1. insert user');
@@ -281,14 +283,14 @@ var createPassportAndInitialRoom = function (user, password, photo, next) {
           logger.debug('9.1 files length: ' + photo._files.length);
           if (photo && photo._files.length > 0) {
             s3service.upload(photo, s3service.PICTURES_BUCKET, function (s3Err, uploadedFiles) {
-              //if (s3Err) {
-              //  logger.error(s3Err);
-              //  var errmsg = 'Error uploading picture to S3';
-              //  logger.error(errmsg);
-              //  return user.destroy(function (destroyErr) {
-              //    next(destroyErr || errmsg);
-              //  });
-              //}
+              if (s3Err) {
+                logger.error(s3Err);
+                var errmsg = 'Error uploading picture to S3';
+                logger.error(errmsg);
+                return user.destroy(function (destroyErr) {
+                  next(destroyErr || errmsg);
+                });
+              }
 
               logger.debug('10. no error on upload picture');
 
@@ -303,6 +305,9 @@ var createPassportAndInitialRoom = function (user, password, photo, next) {
               logger.debug('11.1 populatedUser: ' + populatedUser.username);
 
               var uploadedFile = uploadedFiles[0];
+              logger.debug(uploadedFile)
+
+              logger.debug('11.2 file location: ' + uploadedFile.extra.Location);
 
               populatedUser.photoUrl = uploadedFile.extra.Location;
               populatedUser.save(function (saveErr) {
