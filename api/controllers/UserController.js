@@ -69,7 +69,7 @@ var UserController = {
         }
 
         if (!user) {
-          return response.send(404, new FlipsError('User not found.', 'username = ' + email));
+          return response.send(404, new FlipsError('User not found.'));
         }
 
         Device.findOne({user: user.id})
