@@ -6,7 +6,8 @@ var logger = new (winston.Logger)({
       handleExceptions: true,
       json: true,
       colorize: true,
-      timestamp: true
+      timestamp: true,
+      level: 'silly'
     })
   ]
 });

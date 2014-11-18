@@ -48,6 +48,7 @@ var AuthController = {
       if (err || !user) {
         return response.send(400, new FlipsError('Error signing up user', err));
       }
+      logger.debug('user signed-up');
 
       request.login(Krypto.encryptUser(user), function (loginErr) {
 
@@ -55,6 +56,8 @@ var AuthController = {
           logger.error('Error logging user after creation: ' + loginErr);
           return response.send(400, new FlipsError('Error logging in user', loginErr));
         }
+
+        logger.debug('user signed-in');
 
         // Upon successful login, send the user to the homepage
         // were req.user will available.
