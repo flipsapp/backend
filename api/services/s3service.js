@@ -15,4 +15,4 @@ var S3Service = {
 
 };
 
-module.exports = S3Service;vou
+module.exports = S3Service;
