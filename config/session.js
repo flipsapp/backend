@@ -82,7 +82,7 @@ module.exports.session = {
 
   //adapter: 'memory'
 
-  store: new (MySQLSessionStore(express))(process.env.RDS_DB_NAME, process.env.RDS_USERNAME,
+  store: new (MySQLSessionStore(express))('flips', process.env.RDS_USERNAME,
     process.env.RDS_PASSWORD, { host: process.env.RDS_HOSTNAME})
 
 
