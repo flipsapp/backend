@@ -35,7 +35,7 @@ var UserController = {
 
       var uploadedFile = uploadedFiles[0];
 
-      User.update(userId, { photoUrl: uploadedFile.extra.Location })
+      User.update(userId, { photoUrl: s3service.S3_URL + s3service.PICTURES_BUCKET + '/' + uploadedFile.fd })
         .exec(function (err, updatedUser) {
 
           if (err) {
@@ -314,7 +314,7 @@ var UserController = {
 
                 var uploadedFile = uploadedFiles[0];
 
-                user.photoUrl = uploadedFile.extra.Location;
+                user.photoUrl = s3service.S3_URL + s3service.PICTURES_BUCKET + '/' + uploadedFile.fd;
                 user.save(function (err) {
                   if (err) {
                     var errmsg = new FlipsError('Error updating user', err);
@@ -345,7 +345,7 @@ var UserController = {
 
               var uploadedFile = uploadedFiles[0];
 
-              user.photoUrl = uploadedFile.extra.Location;
+              user.photoUrl = s3service.S3_URL + s3service.PICTURES_BUCKET + '/' + uploadedFile.fd;
               user.save(function (err) {
                 if (err) {
                   var errmsg = new FlipsError('Error updating user', err);

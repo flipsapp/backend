@@ -310,7 +310,7 @@ var createPassportAndInitialRoom = function (user, password, photo, next) {
 
               logger.debug('11.2 file location: ' + 'https://s3.amazonaws.com/' + s3service.PICTURES_BUCKET + '/' + uploadedFile.fd);
 
-              populatedUser.photoUrl = 'https://s3.amazonaws.com/' + s3service.PICTURES_BUCKET + '/' + uploadedFile.fd;
+              populatedUser.photoUrl = s3service.S3_URL + s3service.PICTURES_BUCKET + '/' + uploadedFile.fd;
               populatedUser.save(function (saveErr) {
                 if (saveErr) {
                   logger.error('DB Error when trying to save user');

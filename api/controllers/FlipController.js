@@ -47,7 +47,7 @@ var FlipController = {
       if (!uploadedFiles || uploadedFiles.length < 1) {
         return response.send(400, new FlipsError('Error trying to upload background file to S3', err));
       }
-      return response.send(201, {background_url: uploadedFiles[0].extra.Location});
+      return response.send(201, {background_url: s3service.S3_URL + s3service.BACKGROUND_BUCKET + '/' + uploadedFiles[0].fd});
     });
   },
 
@@ -64,7 +64,7 @@ var FlipController = {
       if (!uploadedFiles || uploadedFiles.length < 1) {
         return response.send(400, new FlipsError('Error trying to upload audio file to S3', err));
       }
-      return response.send(201, {sound_url: uploadedFiles[0].extra.Location});
+      return response.send(201, {sound_url: s3service.S3_URL + s3service.SOUND_BUCKET + '/' + uploadedFiles[0].fd});
     });
   },
 
@@ -93,7 +93,7 @@ var FlipController = {
         if (flip.owner && flip.owner.id != request.params.user_id) {
           return response.send(403, new FlipsError('This flip does not belong to this user'));
         }
-        flip.backgroundURL = uploadedFiles[0].extra.Location;
+        flip.backgroundURL = s3service.S3_URL + s3service.BACKGROUND_BUCKET + '/' + uploadedFiles[0].fd;
         flip.save(function (err) {
           if (err) {
             var errmsg = new FlipsError('Error trying to save flip', err);
@@ -133,7 +133,7 @@ var FlipController = {
 
           return response.send(403, new FlipsError('This flip does not belong to this user'));
         }
-        flip.soundURL = uploadedFiles[0].extra.Location;
+        flip.soundURL = s3service.S3_URL + s3service.SOUND_BUCKET + '/' + uploadedFiles[0].fd;
         flip.save(function (err) {
           if (err) {
             var errmsg = new FlipsError('Error trying to save flip', err);

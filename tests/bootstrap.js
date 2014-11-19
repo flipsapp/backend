@@ -55,11 +55,11 @@ var start = function () {
 
       sinon.stub(app.services.s3service, 'upload', function(file, bucket, callback) {
         if (bucket === 'flips-sound') {
-          callback(null, [{ extra: {Location: "https://flips-sound.s3.amazonaws.com/43346217-6b53-484d-980c-6cca226f16f0.wav"} }]);
+          callback(null, [{ fd: "https://flips-sound.s3.amazonaws.com/43346217-6b53-484d-980c-6cca226f16f0.wav" }]);
         } else if (bucket === 'flips-background') {
-          callback(null, [{ extra: {Location: "https://flips-background.s3.amazonaws.com/43346217-6b53-484d-980c-6cca226f16f0.jpg"} }]);
+          callback(null, [{ fd: "https://flips-background.s3.amazonaws.com/43346217-6b53-484d-980c-6cca226f16f0.jpg" }]);
         } else {
-          callback(null, [{ extra: {Location: "https://flips-pictures.s3.amazonaws.com/43346217-6b53-484d-980c-6cca226f16f0.jpg"} }]);
+          callback(null, [{ fd: "https://flips-pictures.s3.amazonaws.com/43346217-6b53-484d-980c-6cca226f16f0.jpg" }]);
         }
       });
 
