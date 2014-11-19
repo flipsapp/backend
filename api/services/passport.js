@@ -148,6 +148,6 @@ var createFacebookUser = function(fbProfile, next) {
       return next(new FlipsError('Error creating user.'));
     }
 
-    return next(null, user);
+    return next(null, Krypto.decryptUser(user));
   });
 };
