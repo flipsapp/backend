@@ -70,20 +70,20 @@ module.exports.session = {
   *                                                                          *
   ***************************************************************************/
 
-  //adapter: 'mongo',
-  //host: 'ds047930.mongolab.com',
-  //port: 47930,
-  //db: 'flips-session',
-  //collection: 'sessions',
-  //username: 'flips',
-  //password: 'flips'
+  adapter: 'mongo',
+  host: 'ds047930.mongolab.com',
+  port: 47930,
+  db: 'flips-session',
+  collection: 'sessions',
+  username: 'flips',
+  password: 'flips'
 
 
 
   //adapter: 'memory'
 
-  store: new (MySQLSessionStore(express))(process.env.RDS_DB_NAME, process.env.RDS_USERNAME,
-    process.env.RDS_PASSWORD, { host: process.env.RDS_HOSTNAME})
+  //store: new (MySQLSessionStore(express))(process.env.RDS_DB_NAME, process.env.RDS_USERNAME,
+  //  process.env.RDS_PASSWORD, { host: process.env.RDS_HOSTNAME})
 
 
   /***************************************************************************
