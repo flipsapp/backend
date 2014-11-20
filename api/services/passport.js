@@ -67,7 +67,7 @@ passport.facebook = function(request, response, next) {
 
           user.save();
 
-          next(null, user)
+          next(null, Krypto.decryptUser(user))
         }
       }
     );
