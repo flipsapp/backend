@@ -189,12 +189,18 @@ var checkExistingUser = function (userModel, callback) {
     if (userWithSameUsername) {
       return callback('This username is already a Flips user', userWithSameUsername);
     }
-    User.findOne({phoneNumber: Krypto.encrypt(userModel.phoneNumber)}).exec(function (err, userWithSamePhoneNumber) {
-      if (userWithSamePhoneNumber) {
-        return callback('This phone number is already used by an existing Flips user', userWithSamePhoneNumber);
-      }
-      return callback(null, null);
-    })
+
+    if (userModel.phoneNumber && userModel.phoneNumber.length > 0) {
+      User.findOne({phoneNumber: Krypto.encrypt(userModel.phoneNumber)}).exec(function (err, userWithSamePhoneNumber) {
+        if (userWithSamePhoneNumber) {
+          return callback('This phone number is already used by an existing Flips user', userWithSamePhoneNumber);
+        }
+        return callback(null, null);
+      })
+    }
+
+    return callback(null, null);
+
   });
 };
 
