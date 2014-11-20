@@ -41,29 +41,17 @@ var RoomController = {
 
       createUsersForUnknownParticipants(params, function (err, createdUsers) {
         var allUsers = [admin];
-        console.log(params.users);
-        console.log(params.users instanceof Array);
-        console.log(params.users instanceof String);
-        console.log(allUsers);
 
         if (params.users) {
-          console.log('concat 1');
-          console.log(allUsers instanceof Array);
-          allUsers = allUsers.concat(params.users);
-          console.log(allUsers);
+           allUsers = allUsers.concat(params.users);
         }
         if (createdUsers) {
-          console.log('concat 2');
           allUsers = allUsers.concat(createdUsers);
-          console.log(allUsers);
         }
-
-
 
         room.admin = admin;
         room.pubnubId = uuid();
 
-        logger.debug('users: ' + allUsers);
 
         (function (roomAdmin, phoneNumbersToInvite, participants) {
 
