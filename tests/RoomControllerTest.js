@@ -203,9 +203,7 @@ describe('Room Controller', function () {
 
             assert.equal(res.status, 200);
             assert.equal(room.admin, userId);
-            //TODO enable again
-            //assert.equal(room.participants.length, 1);
-            //assert.equal(room.participants[0].id, userId);
+            assert.equal(room.participants.length, 1);
             assert.equal(room.name, "Room 2 - Updated");
             assert.notEqual(room.id, null);
 
@@ -226,9 +224,8 @@ describe('Room Controller', function () {
 
             assert.equal(res.status, 200);
             assert.equal(room.admin, userId);
-            //TODO enable again
+            //TODO
             //assert.equal(room.participants.length, 2);
-            //assert.equal(room.participants[0].id, userId);
             //assert.equal(room.participants[1].id, bUserId);
             assert.equal(room.name, "Room 2 - Updated");
             assert.notEqual(room.id, null);

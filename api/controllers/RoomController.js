@@ -41,25 +41,17 @@ var RoomController = {
 
       createUsersForUnknownParticipants(params, function (err, createdUsers) {
         var allUsers = [admin];
-        console.log(params.users);
-        console.log(params.users instanceof Array);
-        console.log(params.users instanceof String);
 
         if (params.users) {
-          console.log('concat 1');
-          allUsers.concat(params.users);
+           allUsers = allUsers.concat(params.users);
         }
         if (createdUsers) {
-          console.log('concat 2');
-          allUsers.concat(createdUsers);
+          allUsers = allUsers.concat(createdUsers);
         }
-
-
 
         room.admin = admin;
         room.pubnubId = uuid();
 
-        logger.debug('users: ' + allUsers);
 
         (function (roomAdmin, phoneNumbersToInvite, participants) {
 
@@ -121,8 +113,10 @@ var RoomController = {
         if (!room) {
           return response.send(404, new FlipsError('Resource not found', 'id = ' + roomId));
         }
-        //TODO populate participants
-        return response.send(200, room);
+        getParticipantsForRoom(room.id, function(participants) {
+          room.participants = participants;
+          return response.send(200, room);
+        });
       }
     )
   },
@@ -150,8 +144,10 @@ var RoomController = {
           if (!room) {
             return response.send(404, new FlipsError('Resource not found', 'id = ' + affectedRooms[0].id));
           }
-
-          return response.send(200, room);
+          getParticipantsForRoom(room.id, function(participants) {
+            room.participants = participants;
+            return response.send(200, room);
+          });
         });
     });
   },
@@ -186,8 +182,10 @@ var RoomController = {
           if (!room) {
             return response.send(404, new FlipsError('Resource not found', 'id = ' + roomId));
           }
-          //TODO populate participants
-          return response.send(200, room);
+          getParticipantsForRoom(room.id, function(participants) {
+            room.participants = participants;
+            return response.send(200, room);
+          });
         }
       );
     });
@@ -286,6 +284,16 @@ var assignUsersToRoom = function (users, room, callback) {
         })
       }
     });
+};
+
+var getParticipantsForRoom = function (roomId, callback) {
+  Participant.find({room: roomId}).exec(function(err, participants) {
+    if (err) {
+      callback([]);
+    } else {
+      callback(participants);
+    }
+  });
 };
 
 module.exports = RoomController;
