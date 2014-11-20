@@ -39,7 +39,8 @@ var start = function () {
       },
 
       session: {
-        adapter: 'memory'
+        adapter: 'memory',
+        store: ''
       },
 
       models: {
