@@ -55,12 +55,16 @@ var UserController = {
 
   forgot: function (request, response) {
     var phoneNumber = request.param('phone_number');
+    var username = request.param('email');
 
     if (!phoneNumber) {
       return response.send(400, new FlipsError('Error requesting to reset password.', 'Phone Number is empty.'));
     }
+    if (!username) {
+      return response.send(400, new FlipsError('Error requesting to reset password.', 'Email is empty.'));
+    }
 
-    User.findOne({ phoneNumber: Krypto.encrypt(phoneNumber) })
+    User.findOne({ username: Krypto.encrypt(username), phoneNumber: Krypto.encrypt(phoneNumber) })
       .exec(function (err, user) {
         if (err) {
           var errmsg = new FlipsError('Error retrieving the user.');
@@ -83,10 +87,6 @@ var UserController = {
 
             if (!device) {
               return response.send(404, new FlipsError('Device not found.', 'device number = ' + phoneNumber));
-            }
-
-            if (device.user.id != user.id) {
-              return response.send(403, new FlipsError('This device is not yours.'));
             }
 
             sendVerificationCode(device);
