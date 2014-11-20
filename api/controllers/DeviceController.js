@@ -69,6 +69,7 @@ var DeviceController = {
           }
           device.user = user;
 
+          logger.debug('sending verification code');
           sendVerificationCode(device);
           PubnubGateway.addDeviceToPushNotification(device.uuid, device.uuid, device.platform, function(err, channel) {
             if (err) {
@@ -187,6 +188,8 @@ module.exports = DeviceController;
 var sendVerificationCode = function(device) {
   var verificationCode = Math.floor(Math.random() * 8999) + 1000;
   var message = 'Your Flips verification code: ' + verificationCode;
+
+  logger.debug(message);
 
   device.verificationCode = verificationCode;
   device.retryCount = 0;

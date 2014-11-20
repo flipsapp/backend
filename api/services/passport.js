@@ -67,7 +67,7 @@ passport.facebook = function(request, response, next) {
 
           user.save();
 
-          next(null, Krypto.decryptUser(user))
+          next(null, user)
         }
       }
     );
@@ -148,6 +148,6 @@ var createFacebookUser = function(fbProfile, next) {
       return next(new FlipsError('Error creating user.'));
     }
 
-    return next(null, Krypto.decryptUser(user));
+    return next(null, user);
   });
 };

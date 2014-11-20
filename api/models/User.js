@@ -58,9 +58,13 @@ var User = {
       via: 'user'
     },
 
-    rooms: {
-      collection: 'Room',
-      via: 'participants'
+    myRooms: function() {
+      Room.query('select * from room where admin = ' + this.id + ' union select a.* from room a, participant b where a.id = b.room and b.user = ' + this.id, function (err, rooms) {
+        if (err) {
+          rooms = [];
+        }
+        return rooms;
+      });
     },
 
     phoneNumber: {
@@ -71,6 +75,13 @@ var User = {
       type: 'boolean',
       defaultsTo: false
     }
+    //,
+    //
+    //toJSON: function() {
+    //  var obj = this.toObject();
+    //  obj.rooms = this.myRooms();
+    //  return obj;
+    //}
 
   },
 

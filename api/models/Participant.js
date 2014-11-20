@@ -1,34 +1,24 @@
 /**
-* Room.js
+* Participant.js
 *
 * @description :: TODO: You might write a short summary of how this model works and what it represents here.
 * @docs        :: http://sailsjs.org/#!documentation/models
 */
 
-var Room = {
+module.exports = {
 
   attributes: {
 
-    name: {
-      type: 'string'
-    },
-
-    admin: {
+    user: {
       model: 'User',
       required: true
     },
 
-    participants : {
-      collection: 'Participant',
-      via: 'room'
-    },
-
-    pubnubId: {
-      type: 'string',
-      unique: true
+    room: {
+      model: 'Room',
+      required: true
     }
-  }
 
+  }
 };
 
-module.exports = Room;

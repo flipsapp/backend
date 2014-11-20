@@ -244,12 +244,12 @@ var createPassportAndInitialRoom = function (user, password, photo, next) {
       logger.debug('4. Flipboys user found');
       logger.debug('5. user id: ' + user.id);
       logger.debug('6. flipboys id: ' + flipboysUser.id);
-      var participants = [user.id, flipboysUser.id];
+      //var participants = [];
+      //participants.push(user.id);
+      //participants.push(flipboysUser.id);
 
-      logger.debug('7. participants: ' + participants);
       Room.create({
         admin: user.id,
-        participants: participants,
         pubnubId: uuid()
       }).exec(function (roomErr, room) {
         if (roomErr) {
@@ -265,71 +265,92 @@ var createPassportAndInitialRoom = function (user, password, photo, next) {
           });
         }
 
-        logger.debug('8. room created' + room);
-        Room.findOne(room.id).populate('participants').exec(function(bla, aroom) {
-          logger.debug('8.1. room participants: ' + aroom.participants);
+        logger.debug('room was created with id: ' + room.id);
 
-        });
-
-        User.findOne(user.id).populate('rooms').exec(function (populatedUserErr, populatedUser) {
-          logger.debug('8.3 populatedUser: ' + populatedUser.username);
-          if (populatedUserErr) {
+        Participant.create({user: user.id, room: room.id}).exec(function (err, userParticipant) {
+          if (err) {
+            logger.error('Error creating user participation in room: ' + err);
             return user.destroy(function (destroyErr) {
-              next(destroyErr || new FlipsError('Error trying the newly created user', populatedUserErr, ErrorCodes.USER_FIND_INTERNAL_ERROR));
+              next(destroyErr || new FlipsError('Error trying to add user to a room'));
             });
           }
-
-          logger.debug('9. populated user: ' + populatedUser.username);
-          if (photo && photo._files.length > 0) {
-            logger.debug('9.1 files length: ' + photo._files.length);
-            s3service.upload(photo, s3service.PICTURES_BUCKET, function (s3Err, uploadedFiles) {
-              if (s3Err) {
-                logger.error(s3Err);
-                var errmsg = 'Error uploading picture to S3';
-                logger.error(errmsg);
-                return user.destroy(function (destroyErr) {
-                  next(destroyErr || errmsg);
-                });
-              }
-
-              logger.debug('10. no error on upload picture');
-
-              if (!uploadedFiles || uploadedFiles.length < 1) {
-                logger.error('No files uploaded');
-                return user.destroy(function (destroyErr) {
-                  next(destroyErr || 'No files uploaded');
-                });
-              }
-
-              logger.debug('11. one or more pictures uploaded');
-              logger.debug('11.1 populatedUser: ' + populatedUser.username);
-
-              var uploadedFile = uploadedFiles[0];
-              var a = uploadedFile
-              logger.debug(JSON.stringify(a));
-
-              logger.debug('11.2 file location: ' + 'https://s3.amazonaws.com/' + s3service.PICTURES_BUCKET + '/' + uploadedFile.fd);
-
-              populatedUser.photoUrl = s3service.S3_URL + s3service.PICTURES_BUCKET + '/' + uploadedFile.fd;
-              populatedUser.save(function (saveErr) {
-                if (saveErr) {
-                  logger.error('DB Error when trying to save user');
-                  return user.destroy(function (destroyErr) {
-                    next(destroyErr || 'DB Error when trying to save user');
-                  });
-                }
-                logger.debug('12. user saved with thumbnail url');
-                logger.debug('13. populatedUser: ' + populatedUser.username);
-                return next(null, Krypto.decryptUser(populatedUser));
+          Participant.create({user: flipboysUser.id, room: room.id}).exec(function (err, flipBoysParticipant) {
+            if (err) {
+              logger.error('Error creating flipboys  participation in room: ' + err);
+              return user.destroy(function (destroyErr) {
+                next(destroyErr || new FlipsError('Error trying to add user to a room'));
               });
+            }
+            logger.debug('8. room created' + room);
+
+            User.findOne(user.id).exec(function (populatedUserErr, populatedUser) {
+              logger.debug('8.3 populatedUser: ' + populatedUser.username);
+              if (populatedUserErr) {
+                return user.destroy(function (destroyErr) {
+                  next(destroyErr || new FlipsError('Error trying the newly created user', populatedUserErr, ErrorCodes.USER_FIND_INTERNAL_ERROR));
+                });
+              }
+
+              logger.debug('9. populated user: ' + populatedUser.username);
+              if (photo && photo._files.length > 0) {
+                logger.debug('9.1 files length: ' + photo._files.length);
+                s3service.upload(photo, s3service.PICTURES_BUCKET, function (s3Err, uploadedFiles) {
+                  if (s3Err) {
+                    logger.error(s3Err);
+                    var errmsg = 'Error uploading picture to S3';
+                    logger.error(errmsg);
+                    return user.destroy(function (destroyErr) {
+                      next(destroyErr || errmsg);
+                    });
+                  }
+
+                  logger.debug('10. no error on upload picture');
+
+                  if (!uploadedFiles || uploadedFiles.length < 1) {
+                    logger.error('No files uploaded');
+                    return user.destroy(function (destroyErr) {
+                      next(destroyErr || 'No files uploaded');
+                    });
+                  }
+
+                  logger.debug('11. one or more pictures uploaded');
+                  logger.debug('11.1 populatedUser: ' + populatedUser.username);
+
+                  var uploadedFile = uploadedFiles[0];
+
+                  logger.debug('11.2 file location: ' + 'https://s3.amazonaws.com/' + s3service.PICTURES_BUCKET + '/' + uploadedFile.fd);
+
+                  populatedUser.photoUrl = s3service.S3_URL + s3service.PICTURES_BUCKET + '/' + uploadedFile.fd;
+                  populatedUser.save(function (saveErr) {
+                    if (saveErr) {
+                      logger.error('DB Error when trying to save user: ' + saveErr);
+                      return user.destroy(function (destroyErr) {
+                        next(destroyErr || 'DB Error when trying to save user');
+                      });
+                    }
+                    logger.debug('12. user saved with thumbnail url');
+                    logger.debug('13. populatedUser: ' + populatedUser.username);
+                    console.log(JSON.stringify(populatedUser.myRooms()));
+                    Room.query('select * from room where admin = ' + populatedUser.id + ' union select a.* from room a, participant b where a.id = b.room and b.user = ' + populatedUser.id, function (err, rooms) {
+                      if (err) {
+                        rooms = [];
+                      }
+                      populatedUser.rooms = rooms;
+                      return next(null, Krypto.decryptUser(populatedUser));
+                    });
+
+                  });
+
+                });
+              } else {
+                logger.debug('populatedUser: ' + populatedUser.username);
+                return next(null, Krypto.decryptUser(populatedUser));
+              }
 
             });
-          } else {
-            logger.debug('populatedUser: ' + populatedUser.username);
-            return next(null, Krypto.decryptUser(populatedUser));
-          }
-
+          });
         });
+
       });
     });
   });
