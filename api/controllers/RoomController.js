@@ -239,19 +239,21 @@ var sendInvitationBySMS = function (toNumber, fromUser, callback) {
 var subscribeUsersToRoom = function (room) {
   for (var i = 0; i < room.participants.length; i++) {
     var participant = room.participants[i];
-    var message = {type: 1, content: {room_id: room.id, room_pubnubid: room.pubnubId}};
-    (function (aParticipant, aRoom, aMessage) {
-      PubNub.publish({
-        channel: aParticipant.pubnubId,
-        message: aMessage,
-        callback: function (e) {
-          logger.info('User %s subscribed to room %s on channel %s', aParticipant.id, aRoom.id, aRoom.pubnubId)
-        },
-        error: function (e) {
-          logger.error('Error when trying to subscribe user %s to room %s on channel %s. Details: %s', aParticipant.id, aRoom.id, aRoom.pubnubId, e)
-        }
-      });
-    })(participant, room, message);
+    var message = {type: 1, content: room};
+    if (participant.id != room.admin) {
+      (function (aParticipant, aRoom, aMessage) {
+        PubNub.publish({
+          channel: aParticipant.pubnubId,
+          message: aMessage,
+          callback: function (e) {
+            logger.info('User %s subscribed to room %s on channel %s', aParticipant.id, aRoom.id, aRoom.pubnubId)
+          },
+          error: function (e) {
+            logger.error('Error when trying to subscribe user %s to room %s on channel %s. Details: %s', aParticipant.id, aRoom.id, aRoom.pubnubId, e)
+          }
+        });
+      })(participant, room, message);
+    }
   }
 };
 
