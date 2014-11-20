@@ -57,6 +57,31 @@ var Krypto = {
       decryptedUser.nickname = Krypto.decrypt(user.nickname);
     }
     return decryptedUser;
+  },
+
+  decryptUsers: function(users, callback) {
+    async.map(users,
+      function(user, cb) {
+        var decryptedUser = user;
+        if (user.username) {
+          decryptedUser.username = Krypto.decrypt(user.username);
+        }
+        if (user.firstName) {
+          decryptedUser.firstName = Krypto.decrypt(user.firstName);
+        }
+        if (user.lastName) {
+          decryptedUser.lastName = Krypto.decrypt(user.lastName);
+        }
+        if (user.phoneNumber) {
+          decryptedUser.phoneNumber = Krypto.decrypt(user.phoneNumber);
+        }
+        if (user.nickname) {
+          decryptedUser.nickname = Krypto.decrypt(user.nickname);
+        }
+        cb(null, decryptedUser);
+      },
+      callback);
+
   }
 
 };

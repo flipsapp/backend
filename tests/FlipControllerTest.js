@@ -10,6 +10,9 @@ describe('FlipController', function () {
   var userId, user2Id;
 
   before(function (done) {
+
+    this.timeout(5000);
+
     var aUser = {
       username: 'devtest@arctouch.com',
       password: 'Password1',

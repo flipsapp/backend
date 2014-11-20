@@ -34,6 +34,8 @@ describe('AuthController - Using correct params', function () {
 
   it('Should create a user', function (done) {
 
+    this.timeout(5000);
+
     var aUser = {
       username: 'policytest@arctouch.com',
       password: 'Password1',
@@ -130,6 +132,9 @@ describe('AuthController - Signing up with wrong requests', function () {
   });
 
   it('Requesting with user 12 years old, should receive an error message', function (done) {
+
+    this.timeout(5000);
+
     var aUser = {
       username: 'tooyoung@arctouch.com',
       password: 'Password1',
@@ -157,6 +162,9 @@ describe('AuthController - Signing up with wrong requests', function () {
   });
 
   it('Requesting with user with 13 years + 1 day, should receive an error message', function (done) {
+
+    this.timeout(5000);
+
     var aUser = {
       username: 'tomorrowismybirthday@arctouch.com',
       password: 'Password1',
@@ -444,6 +452,8 @@ describe('AuthController - Policy test', function () {
   };
 
   before(function (done) {
+
+    this.timeout(5000);
 
     var flipBoysUser = {
       username: 'flipboys@flips.com',

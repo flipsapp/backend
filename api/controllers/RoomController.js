@@ -9,12 +9,13 @@ var actionUtil = requires('>/node_modules/sails/lib/hooks/blueprints/actionUtil'
 var uuid = require('node-uuid');
 var googl = require('goo.gl');
 var PubNub = requires('>/api/utilities/PubNub');
+var Krypto = requires('>/api/utilities/Krypto');
 
 var RoomController = {
 
   create: function (request, response) {
     var params = actionUtil.parseValues(request);
-    var room = {};
+    var room = {name: params.name};
 
     if (!params) {
       return response.send(400, new FlipsError('Error creating Room', 'Missing parameters.'));
@@ -30,7 +31,7 @@ var RoomController = {
 
     var admin = params.parentid;
 
-    User.findOne(admin).exec(function(err, adminUser) {
+    User.findOne(admin).exec(function (err, adminUser) {
       if (err) {
         return response.send(400, new FlipsError('Error retrieving user from database', err));
       }
@@ -39,23 +40,32 @@ var RoomController = {
       }
 
       createUsersForUnknownParticipants(params, function (err, createdUsers) {
-        var users = params.users;
-        if (createdUsers) {
-          users = users + "," + createdUsers;
+        var allUsers = [admin];
+        console.log(params.users);
+        console.log(params.users instanceof Array);
+        console.log(params.users instanceof String);
+
+        if (params.users) {
+          console.log('concat 1');
+          allUsers.concat(params.users);
         }
+        if (createdUsers) {
+          console.log('concat 2');
+          allUsers.concat(createdUsers);
+        }
+
+
 
         room.admin = admin;
         room.pubnubId = uuid();
 
-        if (!users || users.length < 1) {
-          users = [admin];
-        } else {
-          users += "," + admin;
-        }
+        logger.debug('users: ' + allUsers);
 
-        room.participants = users;
+        (function (roomAdmin, phoneNumbersToInvite, participants) {
 
-        (function (roomAdmin, phoneNumbersToInvite) {
+          logger.debug('participants');
+          logger.debug(participants);
+
           Room.create(room)
             .exec(function (error, newRoom) {
               if (error) {
@@ -67,27 +77,29 @@ var RoomController = {
               }
 
               Room.findOne(newRoom.id)
-                .populate('participants')
-                .exec(function (error, populatedRoom) {
+                .exec(function (error, room) {
                   if (error) {
                     return response.send(500, new FlipsError('Error retrieving the room after created.', error.details));
                   }
 
-                  if (!populatedRoom) {
+                  if (!room) {
                     return response.send(404, new FlipsError('Error retrieving the room after created.', 'Room id = ' + params.id));
                   }
                   if (phoneNumbersToInvite) {
                     var invitedNumberList = Array.prototype.slice.call(phoneNumbersToInvite);
                     for (var i = 0; i < invitedNumberList.length; i++) {
-                      sendInvitationBySMS(phoneNumbersToInvite[i], roomAdmin, function(err, toNumber) {});
+                      sendInvitationBySMS(phoneNumbersToInvite[i], roomAdmin, function (err, toNumber) {
+                      });
                     }
                   }
-                  subscribeUsersToRoom(populatedRoom);
-                  return response.send(201, populatedRoom);
+                  assignUsersToRoom(participants, room, function (err, populatedRoom) {
+                    subscribeUsersToRoom(populatedRoom);
+                    return response.send(201, populatedRoom);
+                  })
                 });
             }
           );
-        })(adminUser, params.phoneNumbers);
+        })(adminUser, params.phoneNumbers, allUsers);
       });
 
     });
@@ -101,7 +113,6 @@ var RoomController = {
     }
 
     Room.findOne(roomId)
-      .populate('participants')
       .exec(function (error, room) {
         if (error) {
           return response.send(500, new FlipsError('Server error', err.details));
@@ -110,7 +121,7 @@ var RoomController = {
         if (!room) {
           return response.send(404, new FlipsError('Resource not found', 'id = ' + roomId));
         }
-
+        //TODO populate participants
         return response.send(200, room);
       }
     )
@@ -118,7 +129,7 @@ var RoomController = {
 
   update: function (request, response) {
     var roomId = request.params.id;
-    var whereClause = { id: roomId };
+    var whereClause = {id: roomId};
     var updateColumns = request.body;
 
     Room.update(whereClause, updateColumns, function (error, affectedRooms) {
@@ -131,7 +142,6 @@ var RoomController = {
       }
 
       Room.findOne(affectedRooms[0].id)
-        .populate('participants')
         .exec(function (error, room) {
           if (error) {
             return response.send(500, new FlipsError('Server error', err.details));
@@ -157,8 +167,8 @@ var RoomController = {
     participants.push(request.user.id);
 
     var roomId = request.params.id;
-    var whereClause = { id: roomId };
-    Room.update(whereClause, { participants: participants }, function (err, affectedRooms) {
+    var whereClause = {id: roomId};
+    Room.update(whereClause, {participants: participants}, function (err, affectedRooms) {
       if (err) {
         return response.send(500, new FlipsError('Error updating room.', err.details));
       }
@@ -168,7 +178,6 @@ var RoomController = {
       }
 
       Room.findOne(affectedRooms[0].id)
-        .populate('participants')
         .exec(function (error, room) {
           if (error) {
             return response.send(500, new FlipsError('Server error', err.details));
@@ -177,7 +186,7 @@ var RoomController = {
           if (!room) {
             return response.send(404, new FlipsError('Resource not found', 'id = ' + roomId));
           }
-
+          //TODO populate participants
           return response.send(200, room);
         }
       );
@@ -189,9 +198,11 @@ var createUsersForUnknownParticipants = function (params, callback) {
   var phoneNumbers = params.phoneNumbers;
   if (!phoneNumbers) {
     return callback(null, null);
-  };
+  }
+  ;
   async.concat(phoneNumbers,
     function (phoneNumber, callback) {
+      //TODO check if phone number exists
       var user = {};
       var anythingTemporary = uuid();
       user.username = anythingTemporary;
@@ -201,7 +212,7 @@ var createUsersForUnknownParticipants = function (params, callback) {
       user.phoneNumber = phoneNumber;
       User.create(user).exec(function (err, createdUser) {
         if (err) {
-          return callback(err);
+          return callback(null);
         }
         if (createdUser) {
           return callback(null, createdUser.id);
@@ -216,8 +227,8 @@ var createUsersForUnknownParticipants = function (params, callback) {
 
 var sendInvitationBySMS = function (toNumber, fromUser, callback) {
   var msg = "You've been Flipped by {{firstname}} {{lastname}}! Download Flips within 30 days to view your message.  {{url}}";
-  msg = msg.replace("{{firstname}}", fromUser.firstName);
-  msg = msg.replace("{{lastname}}", fromUser.lastName);
+  msg = msg.replace("{{firstname}}", Krypto.decrypt(fromUser.firstName));
+  msg = msg.replace("{{lastname}}", Krypto.decrypt(fromUser.lastName));
   msg = msg.replace("{{url}}", process.env.APP_STORE_URL);
   twilioService.sendSms(toNumber, msg, function (err, message) {
     if (err) {
@@ -228,18 +239,53 @@ var sendInvitationBySMS = function (toNumber, fromUser, callback) {
 };
 
 var subscribeUsersToRoom = function (room) {
-  for (var i=0; i<room.participants.length; i++) {
+  for (var i = 0; i < room.participants.length; i++) {
     var participant = room.participants[i];
-    var message = {type : 1, content: {room_id : room.id, room_pubnubid : room.pubnubId}};
+    var message = {type: 1, content: {room_id: room.id, room_pubnubid: room.pubnubId}};
     (function (aParticipant, aRoom, aMessage) {
       PubNub.publish({
-        channel   : aParticipant.pubnubId,
-        message   : aMessage,
-        callback  : function(e) {logger.info('User %s subscribed to room %s on channel %s', aParticipant.id, aRoom.id, aRoom.pubnubId)},
-        error     : function(e) {logger.error('Error when trying to subscribe user %s to room %s on channel %s. Details: %s', aParticipant.id, aRoom.id, aRoom.pubnubId, e)}
+        channel: aParticipant.pubnubId,
+        message: aMessage,
+        callback: function (e) {
+          logger.info('User %s subscribed to room %s on channel %s', aParticipant.id, aRoom.id, aRoom.pubnubId)
+        },
+        error: function (e) {
+          logger.error('Error when trying to subscribe user %s to room %s on channel %s. Details: %s', aParticipant.id, aRoom.id, aRoom.pubnubId, e)
+        }
       });
     })(participant, room, message);
   }
+};
+
+var assignUsersToRoom = function (users, room, callback) {
+  logger.debug(JSON.stringify(room));
+  async.each(users,
+    function (user, cb) {
+      logger.debug('user: ' + user);
+      Participant.create({user: user, room: room.id}).exec(function (err, participant) {
+        cb(err);
+      });
+    },
+    function(err) {
+      if (err) {
+        callback(err)
+      } else {
+        User.find({id: users}).exec(function(err, participants) {
+          if (err) {
+            callback(err);
+          } else {
+            Krypto.decryptUsers(participants, function(err, decryptedParticipants) {
+              if (err) {
+                callback(err);
+              } else {
+                room.participants = decryptedParticipants;
+                callback(null, room);
+              }
+            });
+          }
+        })
+      }
+    });
 };
 
 module.exports = RoomController;

@@ -330,7 +330,6 @@ var createPassportAndInitialRoom = function (user, password, photo, next) {
                     }
                     logger.debug('12. user saved with thumbnail url');
                     logger.debug('13. populatedUser: ' + populatedUser.username);
-                    console.log(JSON.stringify(populatedUser.myRooms()));
                     Room.query('select * from room where admin = ' + populatedUser.id + ' union select a.* from room a, participant b where a.id = b.room and b.user = ' + populatedUser.id, function (err, rooms) {
                       if (err) {
                         rooms = [];

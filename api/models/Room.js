@@ -18,11 +18,6 @@ var Room = {
       required: true
     },
 
-    participants : {
-      collection: 'Participant',
-      via: 'room'
-    },
-
     pubnubId: {
       type: 'string',
       unique: true

@@ -53,6 +53,9 @@ describe('User Controller', function () {
   describe('Uploading a file', function () {
 
     it('Uploading correctly, should receive the user with photoURL', function (done) {
+
+      this.timeout(5000);
+
       user1.post(BASE_URL + '/user/' + userId + "/photo")
         .attach('photo', './tests/fixtures/me.jpg')
         .end(function (err, res) {
