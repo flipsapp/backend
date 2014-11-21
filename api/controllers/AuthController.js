@@ -43,6 +43,7 @@ var AuthController = {
   },
 
   signup: function(request, response) {
+    logger.debug('ENTERED USER SIGNUP');
     passport.signup(request, response, function(err, user) {
       if (err || !user) {
         return response.send(400, new FlipsError('Error signing up user', err));
