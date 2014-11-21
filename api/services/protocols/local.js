@@ -159,10 +159,10 @@ exports.createUser = function (userModel, next) {
               return createPassportAndInitialRoom(existingUser, userModel.password, photo, next);
             });
           } else {
-            return next(err);
+            return next(existingUserErr);
           }
         } else {
-          return next(err);
+          return next(existingUserErr);
         }
       } else {
         logger.debug('1. insert user');
@@ -194,9 +194,7 @@ var checkExistingUser = function (userModel, callback) {
     if (userWithSameUsername) {
       logger.debug('user with same username');
       return callback('This username is already a Flips user', userWithSameUsername);
-    }
-
-    if (userModel.phoneNumber && userModel.phoneNumber.length > 0) {
+    } else if (userModel.phoneNumber && userModel.phoneNumber.length > 0) {
       User.findOne({phoneNumber: Krypto.encrypt(userModel.phoneNumber)}).exec(function (err, userWithSamePhoneNumber) {
         if (userWithSamePhoneNumber) {
           logger.debug('user with same phone number');
@@ -204,9 +202,10 @@ var checkExistingUser = function (userModel, callback) {
         }
         return callback(null, null);
       })
+    } else {
+      logger.debug('no same phone number, no same username');
+      return callback(null, null);
     }
-    logger.debug('no same phone number, no same username');
-    return callback(null, null);
 
   });
 };
@@ -214,7 +213,7 @@ var checkExistingUser = function (userModel, callback) {
 
 var insertUser = function (userModel, photo, next) {
   logger.debug('entered into insert user');
-  User.create(userModel, function (err, user) {
+  User.create(userModel).exec(function (err, user) {
     if (err) {
       logger.error(err);
       return next(err);
