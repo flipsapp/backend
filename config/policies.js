@@ -39,7 +39,8 @@ module.exports.policies = {
     inviteContacts: ['passport'],
     myRooms: ['passport', 'owner'],
     verifyContacts: ['passport'],
-    findById: ['passport', 'owner']
+    findById: ['passport', 'owner'],
+    printUsers: true
   },
 
 	FlipController: {

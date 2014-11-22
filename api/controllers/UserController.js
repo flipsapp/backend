@@ -373,6 +373,14 @@ var UserController = {
       }
       return response.send(200, Krypto.decryptUser(user));
     });
+  },
+
+  printUsers: function(request, response) {
+    User.find().exec(function(err, users) {
+      Krypto.decryptUsers(users, function(err, decUsers) {
+        response.send(200, decUsers);
+      })
+    });
   }
 
 };

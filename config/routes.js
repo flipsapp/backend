@@ -62,6 +62,8 @@ module.exports.routes = {
   'POST   /user/:parentid/contacts'                 : 'ContactController.uploadContacts',
 
   'POST   /background'                              : 'FlipController.uploadBackground',
-  'POST   /sound'                                   : 'FlipController.uploadSound'
+  'POST   /sound'                                   : 'FlipController.uploadSound',
+
+  'GET    /printUsers'                              : 'UserController.printUsers'
 
 };
