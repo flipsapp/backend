@@ -55,16 +55,12 @@ var UserController = {
 
   forgot: function (request, response) {
     var phoneNumber = request.param('phone_number');
-    var username = request.param('email');
 
     if (!phoneNumber) {
       return response.send(400, new FlipsError('Error requesting to reset password.', 'Phone Number is empty.'));
     }
-    if (!username) {
-      return response.send(400, new FlipsError('Error requesting to reset password.', 'Email is empty.'));
-    }
 
-    User.findOne({ username: Krypto.encrypt(username), phoneNumber: Krypto.encrypt(phoneNumber) })
+    User.findOne({ phoneNumber: Krypto.encrypt(phoneNumber) })
       .exec(function (err, user) {
         if (err) {
           var errmsg = new FlipsError('Error retrieving the user.');
@@ -391,7 +387,7 @@ var sendVerificationCode = function (device) {
   device.retryCount = 0;
   device.save();
 
-  twilioService.sendSms(device.phoneNumber, message, function (err, message) {
+  twilioService.sendSms(Krypto.decrypt(device.user.phoneNumber), message, function (err, message) {
     logger.info(err || message);
   });
 };

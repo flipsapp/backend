@@ -86,7 +86,7 @@ var User = {
     if (user.nickname) {
       user.nickname = Krypto.encrypt(user.nickname);
     }
-    next(null, user);
+    next();
   }
 
 };

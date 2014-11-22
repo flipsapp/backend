@@ -53,7 +53,7 @@ exports.register = function (request, response, next) {
     return next('Password must have at least eight characters, one uppercase letter and one lowercase letter and one number.');
   }
 
-  this.createUser(userModel, next);
+  return this.createUser(userModel, next);
 };
 
 /**
@@ -114,17 +114,21 @@ exports.login = function (req, identifier, password, next) {
 };
 
 exports.createUser = function (userModel, next) {
+  logger.debug('entered createUser()');
   var photo = userModel.photo;
   delete userModel.photo;
-  checkAge(userModel, function (err, age) {
-    if (err) {
-      logger.error(err);
-      return next(err);
+  checkAge(userModel, function (ageErr, age) {
+    logger.debug('entered block of check age');
+    if (ageErr) {
+      logger.error(ageErr);
+      return next(ageErr);
     }
-    checkExistingUser(userModel, function (err, existingUser) {
+    checkExistingUser(userModel, function (existingUserErr, existingUser) {
+      logger.debug('entered block of checkExistingUser()');
       if (existingUser) {
+        logger.debug('existing user');
         if (existingUser.username === Krypto.encrypt(userModel.username)) {
-          return next(err);
+          return next(existingUserErr);
         }
         if (existingUser.phoneNumber === Krypto.encrypt(userModel.phoneNumber)) {
           if (existingUser.isTemporary) {
@@ -155,10 +159,10 @@ exports.createUser = function (userModel, next) {
               return createPassportAndInitialRoom(existingUser, userModel.password, photo, next);
             });
           } else {
-            return next(err);
+            return next(existingUserErr);
           }
         } else {
-          return next(err);
+          return next(existingUserErr);
         }
       } else {
         logger.debug('1. insert user');
@@ -169,44 +173,47 @@ exports.createUser = function (userModel, next) {
 };
 
 var checkAge = function (userModel, callback) {
+  logger.debug('checking age');
   try {
     var birthday = moment(userModel.birthday, "YYYY/MM/DD");
     var now = moment();
     var difference = now.diff(birthday, 'years');
 
     if (difference < MINIMAL_AGE) {
-      callback('You must have at least 13 years old.', null);
+      return callback('You must have at least 13 years old.', null);
     }
 
-    callback(null, userModel);
+    return callback(null, userModel);
   } catch (err) {
-    callback(err);
+    return callback(err);
   }
 };
 
 var checkExistingUser = function (userModel, callback) {
   User.findOne({username: Krypto.encrypt(userModel.username)}).exec(function (err, userWithSameUsername) {
     if (userWithSameUsername) {
+      logger.debug('user with same username');
       return callback('This username is already a Flips user', userWithSameUsername);
-    }
-
-    if (userModel.phoneNumber && userModel.phoneNumber.length > 0) {
+    } else if (userModel.phoneNumber && userModel.phoneNumber.length > 0) {
       User.findOne({phoneNumber: Krypto.encrypt(userModel.phoneNumber)}).exec(function (err, userWithSamePhoneNumber) {
         if (userWithSamePhoneNumber) {
+          logger.debug('user with same phone number');
           return callback('This phone number is already used by an existing Flips user', userWithSamePhoneNumber);
         }
         return callback(null, null);
       })
+    } else {
+      logger.debug('no same phone number, no same username');
+      return callback(null, null);
     }
-
-    return callback(null, null);
 
   });
 };
 
 
 var insertUser = function (userModel, photo, next) {
-  User.create(userModel, function (err, user) {
+  logger.debug('entered into insert user');
+  User.create(userModel).exec(function (err, user) {
     if (err) {
       logger.error(err);
       return next(err);
@@ -225,7 +232,7 @@ var createPassportAndInitialRoom = function (user, password, photo, next) {
       logger.error(passportError);
       if (passportError.code === 'E_VALIDATION') {
         logger.error('Error.Passport.Password.Invalid');
-        request.flash('error', 'Error.Passport.Password.Invalid');
+        return request.flash('error', 'Error.Passport.Password.Invalid');
       }
 
       return user.destroy(function (destroyErr) {

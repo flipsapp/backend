@@ -25,6 +25,16 @@ process.chdir(__dirname);
 GLOBAL.requires = require('r').r;
 GLOBAL.FlipsError = requires('>/api/utilities/FlipsError');
 
+//catch unhandled exceptions
+process.on('uncaughtException', function (exception) {
+  console.log("We found an uncaught exception");
+  console.log("******************************")
+  console.log(exception.stack);
+  logger.error("We found an uncaught exception");
+  logger.error("******************************");
+  logger.error(exception.stack);
+});
+
 // CREATE AND LOAD ENVIRONMENT VARIABLES
 var dotenv_path;
 if (process.env.NODE_ENV && process.env.NODE_ENV.toUpperCase() === 'PRODUCTION') {

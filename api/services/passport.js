@@ -9,11 +9,13 @@ var path     = require('path')
 passport.protocols = require('./protocols');
 
 passport.callback = function (req, res, next) {
+  logger.debug('INTO passport callback');
   var provider = req.param('provider', 'local')
     , action   = req.param('action');
 
   if (provider === 'local') {
     if (!req.user) {
+      logger.debug('INTO passport callback register');
       this.protocols.local.register(req, res, next);
     } else {
       this.protocols.local.connect(req, res, next);
@@ -79,6 +81,7 @@ passport.signin = function(request, response, next) {
 };
 
 passport.signup = function(request, response, next) {
+  logger.debug('INTO passport signup');
   this.protocols.local.register(request, response, next);
 };
 
