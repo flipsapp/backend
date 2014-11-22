@@ -8,15 +8,8 @@
  * For more information on bootstrapping your app, check out:
  * http://sailsjs.org/#/documentation/reference/sails.config/sails.config.bootstrap.html
  */
-var Krypto = requires('>/api/utilities/Krypto');
 
 module.exports.bootstrap = function(cb) {
-
-  console.log(Krypto.decrypt('ba1d161e5bc890b323e4'));
-  console.log(Krypto.decrypt('e11d'));
-  console.log(Krypto.decrypt('e01a'));
-  console.log(Krypto.decrypt('be4a111f5fc891bc26e20132da35285a827222456bfcc805'));
-
 
   sails.services.passport.loadStrategies();
 
