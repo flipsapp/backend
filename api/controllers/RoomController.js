@@ -241,7 +241,7 @@ var sendInvitationBySMS = function (toNumber, fromUser, callback) {
 var subscribeUsersToRoom = function (room) {
   for (var i = 0; i < room.participants.length; i++) {
     var participant = room.participants[i];
-    var message = {type: 1, content: room};
+    var message = {type: 1, content: removeUnwantedPropertiesFromUsers(room)};
     if (participant.id != room.admin) {
       (function (aParticipant, aRoom, aMessage) {
         PubNub.publish({
