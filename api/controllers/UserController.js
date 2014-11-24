@@ -225,15 +225,26 @@ var UserController = {
   },
 
   verifyContacts: function (request, response) {
+    var validatedUsers = new Array()
     var contacts = request.param("phoneNumbers");
     for (var i = 0; i < contacts.length; i++) {
       contacts[i] = Krypto.encrypt(contacts[i]);
     }
-    User.find({phoneNumber: contacts}).exec(function (err, users) {
-      for (var i=0; i<users.length; i++) {
-        users[i] = Krypto.decrypt(users[i]);
-      }
-      return response.send(200, users);
+    User.find()
+      .where({ phoneNumber: contacts })
+      .exec(function (err, users) {
+        for (var i=0; i < users.length; i++) {
+          var decryptedUser = Krypto.decryptUser(users[i]);
+          validatedUsers[i] = {
+            id: decryptedUser.id,
+            firstName: decryptedUser.firstName,
+            lastName: decryptedUser.lastName,
+            phoneNumber: decryptedUser.phoneNumber,
+            birthday: decryptedUser.birthday,
+            photoUrl: decryptedUser.photoUrl
+          }
+        }
+        return response.send(200, validatedUsers);
     })
   },
 
