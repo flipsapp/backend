@@ -208,6 +208,7 @@ var createUsersForUnknownParticipants = function (params, callback) {
       user.lastName = anythingTemporary;
       user.birthday = "01/01/1970";
       user.phoneNumber = phoneNumber;
+      user.isTemporary = true;
       User.create(user).exec(function (err, createdUser) {
         if (err) {
           return callback(null);
@@ -274,7 +275,7 @@ var assignUsersToRoom = function (users, room, callback) {
           if (err) {
             callback(err);
           } else {
-            Krypto.decryptUsers(participants, function(err, decryptedParticipants) {
+            Krypto.decryptUsersForCreateRoom(participants, function(err, decryptedParticipants) {
               if (err) {
                 callback(err);
               } else {
