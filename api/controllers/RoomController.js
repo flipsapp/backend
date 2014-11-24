@@ -86,6 +86,7 @@ var RoomController = {
                   }
                   assignUsersToRoom(participants, room, function (err, populatedRoom) {
                     subscribeUsersToRoom(populatedRoom);
+                    populatedRoom = removeUnwantedPropertiesFromUsers(populatedRoom);
                     return response.send(201, populatedRoom);
                   })
                 });
@@ -275,7 +276,7 @@ var assignUsersToRoom = function (users, room, callback) {
           if (err) {
             callback(err);
           } else {
-            Krypto.decryptUsersForCreateRoom(participants, function(err, decryptedParticipants) {
+            Krypto.decryptUsers(participants, function(err, decryptedParticipants) {
               if (err) {
                 callback(err);
               } else {
@@ -297,6 +298,17 @@ var getParticipantsForRoom = function (roomId, callback) {
       callback(participants);
     }
   });
+};
+
+var removeUnwantedPropertiesFromUsers = function (aRoom) {
+  var users = aRoom.participants;
+  for (var i = 0; i < users.length; i++) {
+    delete users[i].pubnubId;
+    delete users[i].flips;
+    delete users[i].devices;
+  }
+  aRoom.participants = users;
+  return aRoom;
 };
 
 module.exports = RoomController;
