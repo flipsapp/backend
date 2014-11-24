@@ -81,6 +81,33 @@ var Krypto = {
         cb(null, decryptedUser);
       },
       callback);
+  },
+
+  decryptUsersForCreateRoom: function(users, callback) {
+    async.map(users,
+      function(user, cb) {
+        var decryptedUser = user;
+        if (user.username) {
+          decryptedUser.username = Krypto.decrypt(user.username);
+        }
+        if (user.firstName) {
+          decryptedUser.firstName = Krypto.decrypt(user.firstName);
+        }
+        if (user.lastName) {
+          decryptedUser.lastName = Krypto.decrypt(user.lastName);
+        }
+        if (user.phoneNumber) {
+          decryptedUser.phoneNumber = Krypto.decrypt(user.phoneNumber);
+        }
+        if (user.nickname) {
+          decryptedUser.nickname = Krypto.decrypt(user.nickname);
+        }
+        delete decryptedUser.pubnubId;
+        delete decryptedUser.flips;
+        delete decryptedUser.devices;
+        cb(null, decryptedUser);
+      },
+      callback);
 
   }
 
