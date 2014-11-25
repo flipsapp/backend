@@ -303,7 +303,7 @@ var getParticipantsForRoom = function (roomId, callback) {
 var removeUnwantedPropertiesFromUsers = function (aRoom) {
   var users = aRoom.participants;
   for (var i = 0; i < users.length; i++) {
-    delete users[i].pubnubId;
+    //delete users[i].pubnubId;
     delete users[i].flips;
     delete users[i].devices;
   }
