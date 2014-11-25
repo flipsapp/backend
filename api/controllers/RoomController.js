@@ -307,7 +307,7 @@ var removeUnwantedPropertiesFromUsers = function (aRoom) {
     name: aRoom.name,
     pubnubId: aRoom.pubnubId,
     createdAt: aRoom.createdAt,
-    updatedAt: aRoom.createdAt
+    updatedAt: aRoom.updatedAt
   };
   var participants = [];
   for (var i = 0; i < aRoom.participants.length; i++) {
