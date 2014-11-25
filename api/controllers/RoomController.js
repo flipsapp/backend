@@ -86,8 +86,7 @@ var RoomController = {
                   }
                   assignUsersToRoom(participants, room, function (err, populatedRoom) {
                     subscribeUsersToRoom(populatedRoom);
-                    populatedRoom = removeUnwantedPropertiesFromUsers(populatedRoom);
-                    return response.send(201, populatedRoom);
+                    return response.send(201, removeUnwantedPropertiesFromUsers(populatedRoom));
                   })
                 });
             }
@@ -239,9 +238,10 @@ var sendInvitationBySMS = function (toNumber, fromUser, callback) {
 };
 
 var subscribeUsersToRoom = function (room) {
+  var cleanRoom = removeUnwantedPropertiesFromUsers(room);
   for (var i = 0; i < room.participants.length; i++) {
     var participant = room.participants[i];
-    var message = {type: 1, content: removeUnwantedPropertiesFromUsers(room)};
+    var message = {type: 1, content: cleanRoom};
     if (participant.id != room.admin) {
       (function (aParticipant, aRoom, aMessage) {
         PubNub.publish({
@@ -301,14 +301,34 @@ var getParticipantsForRoom = function (roomId, callback) {
 };
 
 var removeUnwantedPropertiesFromUsers = function (aRoom) {
-  var users = aRoom.participants;
-  for (var i = 0; i < users.length; i++) {
-    //delete users[i].pubnubId;
-    delete users[i].flips;
-    delete users[i].devices;
+  var room  = {
+    id: aRoom.id,
+    admin: aRoom.admin,
+    name: aRoom.name,
+    pubnubId: aRoom.pubnubId,
+    createdAt: aRoom.createdAt,
+    updatedAt: aRoom.updatedAt
+  };
+  var participants = [];
+  for (var i = 0; i < aRoom.participants.length; i++) {
+    var participant = {
+      id: aRoom.participants[i].id,
+      username: aRoom.participants[i].username,
+      firstName: aRoom.participants[i].firstName,
+      lastName: aRoom.participants[i].lastName,
+      birthday: aRoom.participants[i].birthday,
+      facebookId: aRoom.participants[i].facebookId,
+      photoUrl: aRoom.participants[i].photoUrl,
+      nickname: aRoom.participants[i].nickname,
+      phoneNumber: aRoom.participants[i].phoneNumber,
+      isTemporary: aRoom.participants[i].isTemporary,
+      createdAt: aRoom.participants[i].createdAt,
+      updatedAt: aRoom.participants[i].updatedAt
+    };
+    participants.push(participant);
   }
-  aRoom.participants = users;
-  return aRoom;
+  room.participants = participants;
+  return room;
 };
 
 module.exports = RoomController;
