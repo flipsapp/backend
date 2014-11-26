@@ -35,7 +35,7 @@ var UserController = {
 
       var uploadedFile = uploadedFiles[0];
 
-      User.update(userId, { photoUrl: s3service.S3_URL + s3service.PICTURES_BUCKET + '/' + uploadedFile.fd })
+      User.update(userId, {photoUrl: s3service.S3_URL + s3service.PICTURES_BUCKET + '/' + uploadedFile.fd})
         .exec(function (err, updatedUser) {
 
           if (err) {
@@ -60,7 +60,7 @@ var UserController = {
       return response.send(400, new FlipsError('Error requesting to reset password.', 'Phone Number is empty.'));
     }
 
-    User.findOne({ phoneNumber: Krypto.encrypt(phoneNumber) })
+    User.findOne({phoneNumber: Krypto.encrypt(phoneNumber)})
       .exec(function (err, user) {
         if (err) {
           var errmsg = new FlipsError('Error retrieving the user.');
@@ -103,14 +103,14 @@ var UserController = {
       return response.send(400, new FlipsError('Error requesting to reset password.', 'Phone Number or verification code is empty.'));
     }
 
-    User.findOne({phoneNumber: Krypto.encrypt(phoneNumber)}).exec(function(err, user) {
+    User.findOne({phoneNumber: Krypto.encrypt(phoneNumber)}).exec(function (err, user) {
       if (err) {
         return response.send(500, new FlipsError('Error retrieving user'));
       }
       if (!user) {
         return response.send(404, new FlipsError('User not found'));
       }
-      Device.findOne({ user: user.id })
+      Device.findOne({user: user.id})
         .populate('user')
         .exec(function (error, device) {
           if (error) {
@@ -156,14 +156,17 @@ var UserController = {
       return response.send(400, new FlipsError('Error requesting to update password.', 'Missing parameters.'));
     }
 
-    User.findOne({username: Krypto.encrypt(email), phoneNumber: Krypto.encrypt(phoneNumber)}).exec(function(err, user) {
+    User.findOne({
+      username: Krypto.encrypt(email),
+      phoneNumber: Krypto.encrypt(phoneNumber)
+    }).exec(function (err, user) {
       if (err) {
         return response.send(500, new FlipsError('Error trying to retrieve user'));
       }
       if (!user) {
         return response.send(404, new FlipsError('Username and/or phone number do not match any user'));
       }
-      Device.findOne({ user: user.id })
+      Device.findOne({user: user.id})
         .populate('user')
         .exec(function (error, device) {
           if (error) {
@@ -213,14 +216,19 @@ var UserController = {
 
   myRooms: function (request, response) {
     var userId = request.params.parentid;
-    Room.query('select * from room where admin = ' + userId + ' union select a.* from room a, room_participants__user_rooms b where a.id = b.room_participants and b.user_rooms = ' + userId, function (err, rooms) {
+    Room.query('select a.* from room a, participant b where a.id = b.room and b.user = ' + userId, function (err, rooms) {
       if (err) {
         return response.send(500, new FlipsError('Error when trying to retrieve rooms'));
       }
       if (!rooms) {
         return reponse.send(404, new FlipsError('Rooms not found'))
       }
-      return response.send(200, rooms);
+      populateRooms(rooms, function (err, populatedRooms) {
+        if (err) {
+          return response.send(500, new FlipsError('Error when trying to retrieve rooms'));
+        }
+        return response.send(200, populatedRooms);
+      });
     });
   },
 
@@ -231,7 +239,7 @@ var UserController = {
       contacts[i] = Krypto.encrypt(contacts[i]);
     }
     User.find()
-      .where({ phoneNumber: contacts })
+      .where({phoneNumber: contacts})
       .exec(function (err, users) {
         for (var i = 0; i < users.length; i++) {
           var decryptedUser = Krypto.decryptUser(users[i]);
@@ -245,7 +253,7 @@ var UserController = {
           }
         }
         return response.send(200, validatedUsers);
-    })
+      })
   },
 
   verifyFacebookUsers: function (request, response) {
@@ -401,7 +409,7 @@ var UserController = {
 
   findById: function (request, response) {
     var userId = request.params.parentid;
-    User.findOne(userId).exec(function(err, user) {
+    User.findOne(userId).exec(function (err, user) {
       if (err) {
         return response.send(500, new FlipsError('Error retrieving user'));
       }
@@ -412,17 +420,15 @@ var UserController = {
     });
   },
 
-  printUsers: function(request, response) {
-    User.find().exec(function(err, users) {
-      Krypto.decryptUsers(users, function(err, decUsers) {
+  printUsers: function (request, response) {
+    User.find().exec(function (err, users) {
+      Krypto.decryptUsers(users, function (err, decUsers) {
         response.send(200, decUsers);
       })
     });
   }
 
 };
-
-module.exports = UserController;
 
 var sendVerificationCode = function (device) {
   var verificationCode = Math.floor(Math.random() * 8999) + 1000;
@@ -436,3 +442,76 @@ var sendVerificationCode = function (device) {
     logger.info(err || message);
   });
 };
+
+var getParticipantsForRoom = function (roomId, callback) {
+  Participant.find({room: roomId}).exec(function (err, participants) {
+    if (err) {
+      callback([]);
+    } else {
+      callback(participants);
+    }
+  });
+};
+
+var populateRooms = function (rooms, callback) {
+  async.map(
+    rooms,
+    function (aRoom, transformedCallback) {
+      getParticipantsForRoom(aRoom.id, function (participants) {
+        var participantIds = [];
+        for (var i = 0; i < participants.length; i++) {
+          participantIds.push(participants[i].user);
+        }
+        User.find({id: participantIds}).exec(function (err, users) {
+          if (err) {
+            transformedCallback(null, []);
+          } else {
+            Krypto.decryptUsers(users, function (err, decryptedUsers) {
+              if (err) {
+                callback(null, []);
+              } else {
+                aRoom.participants = decryptedUsers;
+                transformedCallback(null, removeUnwantedPropertiesFromUsers(aRoom));
+              }
+            });
+          }
+        });
+      })
+    },
+    function (err, populatedRooms) {
+      callback(err, populatedRooms);
+    });
+};
+
+var removeUnwantedPropertiesFromUsers = function (aRoom) {
+  var room = {
+    id: aRoom.id,
+    admin: aRoom.admin,
+    name: aRoom.name,
+    pubnubId: aRoom.pubnubId,
+    createdAt: aRoom.createdAt,
+    updatedAt: aRoom.updatedAt
+  };
+  var participants = [];
+  for (var i = 0; i < aRoom.participants.length; i++) {
+    var participant = {
+      id: aRoom.participants[i].id,
+      username: aRoom.participants[i].username,
+      firstName: aRoom.participants[i].firstName,
+      lastName: aRoom.participants[i].lastName,
+      birthday: aRoom.participants[i].birthday,
+      facebookId: aRoom.participants[i].facebookId,
+      photoUrl: aRoom.participants[i].photoUrl,
+      nickname: aRoom.participants[i].nickname,
+      phoneNumber: aRoom.participants[i].phoneNumber,
+      isTemporary: aRoom.participants[i].isTemporary,
+      createdAt: aRoom.participants[i].createdAt,
+      updatedAt: aRoom.participants[i].updatedAt
+    };
+    participants.push(participant);
+  }
+  room.participants = participants;
+  return room;
+};
+
+module.exports = UserController;
