@@ -39,6 +39,7 @@ module.exports.policies = {
     inviteContacts: ['passport'],
     myRooms: ['passport', 'owner'],
     verifyContacts: ['passport'],
+    verifyFacebookUsers: ['passport'],
     findById: ['passport', 'owner'],
     printUsers: true
   },

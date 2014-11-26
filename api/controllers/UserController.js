@@ -225,7 +225,7 @@ var UserController = {
   },
 
   verifyContacts: function (request, response) {
-    var validatedUsers = new Array()
+    var validatedUsers = new Array();
     var contacts = request.param("phoneNumbers");
     for (var i = 0; i < contacts.length; i++) {
       contacts[i] = Krypto.encrypt(contacts[i]);
@@ -233,7 +233,7 @@ var UserController = {
     User.find()
       .where({ phoneNumber: contacts })
       .exec(function (err, users) {
-        for (var i=0; i < users.length; i++) {
+        for (var i = 0; i < users.length; i++) {
           var decryptedUser = Krypto.decryptUser(users[i]);
           validatedUsers[i] = {
             id: decryptedUser.id,
@@ -246,6 +246,32 @@ var UserController = {
         }
         return response.send(200, validatedUsers);
     })
+  },
+
+  verifyFacebookUsers: function (request, response) {
+    var validatedUsers = new Array();
+    var facebookIDs = request.param("facebookIDs");
+    for (var i = 0; i < facebookIDs.length; i++) {
+      facebookIDs[i] = Krypto.encrypt(facebookIDs[i]);
+    }
+
+    User.find()
+      .where({ facebookID: facebookIDs })
+      .exec(function (err, users) {
+        for (var i = 0; i < users.length; i++) {
+          var decryptedUser = Krypto.decryptUser(users[i]);
+          validatedUsers[i] = {
+            id: decryptedUser.id,
+            firstName: decryptedUser.firstName,
+            lastName: decryptedUser.lastName,
+            phoneNumber: decryptedUser.phoneNumber,
+            birthday: decryptedUser.birthday,
+            photoUrl: decryptedUser.photoUrl,
+            facebookID: decryptedUser.facebookID
+          }
+        }
+        return response.send(200, validatedUsers);
+      })
   },
 
   update: function (request, response) {
