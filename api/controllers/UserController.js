@@ -213,7 +213,7 @@ var UserController = {
 
   myRooms: function (request, response) {
     var userId = request.params.parentid;
-    Room.query('select * from room where admin = ' + userId + ' union select a.* from room a, room_participants__user_rooms b where a.id = b.room_participants and b.user_rooms = ' + userId, function (err, rooms) {
+    Room.query('select a.* from room a, participant b where a.id = b.room and b.user = ' + userId, function (err, rooms) {
       if (err) {
         return response.send(500, new FlipsError('Error when trying to retrieve rooms'));
       }
@@ -225,7 +225,7 @@ var UserController = {
   },
 
   verifyContacts: function (request, response) {
-    var validatedUsers = new Array()
+    var validatedUsers = new Array();
     var contacts = request.param("phoneNumbers");
     for (var i = 0; i < contacts.length; i++) {
       contacts[i] = Krypto.encrypt(contacts[i]);
