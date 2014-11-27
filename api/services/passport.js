@@ -65,7 +65,7 @@ passport.facebook = function(request, response, next) {
           user.facebookID = Krypto.encrypt(fbProfile.id);
           user.firstName = Krypto.encrypt(fbProfile.first_name);
           user.lastName = Krypto.encrypt(fbProfile.last_name);
-          user.photoUrl = user.photoUrl ? user.photoUrl: fbProfile.picture.data.url;
+          user.photoUrl = user.photoUrl ? user.photoUrl : fbProfile.picture.data.url;
 
           user.save();
 
