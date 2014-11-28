@@ -69,7 +69,7 @@ var AuthController = {
   facebook: function(request, response) {
     passport.facebook(request, response, function(err, user) {
       if (err) {
-        var errmsg = new FlipsError('Error retrieving user', err);
+        var errmsg = new FlipsError('Error retrieving user', err.message);
         logger.error(errmsg);
         return response.send(500, errmsg);
       }
