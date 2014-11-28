@@ -218,7 +218,7 @@ var insertUser = function (userModel, photo, next) {
       logger.error(err);
       return next(err);
     }
-    logger.debug('2. user created')
+    logger.debug('2. user created');
     return createPassportAndInitialRoom(user, userModel.password, photo, next);
   });
 };
@@ -305,6 +305,10 @@ var createPassportAndInitialRoom = function (user, password, photo, next) {
               }
 
               logger.debug('9. populated user: ' + populatedUser.username);
+
+              logger.debug('9.1 sending welcome message');
+              PubnubGateway.publishWelcomeMessage(room);
+
               if (photo && photo._files.length > 0) {
                 logger.debug('9.1 files length: ' + photo._files.length);
                 s3service.upload(photo, s3service.PICTURES_BUCKET, function (s3Err, uploadedFiles) {
@@ -343,7 +347,7 @@ var createPassportAndInitialRoom = function (user, password, photo, next) {
                     }
                     logger.debug('12. user saved with thumbnail url');
                     logger.debug('13. populatedUser: ' + populatedUser.username);
-                    Room.query('select * from room where admin = ' + populatedUser.id + ' union select a.* from room a, participant b where a.id = b.room and b.user = ' + populatedUser.id, function (err, rooms) {
+                    Room.query('select a.* from room a, participant b where a.id = b.room and b.user = ' + populatedUser.id, function (err, rooms) {
                       if (err) {
                         rooms = [];
                       }
