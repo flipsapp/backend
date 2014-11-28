@@ -1,3 +1,4 @@
+var Krypto = requires('>/api/utilities/Krypto');
 var pubnub = require("pubnub").init({
   publish_key: process.env.PUBNUB_PUB_KEY,
   subscribe_key: process.env.PUBNUB_SUB_KEY
@@ -7,6 +8,44 @@ var pushNotificationURL = 'http://pubsub.pubnub.com/v1/push/sub-key/{{subscribe_
   SUCCESS = 1;
 
 var PubnubGateway = {
+
+  publishWelcomeMessage: function(room) {
+
+    User.findOne({username: Krypto.encrypt(process.env.FLIPBOYS_USERNAME)})
+      .exec(function (err, flipboysUser) {
+
+        var welcomeMessage = {
+          "fromUserId" : flipboysUser.id,
+          "type" : "2",
+          "flipMessageId": ""+flipboysUser.id+":"+new Date().getTime(),
+          "content" : [
+            {
+              "soundURL" : "",
+              "id" : "1",
+              "backgroundURL" : "https://s3.amazonaws.com/flips-background/welcome.png",
+              "word" : "Welcome"
+            }
+          ],
+          "pn_apns" : {
+            "aps" : {
+              "alert" : "You received a new flip message from FlipBoys"
+            }
+          },
+          "sentAt" : "2014-11-27T19:16:01.733Z"
+        };
+
+        pubnub.publish({
+          channel: room.pubnubId,
+          message: welcomeMessage,
+          callback: function(e) {
+            console.log("Successfully sent the welcome message.")
+          },
+          error: function(e) {
+            console.log("Error sending the welcome message. ["+e+"]")
+          }
+        });
+    });
+  },
 
   addDeviceToPushNotification: function (token, channel, platform, callback) {
     var type = platform === 'ios' ? 'apns' : 'gcm';
