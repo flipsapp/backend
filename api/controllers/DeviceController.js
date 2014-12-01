@@ -123,13 +123,13 @@ var DeviceController = {
         if (device.verificationCode != verificationCode) {
           device.retryCount++;
           device.isVerified = false;
-
+          device.save();
           if (device.retryCount > MAX_RETRY_COUNT) {
             sendVerificationCode(device);
+            return response.send(400, new FlipsError('3 incorrect entries. Check your messages for a new code.'));
+          } else {
+            return response.send(400, new FlipsError('Wrong validation code.'));
           }
-
-          device.save();
-          return response.send(400, new FlipsError('Wrong validation code.'));
         }
 
         device.isVerified = true;
