@@ -233,7 +233,6 @@ var UserController = {
   },
 
   verifyContacts: function (request, response) {
-    var validatedUsers = new Array();
     var contacts = request.param("phoneNumbers");
     for (var i = 0; i < contacts.length; i++) {
       contacts[i] = Krypto.encrypt(contacts[i]);
@@ -241,44 +240,29 @@ var UserController = {
     User.find()
       .where({phoneNumber: contacts})
       .exec(function (err, users) {
-        for (var i = 0; i < users.length; i++) {
-          var decryptedUser = Krypto.decryptUser(users[i]);
-          validatedUsers[i] = {
-            id: decryptedUser.id,
-            firstName: decryptedUser.firstName,
-            lastName: decryptedUser.lastName,
-            phoneNumber: decryptedUser.phoneNumber,
-            birthday: decryptedUser.birthday,
-            photoUrl: decryptedUser.photoUrl
+        Krypto.decryptUsers(users, function(err, decryptedUsers) {
+          if (err) {
+            return response.send(200, []);
+          } else {
+            return response.send(200, removeUnwantedPropertiesFromUsers(decryptedUsers));
           }
-        }
-        return response.send(200, validatedUsers);
+        });
       })
   },
 
   verifyFacebookUsers: function (request, response) {
-    var validatedUsers = new Array();
-    var facebookIDs = request.param("facebookIDs");
-    for (var i = 0; i < facebookIDs.length; i++) {
-      facebookIDs[i] = Krypto.encrypt(facebookIDs[i]);
-    }
-
-    User.find()
-      .where({ facebookID: facebookIDs })
-      .exec(function (err, users) {
-        for (var i = 0; i < users.length; i++) {
-          var decryptedUser = Krypto.decryptUser(users[i]);
-          validatedUsers[i] = {
-            id: decryptedUser.id,
-            firstName: decryptedUser.firstName,
-            lastName: decryptedUser.lastName,
-            phoneNumber: decryptedUser.phoneNumber,
-            birthday: decryptedUser.birthday,
-            photoUrl: decryptedUser.photoUrl,
-            facebookID: decryptedUser.facebookID
+    var params = actionUtil.parseValues(request);
+    var facebookIDs = JSON.parse(params.facebookIDs);
+    User.find({ facebookID: facebookIDs }).exec(function (err, users) {
+        console.log(users);
+        Krypto.decryptUsers(users, function(err, decryptedUsers) {
+          console.log(decryptedUsers);
+          if (err) {
+            return response.send(200, []);
+          } else {
+            return response.send(200, removeUnwantedPropertiesFromUsers(decryptedUsers));
           }
-        }
-        return response.send(200, validatedUsers);
+        });
       })
   },
 
@@ -471,7 +455,7 @@ var populateRooms = function (rooms, callback) {
                 callback(null, []);
               } else {
                 aRoom.participants = decryptedUsers;
-                transformedCallback(null, removeUnwantedPropertiesFromUsers(aRoom));
+                transformedCallback(null, removeUnwantedPropertiesFromParticipants(aRoom));
               }
             });
           }
@@ -483,7 +467,7 @@ var populateRooms = function (rooms, callback) {
     });
 };
 
-var removeUnwantedPropertiesFromUsers = function (aRoom) {
+var removeUnwantedPropertiesFromParticipants = function (aRoom) {
   var room = {
     id: aRoom.id,
     admin: aRoom.admin,
@@ -492,26 +476,33 @@ var removeUnwantedPropertiesFromUsers = function (aRoom) {
     createdAt: aRoom.createdAt,
     updatedAt: aRoom.updatedAt
   };
-  var participants = [];
-  for (var i = 0; i < aRoom.participants.length; i++) {
-    var participant = {
-      id: aRoom.participants[i].id,
-      username: aRoom.participants[i].username,
-      firstName: aRoom.participants[i].firstName,
-      lastName: aRoom.participants[i].lastName,
-      birthday: aRoom.participants[i].birthday,
-      facebookId: aRoom.participants[i].facebookId,
-      photoUrl: aRoom.participants[i].photoUrl,
-      nickname: aRoom.participants[i].nickname,
-      phoneNumber: aRoom.participants[i].phoneNumber,
-      isTemporary: aRoom.participants[i].isTemporary,
-      createdAt: aRoom.participants[i].createdAt,
-      updatedAt: aRoom.participants[i].updatedAt
-    };
-    participants.push(participant);
-  }
-  room.participants = participants;
+  room.participants = removeUnwantedPropertiesFromUsers(aRoom.participants);
   return room;
+};
+
+var removeUnwantedPropertiesFromUsers = function(users) {
+  var transformedUsers = [];
+  for (var i = 0; i < users.length; i++) {
+    transformedUsers.push(removeUnwantedPropertiesFromUser(users[i]));
+  }
+  return transformedUsers;
+};
+
+var removeUnwantedPropertiesFromUser = function(aUser) {
+  return {
+    id: aUser.id,
+    username: aUser.username,
+    firstName: aUser.firstName,
+    lastName: aUser.lastName,
+    birthday: aUser.birthday,
+    facebookId: aUser.facebookID,
+    photoUrl: aUser.photoUrl,
+    nickname: aUser.nickname,
+    phoneNumber: aUser.phoneNumber,
+    isTemporary: aUser.isTemporary,
+    createdAt: aUser.createdAt,
+    updatedAt: aUser.updatedAt
+  };
 };
 
 module.exports = UserController;
