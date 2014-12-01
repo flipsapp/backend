@@ -197,7 +197,6 @@ var createUsersForUnknownParticipants = function (params, callback) {
   if (!phoneNumbers) {
     return callback(null, null);
   }
-  ;
   async.concat(phoneNumbers,
     function (phoneNumber, callback) {
       //TODO check if phone number exists
