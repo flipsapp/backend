@@ -87,6 +87,7 @@ var DeviceController = {
     var userId = request.params.parentid;
     var deviceId = request.params.id;
     var verificationCode = request.param('verification_code');
+    var phoneNumber = request.param('phoneNumber');
 
     if (!userId) {
       return response.send(400, new FlipsError('Missing parameter [User Id]'));
@@ -133,11 +134,33 @@ var DeviceController = {
 
         device.isVerified = true;
         device.retryCount = 0;
+        device.user = device.user.id;
         device.save();
 
-        device.user = device.user.id;
+        if (phoneNumber) {
+          User.findOne({id: userId})
+            .exec(function(error, user) {
+              if (error) {
+                return response.send(500, new FlipsError('Error retrieving user.', JSON.stringify(error)));
+              }
 
-        return response.send(200, device);
+              if (!user) {
+                return response.send(400, new FlipsError('Error retrieving user.', 'User not found with id = '+device.user.id))
+              }
+
+              user.phoneNumber = Krypto.encrypt(phoneNumber);
+
+              user.save(function(error) {
+
+                if (error) {
+                  return response.send(500, new FlipsError('Error saving user after update device'));
+                }
+                return response.send(200, device);
+              });
+            })
+        } else {
+          return response.send(200, device);
+        }
       }
     );
   },
