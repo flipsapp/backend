@@ -23,6 +23,10 @@ var Flip = {
       type: 'string'
     },
 
+    thumbnailURL: {
+      type: 'string'
+    },
+
     owner: {
       model: 'User'
     },

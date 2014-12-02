@@ -68,6 +68,23 @@ var FlipController = {
     });
   },
 
+  uploadThumbnail: function (request, response) {
+    if (!request.file('thumbnail') || request.file('thumbnail')._files.length < 1) {
+      return response.send(400, new FlipsError('No thumbnail file to upload'));
+    }
+    s3service.upload(request.file('thumbnail'), s3service.THUMBNAILS_BUCKET, function (err, uploadedFiles) {
+      if (err) {
+        var errmsg = new FlipsError('Error trying to upload thumbnail file to S3', err);
+        logger.error(errmsg);
+        return response.send(500, errmsg);
+      }
+      if (!uploadedFiles || uploadedFiles.length < 1) {
+        return response.send(400, new FlipsError('Error trying to upload thumbnail file to S3', err));
+      }
+      return response.send(201, {thumbnail_url: s3service.S3_URL + s3service.THUMBNAILS_BUCKET + '/' + uploadedFiles[0].fd});
+    });
+  },
+
   updateBackground: function (request, response) {
     if (!request.file('background') || request.file('background')._files.length < 1) {
       return response.send(400, new FlipsError('No background file to upload'));
@@ -134,6 +151,45 @@ var FlipController = {
           return response.send(403, new FlipsError('This flip does not belong to this user'));
         }
         flip.soundURL = s3service.S3_URL + s3service.SOUND_BUCKET + '/' + uploadedFiles[0].fd;
+        flip.save(function (err) {
+          if (err) {
+            var errmsg = new FlipsError('Error trying to save flip', err);
+            logger.error(errmsg);
+            return response.send(500, errmsg);
+          }
+          return response.send(200, flip);
+        });
+      })
+    });
+  },
+
+  updateThumbnail: function (request, response) {
+    if (!request.file('thumbnail') || request.file('thumbnail')._files.length < 1) {
+      return response.send(400, new FlipsError('No thumbnail file to upload'));
+    }
+    s3service.upload(request.file('thumbnail'), s3service.THUMBNAILS_BUCKET, function (err, uploadedFiles) {
+      if (err) {
+        var errmsg = new FlipsError('Error trying to upload thumbnail file to S3', err);
+        logger.error(errmsg);
+        return response.send(500, errmsg);
+      }
+      if (!uploadedFiles || uploadedFiles.length < 1) {
+        return response.send(400, new FlipsError('Error trying to upload thumbnail file to S3', err));
+      }
+      Flip.findOne(request.params.flip_id).populate('owner').exec(function (err, flip) {
+        if (err) {
+          var errmsg = new FlipsError('Error trying to retrieve flip', err);
+          logger.error(errmsg);
+          return response.send(500, errmsg);
+        }
+        if (!flip) {
+          return response.send(404, new FlipsError('Flip not found'));
+        }
+        if (flip.owner && flip.owner.id != request.params.user_id) {
+
+          return response.send(403, new FlipsError('This flip does not belong to this user'));
+        }
+        flip.thumbnailURL = s3service.S3_URL + s3service.THUMBNAILS_BUCKET + '/' + uploadedFiles[0].fd;
         flip.save(function (err) {
           if (err) {
             var errmsg = new FlipsError('Error trying to save flip', err);
