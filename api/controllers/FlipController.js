@@ -240,12 +240,19 @@ var FlipController = {
     var whereClause = {
       isPrivate: false
     };
+
     if (request.param('owner')) {
       whereClause.owner = request.param('owner');
     }
+
     if (request.param('category')) {
       whereClause.category = request.param('category');
     }
+
+    if (request.param('word')) {
+      whereClause.word = request.param('word');
+    }
+
     Flip.find(whereClause).exec(function (err, flips) {
       if (err) {
         var errmsg = new FlipsError('Error trying to retrieve flips', err);
