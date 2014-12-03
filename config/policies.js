@@ -48,8 +48,10 @@ module.exports.policies = {
     create: ['passport', 'flipOwner'],
     uploadBackground: ['passport'],
     uploadSound: ['passport'],
+    uploadThumbnail: ['passport'],
     updateBackground: ['passport', 'flipOwner'],
     updateSound: ['passport', 'flipOwner'],
+    updateThumbnail: ['passport', 'flipOwner'],
     myFlips: ['passport', 'flipOwner'],
     flipById: ['passport', 'flipOwner'],
     stockFlips: ['passport']

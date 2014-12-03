@@ -12,6 +12,7 @@ var S3Service = {
   PICTURES_BUCKET: 'flips-pictures',
   BACKGROUND_BUCKET: 'flips-background',
   SOUND_BUCKET: 'flips-sound',
+  THUMBNAILS_BUCKET: 'flips-thumbnails',
   S3_URL: 'https://s3.amazonaws.com/'
 
 };

@@ -43,6 +43,7 @@ module.exports.routes = {
   'POST   /user/:user_id/flips'                     : 'FlipController.create',
   'PUT    /user/:user_id/flips/:flip_id/background' : 'FlipController.updateBackground',
   'PUT    /user/:user_id/flips/:flip_id/sound'      : 'FlipController.updateSound',
+  'PUT    /user/:user_id/flips/:flip_id/thumbnail'  : 'FlipController.updateThumbnail',
   'GET    /user/:user_id/flips/:flip_id'            : 'FlipController.flipById',
   'GET    /user/:user_id/flips'                     : 'FlipController.myFlips',     // all flips or filtered by word -> /user/:user_id/flips?word='San Francisco'
   'POST   /user/:parentid/contacts/verify'          : 'UserController.verifyContacts',
@@ -64,6 +65,7 @@ module.exports.routes = {
 
   'POST   /background'                              : 'FlipController.uploadBackground',
   'POST   /sound'                                   : 'FlipController.uploadSound',
+  'POST   /thumbnail'                               : 'FlipController.uploadThumbnail',
 
   'GET    /printUsers'                              : 'UserController.printUsers'
 
