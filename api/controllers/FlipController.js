@@ -21,7 +21,7 @@ var FlipController = {
       values.owner = request.params.user_id
     }
     if (request.body.is_private) {
-      values.isPrivate = request.body.is_private
+      values.isPrivate = (request.body.is_private == "1" || request.body.is_private)
     }
     if (request.body.category) {
       values.category = request.body.category
