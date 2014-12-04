@@ -49,9 +49,7 @@ passport.facebook = function(request, response, next) {
       return next(fbProfile.error);
     }
 
-    var userEmail = Krypto.encrypt(fbProfile.email);
-
-    User.findOne({ username: userEmail })
+    User.findOne({ username: Krypto.encrypt(fbProfile.id) })
       .populate('devices')
       .exec(function(err, user) {
         if (err) {
@@ -62,7 +60,7 @@ passport.facebook = function(request, response, next) {
           createFacebookUser(fbProfile, next);
         } else {
 
-          user.facebookID = Krypto.encrypt(fbProfile.id);
+          user.facebookID = fbProfile.id;
           user.firstName = Krypto.encrypt(fbProfile.first_name);
           user.lastName = Krypto.encrypt(fbProfile.last_name);
           user.photoUrl = user.photoUrl ? user.photoUrl : fbProfile.picture.data.url;
@@ -133,9 +131,9 @@ module.exports = passport;
 
 var createFacebookUser = function(fbProfile, next) {
   var userModel = {
-    username  : fbProfile.email,
+    username  : fbProfile.id,
     password  : fbProfile.password || '',
-    facebookID: Krypto.encrypt(fbProfile.id),
+    facebookID: fbProfile.id,
     firstName : fbProfile.first_name,
     lastName  : fbProfile.last_name,
     birthday : fbProfile.birthday || moment().subtract(fbProfile.age_range.min, 'years'),
