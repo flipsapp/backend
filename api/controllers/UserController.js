@@ -254,9 +254,7 @@ var UserController = {
     var params = actionUtil.parseValues(request);
     var facebookIDs = JSON.parse(params.facebookIDs);
     User.find({ facebookID: facebookIDs }).exec(function (err, users) {
-        console.log(users);
         Krypto.decryptUsers(users, function(err, decryptedUsers) {
-          console.log(decryptedUsers);
           if (err) {
             return response.send(200, []);
           } else {
