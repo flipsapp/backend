@@ -49,4 +49,4 @@ module.exports.connections = {
 
 };
 
-console.log('database name: ' + process.env.RDS_DB_NAME);
+console.log('database name: ' + process.env.RDS_DATABASE_NAME);
