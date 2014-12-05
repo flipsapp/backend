@@ -39,8 +39,10 @@ process.on('uncaughtException', function (exception) {
 var dotenv_path;
 if (process.env.NODE_ENV && process.env.NODE_ENV.toUpperCase() === 'PRODUCTION') {
   dotenv_path = './.prod-env';
-} else {
+} else if (process.env.NODE_ENV && process.env.NODE_ENV.toUpperCase() === 'DEVELOPMENT') {
   dotenv_path = './.dev-env';
+} else {
+  dotenv_path = './.qa-env';
 }
 
 var dotenv = require('dotenv');

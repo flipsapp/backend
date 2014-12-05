@@ -38,7 +38,7 @@ module.exports.routes = {
   'POST   /user/:parentid/update'                   : 'UserController.update',
   'PUT    /user/:parentid'                          : 'UserController.update',
   'POST   /user/verify'                             : 'UserController.verify',
-  'PUT    /user/password'                           : 'UserController.updatePassword',
+  'POST   /user/password'                           : 'UserController.updatePassword',
   'GET    /user/:parentid'                          : 'UserController.findById',
   'POST   /user/:user_id/flips'                     : 'FlipController.create',
   'PUT    /user/:user_id/flips/:flip_id/background' : 'FlipController.updateBackground',

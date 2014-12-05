@@ -1,0 +1,15 @@
+AWS_S3_KEY            = AKIAILGTT2X6FTUAFI6Q
+AWS_S3_SECRET         = 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
+RDS_HOSTNAME          = aa11y2hu2ksf2rx.cuc047pruo5n.us-west-2.rds.amazonaws.com
+RDS_USERNAME          = root
+RDS_PASSWORD          = sdv13rn97x0ftw313
+RDS_PORT              = 3306
+RDS_DATABASE_NAME     = flips
+PUBNUB_SUB_KEY        = sub-c-3bcb7c42-59ff-11e4-9632-02ee2ddab7fe
+PUBNUB_PUB_KEY        = pub-c-579fbcaa-1c0a-44fc-bb1c-e02e43e7eb30
+JWT_SECRET            = U868D8e6zUfKes8w3Ye6WBq8426u2c5Tnn788A64p7876mRIZx
+TWILIO_ACCOUNT_SID    = ACa74afac8dba30dfe3be33628980f18c6
+TWILIO_AUTH_TOKEN     = 8f7b763fc9a5866d2ed18d640117c459
+APP_STORE_URL         = appstore.com/flips
+FLIPBOYS_USERNAME     = flipboys@flips.com
+CRYPTO_PASSWORD       = ce7E5bBb94f0416fbAaf74bBDa0b12bF9b600e77a1F64f6D8b8C0e2AF18fe5Af
