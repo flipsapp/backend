@@ -18,8 +18,9 @@ module.exports.bootstrap = function(cb) {
 
   User.create({
     username: 'flipboys@flips.com',
-    firstName: 'Flip',
-    lastName: 'Boys',
+    firstName: 'FlipBoys',
+    lastName: ' ',
+    photoUrl: 'https://s3.amazonaws.com/flips-pictures/flipboys_avatar.png',
     birthday: '1970-01-01',
     phoneNumber: '+14155555555'
   }).exec(function(err, user) {
