@@ -31,7 +31,7 @@ var PubnubGateway = {
               "alert" : "You received a new flip message from FlipBoys"
             }
           },
-          "sentAt" : "2014-11-27T19:16:01.733Z"
+          "sentAt" : Date()
         };
 
         pubnub.publish({
