@@ -221,7 +221,7 @@ var UserController = {
         return response.send(500, new FlipsError('Error when trying to retrieve rooms'));
       }
       if (!rooms) {
-        return reponse.send(404, new FlipsError('Rooms not found'))
+        return response.send(404, new FlipsError('Rooms not found'))
       }
       populateRooms(rooms, function (err, populatedRooms) {
         if (err) {
@@ -251,9 +251,15 @@ var UserController = {
   },
 
   verifyFacebookUsers: function (request, response) {
-    var params = actionUtil.parseValues(request);
-    var facebookIDs = JSON.parse(params.facebookIDs);
-    User.find({ facebookID: facebookIDs }).exec(function (err, users) {
+    var facebookIDs = request.param("facebookIDs");
+
+    if (!facebookIDs || facebookIDs.length == 0) {
+      return response.send(400, new FlipsError('Missing parameter', 'Facebook Ids is missing.'))
+    }
+
+    User.find({
+      facebookID: facebookIDs
+    }).exec(function (err, users) {
         Krypto.decryptUsers(users, function(err, decryptedUsers) {
           if (err) {
             return response.send(200, []);
