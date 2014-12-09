@@ -14,6 +14,11 @@ var PubnubGateway = {
     User.findOne({username: Krypto.encrypt(process.env.FLIPBOYS_USERNAME)})
       .exec(function (err, flipboysUser) {
 
+        var now = new Date();
+        var formattedNow = now.getUTCFullYear() + '-' + (now.getUTCMonth()+1) + '-' + now.getUTCDate() + 'T' + now.getUTCHours() + ':' + now.getUTCMinutes() + ':' + now.getUTCSeconds() + '.' + now.getUTCMilliseconds() + 'Z';
+
+
+
         var welcomeMessage = {
           "fromUserId" : flipboysUser.id,
           "type" : "2",
@@ -31,7 +36,7 @@ var PubnubGateway = {
               "alert" : "You received a new flip message from FlipBoys"
             }
           },
-          "sentAt" : Date()
+          "sentAt" : formattedNow
         };
 
         pubnub.publish({
