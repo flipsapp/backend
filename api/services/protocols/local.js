@@ -193,7 +193,7 @@ var checkExistingUser = function (userModel, callback) {
   User.findOne({username: Krypto.encrypt(userModel.username)}).exec(function (err, userWithSameUsername) {
     if (userWithSameUsername) {
       logger.debug('user with same username');
-      return callback('This username is already a Flips user', userWithSameUsername);
+      return callback('An account already exists for that email address.', userWithSameUsername);
     } else if (userModel.phoneNumber && userModel.phoneNumber.length > 0) {
       User.findOne({phoneNumber: Krypto.encrypt(userModel.phoneNumber)}).exec(function (err, userWithSamePhoneNumber) {
         if (userWithSamePhoneNumber) {
