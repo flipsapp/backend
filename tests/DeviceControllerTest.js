@@ -19,7 +19,7 @@ describe('Device Controller', function () {
 
   before(function(done) {
     var flipBoysUser = {
-      username: 'flipboys@flips.com',
+      username: 'flipboys@flipsapp.com',
       password: 'Password1',
       firstName: 'Dev',
       lastName: 'Test',

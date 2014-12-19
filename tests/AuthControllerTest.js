@@ -15,7 +15,7 @@ describe('AuthController - Using correct params', function () {
   before(function (done) {
     User.destroy({}).exec(function(err) {});
     var flipBoysUser = {
-      username: 'flipboys@flips.com',
+      username: 'flipboys@flipsapp.com',
       password: 'Password1',
       firstName: 'Dev',
       lastName: 'Test',
@@ -305,7 +305,7 @@ describe('AuthController - Sign in', function () {
   before(function (done) {
     User.destroy({}).exec(function(err) {});
     var flipBoysUser = {
-      username: 'flipboys@flips.com',
+      username: 'flipboys@flipsapp.com',
       password: 'Password1',
       firstName: 'Dev',
       lastName: 'Test',
@@ -456,7 +456,7 @@ describe('AuthController - Policy test', function () {
     this.timeout(5000);
 
     var flipBoysUser = {
-      username: 'flipboys@flips.com',
+      username: 'flipboys@flipsapp.com',
       password: 'Password1',
       firstName: 'Dev',
       lastName: 'Test',
