@@ -5,6 +5,8 @@
  * @help        :: See http://links.sailsjs.org/docs/controllers
  */
 
+var Krypto = requires('>/api/utilities/Krypto');
+
 var FlipController = {
 
   create: function (request, response) {
@@ -26,11 +28,16 @@ var FlipController = {
     if (request.body.category) {
       values.category = request.body.category
     }
-    Flip.create(values).exec(function (err, flip) {
-      if (err || !flip) {
-        return response.send(400, new FlipsError('Error trying to create flip', err));
+    User.findOne(values.owner).exec(function (err, user) {
+      if (user && Krypto.decrypt(user.username) == process.env.STOCKFLIPS_USERNAME) {
+        values.isPrivate = false;
       }
-      return response.send(201, flip);
+      Flip.create(values).exec(function (err, flip) {
+        if (err || !flip) {
+          return response.send(400, new FlipsError('Error trying to create flip', err));
+        }
+        return response.send(201, flip);
+      });
     });
   },
 

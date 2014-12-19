@@ -17,13 +17,30 @@ module.exports.bootstrap = function(cb) {
   // with the bootstrap!  (otherwise your server will never lift, since it's waiting on the bootstrap)
 
   User.create({
-    username: 'flipboys@flips.com',
+    username: process.env.FLIPBOYS_USERNAME,
     firstName: 'FlipBoys',
     lastName: ' ',
     photoUrl: 'https://s3.amazonaws.com/flips-pictures/flipboys_avatar.png',
     birthday: '1970-01-01',
     phoneNumber: '+14155555555'
   }).exec(function(err, user) {
-    cb();
+    User.create({
+      username: process.env.STOCKFLIPS_USERNAME,
+      firstName: 'Stock',
+      lastName: 'Flips',
+      photoUrl: 'https://s3.amazonaws.com/flips-pictures/flipboys_avatar.png',
+      birthday: '1970-01-01',
+      phoneNumber: '+14155555556'
+    }).exec(function(err, user) {
+      if (user) {
+        Passport.create({
+          protocol: 'local', password: process.env.STOCKFLIPS_PASSWORD, user: user.id
+        }, function (passportError, passport) {
+          cb();
+        });
+      } else {
+        cb();
+      }
+    });
   });
 };
