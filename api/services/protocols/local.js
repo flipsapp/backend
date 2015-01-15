@@ -117,6 +117,7 @@ exports.createUser = function (userModel, next) {
   logger.debug('entered createUser()');
   var photo = userModel.photo;
   delete userModel.photo;
+
   checkAge(userModel, function (ageErr, age) {
     logger.debug('entered block of check age');
     if (ageErr) {
@@ -127,43 +128,58 @@ exports.createUser = function (userModel, next) {
       logger.debug('entered block of checkExistingUser()');
       if (existingUser) {
         logger.debug('existing user');
-        if (existingUser.username === Krypto.encrypt(userModel.username)) {
-          return next(existingUserErr);
-        }
-        if (existingUser.phoneNumber === Krypto.encrypt(userModel.phoneNumber)) {
-          if (existingUser.isTemporary) {
-            // replace existing user information and make it a valid user
-            logger.debug('replacing existing user information');
-            if (userModel.username) {
-              existingUser.username = Krypto.encrypt(userModel.username);
-            }
-            if (userModel.firstName) {
-              existingUser.firstName = Krypto.encrypt(userModel.firstName);
-            }
-            if (userModel.lastName) {
-              existingUser.lastName = Krypto.encrypt(userModel.lastName);
-            }
-            if (userModel.phoneNumber) {
-              existingUser.phoneNumber = Krypto.encrypt(userModel.phoneNumber);
-            }
-            if (userModel.nickname) {
-              existingUser.nickname = Krypto.encrypt(userModel.nickname);
-            }
-            existingUser.birthday = userModel.birthday;
-            existingUser.isTemporary = false;
-            existingUser.save(function (err) {
-              if (err) {
-                logger.error(err);
-                return next('It was not possible to sign up this user');
-              }
-              return createPassportAndInitialRoom(existingUser, userModel.password, photo, next);
-            });
-          } else {
+
+        if (!existingUser.isTemporary) {
+
+          // has the same username?
+          if (existingUser.username === Krypto.encrypt(userModel.username)) {
+            return next(existingUserErr);
+          }
+
+          // has the same phone number?
+          if (existingUser.phoneNumber === Krypto.encrypt(userModel.phoneNumber)) {
             return next(existingUserErr);
           }
         } else {
-          return next(existingUserErr);
+          // temporary user (just created or invited user)
+
+          // update user info using the new values
+          logger.debug('replacing existing user information');
+
+          if (userModel.username) {
+            existingUser.username = Krypto.encrypt(userModel.username);
+          }
+          if (userModel.firstName) {
+            existingUser.firstName = Krypto.encrypt(userModel.firstName);
+          }
+          if (userModel.lastName) {
+            existingUser.lastName = Krypto.encrypt(userModel.lastName);
+          }
+          if (userModel.phoneNumber) {
+            existingUser.phoneNumber = Krypto.encrypt(userModel.phoneNumber);
+          }
+          if (userModel.nickname) {
+            existingUser.nickname = Krypto.encrypt(userModel.nickname);
+          }
+          existingUser.birthday = userModel.birthday;
+
+          existingUser.save(function (err) {
+            if (err) {
+              logger.error(err);
+              return next('It was not possible to sign up this user');
+            }
+
+            User.findOne(existingUser.id).exec(function(error, user) {
+              if (err || !user) {
+                return next('It was not possible to sign up this user');
+              }
+
+              return next(null, Krypto.decryptUser(user));
+
+            });
+          });
         }
+
       } else {
         logger.debug('1. insert user');
         return insertUser(userModel, photo, next);

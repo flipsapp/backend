@@ -59,24 +59,27 @@ var DeviceController = {
           logger.error(errmsg);
           return response.send(500, errmsg);
         }
+
         if (!device) {
           return response.send(400, new FlipsError('Error creating device.', 'Device returned empty.'));
         }
-        User.findOne(device.user).exec(function(err, user) {
+
+        User.findOne(userId).exec(function(err, user) {
+
           if (!user.phoneNumber) {
             user.phoneNumber = Krypto.encrypt(phoneNumber);
             user.save();
           }
-          device.user = user;
 
           logger.debug('sending verification code');
-          sendVerificationCode(device);
+          sendVerificationCode(device, user.phoneNumber);
+
           PubnubGateway.addDeviceToPushNotification(device.uuid, device.uuid, device.platform, function(err, channel) {
             if (err) {
               logger.error(new FlipsError(err));
             }
           });
-          device.user = user.id;
+
           return response.send(201, device);
         });
       }
@@ -125,7 +128,7 @@ var DeviceController = {
           device.isVerified = false;
           device.save();
           if (device.retryCount > MAX_RETRY_COUNT) {
-            sendVerificationCode(device);
+            sendVerificationCode(device, device.user.phoneNumber);
             return response.send(400, new FlipsError('3 incorrect entries. Check your messages for a new code.'));
           } else {
             return response.send(400, new FlipsError('Wrong validation code.'));
@@ -134,7 +137,11 @@ var DeviceController = {
 
         device.isVerified = true;
         device.retryCount = 0;
-        device.user = device.user.id;
+        var user = device.user;
+        user.isTemporary = false;
+        user.save();
+
+        device.user = user.id;
         device.save();
 
         if (phoneNumber) {
@@ -196,7 +203,18 @@ var DeviceController = {
           return response.send(403, new FlipsError('This device does not belong to you'));
         }
 
-        sendVerificationCode(device);
+        User.findOne(userId).exec(function(error, user) {
+
+          if (error) {
+            return response.send(500, new FlipsError('Error retrieving the device.', error.details));
+          }
+
+          if (!user) {
+            return response.send(404, new FlipsError('User not found.', 'Device id = ' + deviceId));
+          }
+
+          sendVerificationCode(device, user.phoneNumber);
+        });
 
         return response.send(200, device);
       }
@@ -208,7 +226,7 @@ var DeviceController = {
 
 module.exports = DeviceController;
 
-var sendVerificationCode = function(device) {
+var sendVerificationCode = function(device, phoneNumber) {
   var verificationCode = Math.floor(Math.random() * 8999) + 1000;
   var message = 'Your Flips verification code: ' + verificationCode;
 
@@ -218,7 +236,7 @@ var sendVerificationCode = function(device) {
   device.retryCount = 0;
   device.save();
 
-  twilioService.sendSms(Krypto.decrypt(device.user.phoneNumber), message, function (err, message) {
+  twilioService.sendSms(Krypto.decrypt(phoneNumber), message, function (err, message) {
     logger.info(err || message);
   });
 };
