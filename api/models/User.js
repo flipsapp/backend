@@ -64,7 +64,7 @@ var User = {
 
     isTemporary: {
       type: 'boolean',
-      defaultsTo: false
+      defaultsTo: true
     }
 
   },
