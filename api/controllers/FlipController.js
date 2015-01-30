@@ -260,7 +260,7 @@ var FlipController = {
       whereClause.word = request.param('word');
     }
 
-    Flip.find(whereClause).exec(function (err, flips) {
+    Flip.find(whereClause).populate('owner').exec(function (err, flips) {
       if (err) {
         var errmsg = new FlipsError('Error trying to retrieve flips', err);
         logger.error(errmsg);
@@ -269,10 +269,31 @@ var FlipController = {
       if (!flips) {
         return response.send(404, new FlipsError('Flips not found'));
       }
-      return response.send(200, flips);
+      decryptOwners(flips, function(decryptedFlips, err) {
+        if (err) {
+          return response.send(500, new FlipsError(err));
+        }
+        return response.send(200, decryptedFlips);
+      });
     })
   }
 
 };
+
+function decryptOwners(flips, callback) {
+  try {
+    var decryptedFlips = [];
+    for (var i = 0; i < flips.length; i++) {
+      var flip = flips[i];
+      var owner = Krypto.decryptUser(flip.owner);
+      delete owner.pubnubId;
+      flip.owner = owner;
+      decryptedFlips.push(flip);
+    }
+    callback(decryptedFlips);
+  } catch(err) {
+    callback(null, err.message);
+  }
+}
 
 module.exports = FlipController;
