@@ -34,47 +34,54 @@ describe('FlipController', function () {
         assert.equal(createdUser.firstName, 'Dev');
         assert.equal(createdUser.lastName, 'Test');
         assert.equal(createdUser.birthday.substring(0, 10), '1968-12-02');
-
-        user1.post('http://localhost:1337/signin')
-          .send({username: createdUser.username, password: createdUser.password})
-          .end(function (err, res) {
-            if (err) {
-              throw err;
-            }
-            assert.equal(res.status, 200);
-            var aUser = {
-              username: 'devtest1@arctouch.com',
-              password: 'Password1',
-              firstName: 'Dev1',
-              lastName: 'Test1',
-              birthday: '1968-12-02'
-            };
-            user2.post('http://localhost:1337/signup')
-              .send(aUser)
-              .end(function (err, res) {
-                var createdUser = res.body;
-                if (err) {
-                  throw err;
-                }
-                user2Id = createdUser.id;
-                assert.equal(res.status, 200);
-                assert.equal(createdUser.username, 'devtest1@arctouch.com');
-                assert.equal(createdUser.password, 'Password1');
-                assert.equal(createdUser.firstName, 'Dev1');
-                assert.equal(createdUser.lastName, 'Test1');
-                assert.equal(createdUser.birthday.substring(0, 10), '1968-12-02');
-
-                user2.post('http://localhost:1337/signin')
-                  .send({username: createdUser.username, password: createdUser.password})
-                  .end(function (err, res) {
-                    if (err) {
-                      throw err;
-                    }
+        User.findOne(userId).exec(function(err, thisUser) {
+          thisUser.isTemporary = false;
+          thisUser.save();
+          user1.post('http://localhost:1337/signin')
+            .send({username: createdUser.username, password: createdUser.password})
+            .end(function (err, res) {
+              if (err) {
+                throw err;
+              }
+              assert.equal(res.status, 200);
+              var aUser = {
+                username: 'devtest1@arctouch.com',
+                password: 'Password1',
+                firstName: 'Dev1',
+                lastName: 'Test1',
+                birthday: '1968-12-02'
+              };
+              user2.post('http://localhost:1337/signup')
+                .send(aUser)
+                .end(function (err, res) {
+                  var createdUser = res.body;
+                  if (err) {
+                    throw err;
+                  }
+                  user2Id = createdUser.id;
+                  User.findOne(user2Id).exec(function(err, thisUser) {
+                    thisUser.isTemporary = false;
+                    thisUser.save();
                     assert.equal(res.status, 200);
-                    done();
+                    assert.equal(createdUser.username, 'devtest1@arctouch.com');
+                    assert.equal(createdUser.password, 'Password1');
+                    assert.equal(createdUser.firstName, 'Dev1');
+                    assert.equal(createdUser.lastName, 'Test1');
+                    assert.equal(createdUser.birthday.substring(0, 10), '1968-12-02');
+
+                    user2.post('http://localhost:1337/signin')
+                      .send({username: createdUser.username, password: createdUser.password})
+                      .end(function (err, res) {
+                        if (err) {
+                          throw err;
+                        }
+                        assert.equal(res.status, 200);
+                        done();
+                      });
                   });
-              });
-          });
+                });
+            });
+        });
       });
   });
 

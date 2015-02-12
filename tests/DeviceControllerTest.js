@@ -35,16 +35,19 @@ describe('Device Controller', function () {
           }
 
           userId = res.body.id;
+          User.findOne(userId).exec(function(err, thisUser) {
+            thisUser.isTemporary = false;
+            thisUser.save();
+            user1.post(BASE_URL + '/signin')
+              .send({username: aUser.username, password: aUser.password})
+              .end(function (err, res) {
+                if (err) {
+                  throw err;
+                }
 
-          user1.post(BASE_URL + '/signin')
-            .send({ username: aUser.username, password: aUser.password})
-            .end(function (err, res) {
-              if (err) {
-                throw err;
-              }
-
-              done();
-            });
+                done();
+              });
+          });
         });
     });
 

@@ -38,35 +38,41 @@ describe('Room Controller', function () {
 
         userId = res.body.id;
 
-        user1.post(BASE_URL + '/signin/')
-          .send({ username: aUser.username, password: aUser.password })
-          .end(function (err, res) {
+        User.findOne(userId).exec(function(err, thisUser) {
+          thisUser.isTemporary = false;
+          thisUser.save();
+          user1.post(BASE_URL + '/signin/')
+            .send({ username: aUser.username, password: aUser.password })
+            .end(function (err, res) {
 
-            if (err) {
-              throw err;
-            }
+              if (err) {
+                throw err;
+              }
 
-            user2.post(BASE_URL + '/signup')
-              .send(bUser)
-              .end(function (err, res) {
-                if (err) {
-                  throw err;
-                }
+              user2.post(BASE_URL + '/signup')
+                .send(bUser)
+                .end(function (err, res) {
+                  if (err) {
+                    throw err;
+                  }
 
-                bUserId = res.body.id;
+                  bUserId = res.body.id;
 
-                user2.post(BASE_URL + '/signin/')
-                  .send({ username: bUser.username, password: bUser.password })
-                  .end(function (err, res) {
-
-                    if (err) {
-                      throw err;
-                    }
-
-                    done();
+                  User.findOne(bUserId).exec(function(err, thisUser) {
+                    thisUser.isTemporary = false;
+                    thisUser.save();
+                    user2.post(BASE_URL + '/signin/')
+                      .send({ username: bUser.username, password: bUser.password })
+                      .end(function (err, res) {
+                        if (err) {
+                          throw err;
+                        }
+                        done();
+                      });
                   });
-              });
-          });
+                });
+            });
+        });
       });
   });
 

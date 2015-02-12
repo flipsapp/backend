@@ -323,6 +323,10 @@ describe('AuthController - Sign in', function () {
 
           var createdUser = res.body;
           userId = createdUser.id;
+          User.findOne(userId).exec(function(err, thisUser) {
+            thisUser.isTemporary = false;
+            thisUser.save();
+          });
           done();
         });
 
@@ -473,34 +477,39 @@ describe('AuthController - Policy test', function () {
           }
 
           user1Id = res.body.id;
+          User.findOne(user1Id).exec(function(err, thisUser) {
+            thisUser.isTemporary = false;
+            thisUser.save();
+            user1.post(BASE_URL + '/signin')
+              .send({ username: aUser.username, password: aUser.password})
+              .end(function (err, res) {
+                if (err) {
+                  throw err;
+                }
 
-          user1.post(BASE_URL + '/signin')
-            .send({ username: aUser.username, password: aUser.password})
-            .end(function (err, res) {
-              if (err) {
-                throw err;
-              }
+                user2.post(BASE_URL + '/signup')
+                  .send(bUser)
+                  .end(function (err, res) {
+                    if (err) {
+                      throw err;
+                    }
 
-              user2.post(BASE_URL + '/signup')
-                .send(bUser)
-                .end(function (err, res) {
-                  if (err) {
-                    throw err;
-                  }
-
-                  user2Id = res.body.id;
-
-                  user2.post(BASE_URL + '/signin')
-                    .send({ username: bUser.username, password: bUser.password})
-                    .end(function (err, res) {
-                      if (err) {
-                        throw err;
-                      }
-
-                      done();
+                    user2Id = res.body.id;
+                    User.findOne(user2Id).exec(function(err, thisUser) {
+                      thisUser.isTemporary = false;
+                      thisUser.save();
+                      user2.post(BASE_URL + '/signin')
+                        .send({ username: bUser.username, password: bUser.password})
+                        .end(function (err, res) {
+                          if (err) {
+                            throw err;
+                          }
+                          done();
+                        });
                     });
-                });
-            });
+                  });
+              });
+          });
         });
     });
   });

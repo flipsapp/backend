@@ -23,17 +23,20 @@ describe('User Controller', function () {
         }
 
         userId = res.body.id;
+        User.findOne(userId).exec(function(err, thisUser) {
+          thisUser.isTemporary = false;
+          thisUser.save();
+          user1.post(BASE_URL + '/signin/')
+            .send({ username: aUser.username, password: aUser.password })
+            .end(function (err, res) {
 
-        user1.post(BASE_URL + '/signin/')
-          .send({ username: aUser.username, password: aUser.password })
-          .end(function (err, res) {
+              if (err) {
+                throw err;
+              }
 
-            if (err) {
-              throw err;
-            }
-
-            done();
-          });
+              done();
+            });
+        });
       });
   });
 
