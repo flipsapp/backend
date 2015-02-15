@@ -19,6 +19,9 @@ var FlipController = {
     if (request.body.sound_url) {
       values.soundURL = request.body.sound_url
     }
+    if (request.body.thumbnail_url) {
+      values.thumbnailURL = request.body.thumbnail_url
+    }
     if (request.params.user_id) {
       values.owner = request.params.user_id
     }
