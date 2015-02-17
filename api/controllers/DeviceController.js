@@ -29,7 +29,7 @@ var DeviceController = {
         }
 
         if (!device) {
-          return response.send(404, new FlipsError('Device not found', 'Id='+deviceId));
+          return response.send(404, new FlipsError('Device not found', 'Id=' + deviceId));
         }
 
         return response.send(200, device);
@@ -64,7 +64,7 @@ var DeviceController = {
           return response.send(400, new FlipsError('Error creating device.', 'Device returned empty.'));
         }
 
-        User.findOne(userId).exec(function(err, user) {
+        User.findOne(userId).exec(function (err, user) {
 
           if (!user.phoneNumber) {
             user.phoneNumber = Krypto.encrypt(phoneNumber);
@@ -74,7 +74,7 @@ var DeviceController = {
           logger.debug('sending verification code');
           sendVerificationCode(device, user.phoneNumber);
 
-          PubnubGateway.addDeviceToPushNotification(device.uuid, device.uuid, device.platform, function(err, channel) {
+          PubnubGateway.addDeviceToPushNotification(device.uuid, device.uuid, device.platform, function (err, channel) {
             if (err) {
               logger.error(new FlipsError(err));
             }
@@ -139,35 +139,25 @@ var DeviceController = {
         device.retryCount = 0;
         var user = device.user;
         user.isTemporary = false;
-        user.save();
+        user.save(function (errSavingUser) {
 
-        device.user = user.id;
-        device.save();
+          device.user = user.id;
+          device.save();
 
-        if (phoneNumber) {
-          User.findOne({id: userId})
-            .exec(function(error, user) {
+          if (phoneNumber) {
+            user.phoneNumber = Krypto.encrypt(phoneNumber);
+            user.save(function (error) {
               if (error) {
-                return response.send(500, new FlipsError('Error retrieving user.', JSON.stringify(error)));
+                return response.send(500, new FlipsError('Error saving user after update device'));
               }
+              return response.send(200, device);
+            });
+          } else {
+            return response.send(200, device);
+          }
+        });
 
-              if (!user) {
-                return response.send(400, new FlipsError('Error retrieving user.', 'User not found with id = '+device.user.id))
-              }
 
-              user.phoneNumber = Krypto.encrypt(phoneNumber);
-
-              user.save(function(error) {
-
-                if (error) {
-                  return response.send(500, new FlipsError('Error saving user after update device'));
-                }
-                return response.send(200, device);
-              });
-            })
-        } else {
-          return response.send(200, device);
-        }
       }
     );
   },
@@ -203,7 +193,7 @@ var DeviceController = {
           return response.send(403, new FlipsError('This device does not belong to you'));
         }
 
-        User.findOne(userId).exec(function(error, user) {
+        User.findOne(userId).exec(function (error, user) {
 
           if (error) {
             return response.send(500, new FlipsError('Error retrieving the device.', error.details));
@@ -221,12 +211,12 @@ var DeviceController = {
     );
 
   }
-	
+
 };
 
 module.exports = DeviceController;
 
-var sendVerificationCode = function(device, phoneNumber) {
+var sendVerificationCode = function (device, phoneNumber) {
   var verificationCode = Math.floor(Math.random() * 8999) + 1000;
   var message = 'Your Flips verification code: ' + verificationCode;
 
