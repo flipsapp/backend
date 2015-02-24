@@ -17,39 +17,46 @@ var PubnubGateway = {
         var now = new Date();
         var formattedNow = now.getUTCFullYear() + '-' + (now.getUTCMonth()+1) + '-' + now.getUTCDate() + 'T' + now.getUTCHours() + ':' + now.getUTCMinutes() + ':' + now.getUTCSeconds() + '.' + now.getUTCMilliseconds() + 'Z';
 
-
-
         var welcomeMessage = {
-          "fromUserId" : flipboysUser.id,
-          "type" : "2",
-          "flipMessageId": ""+flipboysUser.id+":"+new Date().getTime(),
-          "content" : [
-            {
-              "soundURL" : "",
-              "id" : "1",
-              "backgroundURL" : "https://s3.amazonaws.com/flips-background/welcome.png",
-              "word" : "Welcome"
-            }
-          ],
-          "pn_apns" : {
-            "aps" : {
-              "alert" : "You received a new flip message from FlipBoys"
+          fromUserId : flipboysUser.id,
+          type : "2",
+          flipMessageId: ""+flipboysUser.id+":"+new Date().getTime(),
+          pn_apns : {
+            aps : {
+              alert : "You received a new flip message from FlipBoys"
             }
           },
-          "sentAt" : formattedNow
+          sentAt : formattedNow
         };
 
-        pubnub.publish({
-          channel: room.pubnubId,
-          message: welcomeMessage,
-          callback: function(e) {
-            console.log("Successfully sent the welcome message.")
-          },
-          error: function(e) {
-            console.log("Error sending the welcome message. ["+e+"]")
+        var welcomeFlips = [];
+
+        Welcome.find({sort: 'sequence DESC'}).exec(function(err, flips) {
+          if (err || !flips) {
+            console.log("Error. Welcome message not found in database.")
           }
+          for (var i = 0; i < flips.length; i++) {
+            var flip = flips[i];
+            welcomeFlips.push({
+              id: flip.sequence,
+              thumbnailURL: flip.thumbnailURL,
+              backgroundURL: flip.backgroundURL,
+              word: flip.word
+            });
+          }
+          welcomeMessage.content = welcomeFlips;
+          pubnub.publish({
+            channel: room.pubnubId,
+            message: welcomeMessage,
+            callback: function(e) {
+              console.log("Successfully sent the welcome message.")
+            },
+            error: function(e) {
+              console.log("Error sending the welcome message. ["+e+"]")
+            }
+          });
         });
-    });
+      });
   },
 
   addDeviceToPushNotification: function (token, channel, platform, callback) {
