@@ -49,7 +49,7 @@ passport.facebook = function(request, response, next) {
       return next(fbProfile.error);
     }
 
-    User.findOne({ facebookID: Krypto.encrypt(fbProfile.id) })
+    User.findOne({ facebookID: fbProfile.id })
       .populate('devices')
       .exec(function(err, user) {
         if (err) {

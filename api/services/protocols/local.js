@@ -41,15 +41,19 @@ exports.register = function (request, response, next) {
   userModel.photo = photo;
 
   if (!userModel.username) {
-    return next('No username was entered.');
+    if (userModel.facebookID) {
+      return next('No email was entered.');
+    } else {
+      return next('No username was entered.');
+    }
   }
 
   var password = userModel.password;
 
-  if (!password) {
+  if (!password && !userModel.facebookID) {
     return next('No password was entered.');
   }
-  if (!password.match(PASSWORD_REGEX)) {
+  if (!password.match(PASSWORD_REGEX) && !userModel.facebookID) {
     return next('Password must have at least eight characters, one uppercase letter and one lowercase letter and one number.');
   }
 
