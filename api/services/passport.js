@@ -49,7 +49,7 @@ passport.facebook = function(request, response, next) {
       return next(fbProfile.error);
     }
 
-    User.findOne({ username: Krypto.encrypt(fbProfile.id) })
+    User.findOne({ facebookID: Krypto.encrypt(fbProfile.id) })
       .populate('devices')
       .exec(function(err, user) {
         if (err) {
@@ -57,7 +57,9 @@ passport.facebook = function(request, response, next) {
         }
 
         if (!user) {
-          createFacebookUser(fbProfile, next);
+          //createFacebookUser(fbProfile, next);
+          //User not found
+          return next(null);
         } else {
 
           user.facebookID = fbProfile.id;
