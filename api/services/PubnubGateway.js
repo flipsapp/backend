@@ -31,7 +31,7 @@ var PubnubGateway = {
 
         var welcomeFlips = [];
 
-        Welcome.find({sort: 'sequence DESC'}).exec(function(err, flips) {
+        Welcome.find({sort: 'sequence ASC'}).exec(function(err, flips) {
           if (err || !flips) {
             console.log("Error. Welcome message not found in database.")
           }
