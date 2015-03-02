@@ -40,6 +40,9 @@ var AuthController = {
           return response.send(400, new FlipsError('Error logging in user', loginErr));
         }
 
+        logger.debug('inside signin -> request.login');
+        logger.debug(user);
+
         // Upon successful login, send the user to the homepage were req.user
         // will available.
         return response.send(200, Krypto.decryptUser(user));
@@ -63,7 +66,7 @@ var AuthController = {
         }
 
         logger.debug('user signed-in');
-
+        logger.debug(user);
         // Upon successful login, send the user to the homepage
         // were req.user will available.
         return response.send(200, Krypto.decryptUser(user));

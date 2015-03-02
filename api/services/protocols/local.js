@@ -104,8 +104,6 @@ exports.login = function (req, identifier, password, next) {
               req.flash('error', 'Error.Passport.Password.Wrong');
               return next(null, false);
             } else {
-              console.log('login');
-              console.log(Krypto.decryptUser(user));
               return next(null, user);
             }
           });
