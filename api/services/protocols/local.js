@@ -133,10 +133,19 @@ exports.createUser = function (userModel, next) {
       if (existingUsers) {
         logger.debug('existing users');
 
+        logger.debug(existingUsers);
+
         var activeUser = getActiveUser(existingUsers);
         var tempUser = getTempUser(existingUsers);
 
+        logger.debug('activeUser');
+        logger.debug(activeUser);
+        logger.debug('tempUser');
+        logger.debug(tempUser);
+
         if (activeUser) {
+
+          logger.debug('active user');
 
           // has the same username?
           if (activeUser.username === Krypto.encrypt(userModel.username)) {
