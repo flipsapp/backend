@@ -67,6 +67,9 @@ var DeviceController = {
         User.findOne(userId).exec(function (err, user) {
 
           if (!user.phoneNumber) {
+            if (!phoneNumber) {
+              return response.send(400, new FlipsError('Missing parameter [Phone number].'));
+            }
             user.phoneNumber = Krypto.encrypt(phoneNumber);
             user.save();
           }

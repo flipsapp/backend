@@ -364,6 +364,8 @@ describe('AuthController - Sign in', function () {
 
         var user = res.body;
 
+        console.log(user);
+
         assert.notEqual(user.id, null);
         assert.equal(user.username, aUser.username);
         assert.equal(user.password, aUser.password);
