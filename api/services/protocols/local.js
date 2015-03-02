@@ -104,8 +104,6 @@ exports.login = function (req, identifier, password, next) {
               req.flash('error', 'Error.Passport.Password.Wrong');
               return next(null, false);
             } else {
-              console.log('login');
-              console.log(Krypto.decryptUser(user));
               return next(null, user);
             }
           });
@@ -130,62 +128,56 @@ exports.createUser = function (userModel, next) {
       logger.error(ageErr);
       return next(ageErr);
     }
-    checkExistingUser(userModel, function (existingUserErr, existingUsers) {
+    checkExistingUser(userModel, function (existingUserErr, existingUser) {
       logger.debug('entered block of checkExistingUser()');
-      if (existingUsers) {
-        logger.debug('existing users');
+      if (existingUser) {
+        logger.debug('existing user');
 
-        var activeUser = getActiveUser(existingUsers);
-        var tempUser = getTempUser(existingUsers);
-
-        if (activeUser) {
+        if (!existingUser.isTemporary) {
 
           // has the same username?
-          if (activeUser.username === Krypto.encrypt(userModel.username)) {
-            return next('An account already exists for that email address.  Log in or sign up again.');
+          if (existingUser.username === Krypto.encrypt(userModel.username)) {
+            return next(existingUserErr);
           }
 
           // has the same phone number?
-          if (activeUser.phoneNumber === Krypto.encrypt(userModel.phoneNumber)) {
-            return next('An account already exists for that phone number.  Log in or sign up again.');
+          if (existingUser.phoneNumber === Krypto.encrypt(userModel.phoneNumber)) {
+            return next(existingUserErr);
           }
-        }
-        if (tempUser) {
+        } else {
           // temporary user (just created or invited user)
 
           // update user info using the new values
           logger.debug('replacing existing user information');
 
           if (userModel.username) {
-            tempUser.username = Krypto.encrypt(userModel.username);
+            existingUser.username = Krypto.encrypt(userModel.username);
           }
           if (userModel.firstName) {
-            tempUser.firstName = Krypto.encrypt(userModel.firstName);
+            existingUser.firstName = Krypto.encrypt(userModel.firstName);
           }
           if (userModel.lastName) {
-            tempUser.lastName = Krypto.encrypt(userModel.lastName);
+            existingUser.lastName = Krypto.encrypt(userModel.lastName);
           }
           if (userModel.phoneNumber) {
-            tempUser.phoneNumber = Krypto.encrypt(userModel.phoneNumber);
+            existingUser.phoneNumber = Krypto.encrypt(userModel.phoneNumber);
           }
           if (userModel.nickname) {
-            tempUser.nickname = Krypto.encrypt(userModel.nickname);
+            existingUser.nickname = Krypto.encrypt(userModel.nickname);
           }
-          tempUser.birthday = userModel.birthday;
+          existingUser.birthday = userModel.birthday;
 
-          tempUser.save(function (err) {
+          existingUser.save(function (err) {
             if (err) {
-              logger.debug(err);
               logger.error(err);
               return next('It was not possible to sign up this user');
             }
 
-            User.findOne(tempUser.id).exec(function(error, user) {
+            User.findOne(existingUser.id).exec(function(error, user) {
               if (err || !user) {
-                logger.debug('It was not possible to sign up this user');
                 return next('It was not possible to sign up this user');
               }
-              logger.debug('ok... temp user saved');
+
               return next(null, Krypto.decryptUser(user));
 
             });
@@ -218,39 +210,24 @@ var checkAge = function (userModel, callback) {
 };
 
 var checkExistingUser = function (userModel, callback) {
-  User.find({
-    or: [
-      {username: Krypto.encrypt(userModel.username)},
-      {phoneNumber: Krypto.encrypt(userModel.phoneNumber)}
-    ]
-  }).exec(function (err, usersWithSameUsernameOrPhoneNumber) {
-    if (usersWithSameUsernameOrPhoneNumber && usersWithSameUsernameOrPhoneNumber.length > 0) {
-      logger.debug('user with same username or phone number');
-      return callback('An account already exists for that email address or phone number.  Log in or sign up again with different information.', usersWithSameUsernameOrPhoneNumber);
+  User.findOne({username: Krypto.encrypt(userModel.username)}).exec(function (err, userWithSameUsername) {
+    if (userWithSameUsername) {
+      logger.debug('user with same username');
+      return callback('An account already exists for that email address.  Log in or sign up with a different address.', userWithSameUsername);
+    } else if (userModel.phoneNumber && userModel.phoneNumber.length > 0) {
+      User.findOne({phoneNumber: Krypto.encrypt(userModel.phoneNumber)}).exec(function (err, userWithSamePhoneNumber) {
+        if (userWithSamePhoneNumber) {
+          logger.debug('user with same phone number');
+          return callback('This phone number is already used by an existing Flips user', userWithSamePhoneNumber);
+        }
+        return callback(null, null);
+      })
     } else {
       logger.debug('no same phone number, no same username');
       return callback(null, null);
     }
 
   });
-};
-
-var getActiveUser = function (users) {
-  for (var i = 0; i < users.length; i++) {
-    if (!users[i].isTemporary) {
-      return users[i];
-    }
-  }
-  return null;
-};
-
-var getTempUser = function(users) {
-  for (var i = 0; i < users.length; i++) {
-    if (users[i].isTemporary) {
-      return users[i];
-    }
-  }
-  return null;
 };
 
 

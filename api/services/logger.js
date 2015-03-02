@@ -7,7 +7,7 @@ var logger = new (winston.Logger)({
       json: true,
       colorize: true,
       timestamp: true,
-      level: 'debug'
+      level: 'error'
     })
   ]
 });
