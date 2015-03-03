@@ -73,5 +73,9 @@ module.exports.policies = {
     updateParticipants: ['passport', 'owner'],
     update: ['passport', 'owner'],
     destroy: ['passport', 'owner']
+  },
+
+  AuthController: {
+    checkSession: ['passport', 'owner']
   }
 };

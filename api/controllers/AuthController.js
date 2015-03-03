@@ -96,6 +96,10 @@ var AuthController = {
         return response.send(200, Krypto.decryptUser(user));
       });
     });
+  },
+
+  checkSession: function(request, response) {
+    return response.send(200, {});
   }
 };
 
