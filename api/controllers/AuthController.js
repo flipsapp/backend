@@ -30,7 +30,7 @@ var AuthController = {
       }
 
       if (user.isTemporary) {
-        return response.send(403, new FlipsError('User was not validated. Please sign up or validate verification code.'))
+        return response.send(404, new FlipsError('User was not validated. Please sign up or validate verification code.'))
       }
 
       request.login(user, function (loginErr) {
