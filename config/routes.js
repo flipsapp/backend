@@ -29,7 +29,7 @@ module.exports.routes = {
   'POST   /signin'                                  : 'AuthController.signin',
   'POST   /signup'                                  : 'AuthController.signup',
   'POST   /signin/facebook'                         : 'AuthController.facebook',
-  'GET    /user/:user_id/session'                   : 'AuthController.checkSession',
+  'GET    /user/:parentid/session'                   : 'AuthController.checkSession',
 
   'GET    /flips/stock'                             : 'FlipController.stockFlips',  // all stock flips or filtered by category or owner or both
                                                                                     // /flips/stock?category=Toon
