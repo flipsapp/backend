@@ -149,12 +149,12 @@ exports.createUser = function (userModel, next) {
 
           // has the same username?
           if (activeUser.username === Krypto.encrypt(userModel.username)) {
-            return next('An account already exists for that email address.  Log in or sign up again.');
+            return next('An account already exists for that email address.  Log in or sign up with a different address.');
           }
 
           // has the same phone number?
           if (activeUser.phoneNumber === Krypto.encrypt(userModel.phoneNumber)) {
-            return next('An account already exists for that phone number.  Log in or sign up again.');
+            return next('This phone number is already used by an existing Flips user.');
           }
         }
         if (tempUser) {
