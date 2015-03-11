@@ -263,6 +263,12 @@ var FlipController = {
       whereClause.word = request.param('word');
     }
 
+    if (request.param('timestamp')) {
+      whereClause.updatedAt = {'>': new Date(request.param('timestamp'))};
+    } else {
+      whereClause.isDeleted = false;
+    }
+
     Flip.find(whereClause).populate('owner').exec(function (err, flips) {
       if (err) {
         var errmsg = new FlipsError('Error trying to retrieve flips', err);
