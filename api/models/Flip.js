@@ -38,6 +38,11 @@ var Flip = {
 
     category: {
       type: 'string'
+    },
+
+    isDeleted: {
+      type: 'boolean',
+      defaultsTo: false
     }
 
   }
