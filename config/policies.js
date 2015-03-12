@@ -41,7 +41,8 @@ module.exports.policies = {
     verifyContacts: ['passport'],
     verifyFacebookUsers: ['passport'],
     findById: ['passport', 'owner'],
-    printUsers: true
+    printUsers: true,
+    findActiveUserByPhoneNumber: true
   },
 
 	FlipController: {
