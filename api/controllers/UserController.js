@@ -146,6 +146,25 @@ var UserController = {
     });
   },
 
+  findActiveUserByPhoneNumber: function (request, response) {
+    var phoneNumber = request.param('phone_number');
+
+    if (!phoneNumber) {
+      return response.send(400, new FlipsError('Phone number is empty.'));
+    }
+
+    User.findOne({phoneNumber: Krypto.encrypt(phoneNumber), isTemporary: false}).exec(function (err, user) {
+      if (err) {
+        return response.send(500, new FlipsError('Error retrieving user'));
+      }
+      if (!user) {
+        return response.send(404, {exists: false});
+      }
+      return response.send(200, {exists: true});
+    });
+  },
+
+
   updatePassword: function (request, response) {
     var email = request.param('email');
     var phoneNumber = request.param('phone_number');

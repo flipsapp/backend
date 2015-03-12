@@ -49,6 +49,7 @@ module.exports.routes = {
   'GET    /user/:user_id/flips'                     : 'FlipController.myFlips',     // all flips or filtered by word -> /user/:user_id/flips?word='San Francisco'
   'POST   /user/:parentid/contacts/verify'          : 'UserController.verifyContacts',
   'POST   /user/:parentid/facebook/verify'          : 'UserController.verifyFacebookUsers',
+  'GET    /phoneNumber/:phone_number/exists'        : 'UserController.findActiveUserByPhoneNumber',
 
   'POST   /user/:parentid/photo'                    : 'UserController.uploadPhoto',
   'POST   /user/:parentid/devices'                  : 'DeviceController.create',
