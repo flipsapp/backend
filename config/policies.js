@@ -42,7 +42,7 @@ module.exports.policies = {
     verifyFacebookUsers: ['passport'],
     findById: ['passport', 'owner'],
     printUsers: true,
-    findActiveUserByPhoneNumber: true
+    findActiveUserByPhoneNumber: ['passport']
   },
 
 	FlipController: {
