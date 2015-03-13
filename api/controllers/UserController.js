@@ -155,10 +155,10 @@ var UserController = {
 
     User.findOne({phoneNumber: Krypto.encrypt(phoneNumber), isTemporary: false}).exec(function (err, user) {
       if (err) {
-        return response.send(500, new FlipsError('Error retrieving user'));
+        return response.send(500, new FlipsError('An error occurred while trying to lookup phone number.'));
       }
       if (!user) {
-        return response.send(404, {exists: false});
+        return response.send(200, {exists: false});
       }
       return response.send(200, {exists: true});
     });
