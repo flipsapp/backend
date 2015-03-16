@@ -74,6 +74,16 @@ var DeviceController = {
             user.save();
           }
 
+          if (!user.phoneNumber) {
+            if (!phoneNumber) {
+              return response.send(400, new FlipsError('Missing parameter [Phone number].'));
+            }
+            user.phoneNumber = Krypto.encrypt(phoneNumber);
+            user.save();
+          }
+
+          sendVerificationCode(device, phoneNumber ? phoneNumber : user.phoneNumber);
+
           logger.debug('sending verification code');
           sendVerificationCode(device, user.phoneNumber);
 

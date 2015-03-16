@@ -42,7 +42,8 @@ module.exports.policies = {
     verifyFacebookUsers: ['passport'],
     findById: ['passport', 'owner'],
     printUsers: true,
-    findActiveUserByPhoneNumber: ['passport']
+    findActiveUserByPhoneNumber: ['passport'],
+    resendCodeWhenChangingNumber: ['passport', 'owner', 'deviceOwner']
   },
 
 	FlipController: {
