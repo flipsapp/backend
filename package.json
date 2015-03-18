@@ -43,7 +43,7 @@
     "twilio": "^1.7.0",
     "validator": "^3.17.1",
     "winston": "~0.7.3",
-    "pubnub": "~3.6.8",
+    "pubnub": "~3.7.8",
     "request": "~2.44.0",
     "goo.gl": "~0.1.2",
     "node-uuid": "~1.4.1",
