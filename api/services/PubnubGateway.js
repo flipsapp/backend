@@ -1,7 +1,9 @@
 var Krypto = requires('>/api/utilities/Krypto');
 var pubnub = require("pubnub").init({
   publish_key: process.env.PUBNUB_PUB_KEY,
-  subscribe_key: process.env.PUBNUB_SUB_KEY
+  subscribe_key: process.env.PUBNUB_SUB_KEY,
+  cipher_key: process.env.PUBNUB_CIPHER_KEY,
+  secret_key: process.env.PUBNUB_SECRET_KEY
 });
 
 var pushNotificationURL = 'http://pubsub.pubnub.com/v1/push/sub-key/{{subscribe_key}}/devices/{{token}}?{{action}}={{channel}}&type={{type}}',
@@ -51,7 +53,7 @@ PubnubGateway = {
               channel: room.pubnubId,
               message: welcomeMessage,
               callback: function (e) {
-                console.log("Successfully sent the welcome message.")
+                console.log("Successfully sent the welcome message to channel " + room.pubnubId);
               },
               error: function (e) {
                 console.log("Error sending the welcome message. [" + e + "]")
