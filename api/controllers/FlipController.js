@@ -282,7 +282,15 @@ var FlipController = {
         if (err) {
           return response.send(500, new FlipsError(err));
         }
-        return response.send(200, decryptedFlips);
+        var lastTimestamp = "";
+        if (decryptedFlips.length > 0) {
+          lastTimestamp = decryptedFlips[decryptedFlips.length - 1].updatedAt;
+        }
+        var flipsToReturn = {
+          stock_flips: decryptedFlips,
+          last_timestamp: lastTimestamp
+        };
+        return response.send(200, flipsToReturn);
       });
     })
   }
