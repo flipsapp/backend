@@ -26,7 +26,7 @@ PubnubGateway = {
           flipMessageId: "" + flipboysUser.id + ":" + new Date().getTime(),
           pn_apns: {
             aps: {
-              alert: "You received a new flip message from FlipBoys"
+              alert: "You received a new Flip message from FlipBoys"
             }
           },
           sentAt: formattedNow
@@ -45,7 +45,8 @@ PubnubGateway = {
                 id: flip.sequence,
                 thumbnailURL: flip.thumbnailURL,
                 backgroundURL: flip.backgroundURL,
-                word: flip.word
+                word: flip.word,
+                updatedAt: flip.updatedAt
               });
             }
             welcomeMessage.content = welcomeFlips;
