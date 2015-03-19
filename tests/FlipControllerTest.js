@@ -192,7 +192,7 @@ describe('FlipController', function () {
                         if (err) {
                           throw err;
                         }
-                        flips = res.body;
+                        flips = res.body.stock_flips;
                         assert.equal(res.status, 200, 'Response status is ' + res.status + ' and should be 200');
                         assert.equal(flips.length, 3, 'There are ' + flips.length + ' total stock flips flips and there should be 3');
 
@@ -201,7 +201,7 @@ describe('FlipController', function () {
                             if (err) {
                               throw err;
                             }
-                            flips = res.body;
+                            flips = res.body.stock_flips;
                             assert.equal(res.status, 200, 'Response status is ' + res.status + ' and should be 200');
                             assert.equal(flips.length, 2, 'There are ' + flips.length + ' stock flips in category "test" and there should be 2');
 
