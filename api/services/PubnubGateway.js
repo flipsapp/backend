@@ -9,8 +9,7 @@ var pubnub = require("pubnub").init({
 var pushNotificationURL = 'http://pubsub.pubnub.com/v1/push/sub-key/{{subscribe_key}}/devices/{{token}}?{{action}}={{channel}}&type={{type}}',
   SUCCESS = 1;
 
-var PubnubGateway;
-PubnubGateway = {
+var PubnubGateway = {
 
   publishWelcomeMessage: function (room) {
 

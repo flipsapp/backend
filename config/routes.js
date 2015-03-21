@@ -57,6 +57,8 @@ module.exports.routes = {
   'GET    /user/:parentid/devices/:id'              : 'DeviceController.findOne',
   'POST   /user/:parentid/devices/:id/verify'       : 'DeviceController.verify',
   'POST   /user/:parentid/devices/:id/resend'       : 'DeviceController.resendVerificationCode',
+  'POST   /user/:parentid/devices/:id/register_pn'  : 'DeviceController.registerForPushNotifications',
+  'POST   /user/:parentid/devices/:id/unregister_pn' : 'DeviceController.unregisterForPushNotifications',
 
   'POST   /user/:parentid/rooms'                    : 'RoomController.create',
   'GET    /user/:parentid/rooms/:id'                : 'RoomController.findOne',

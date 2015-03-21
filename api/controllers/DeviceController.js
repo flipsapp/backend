@@ -188,7 +188,6 @@ var DeviceController = {
     }
 
     Device.findOne(deviceId)
-      .populate('user')
       .exec(function (error, device) {
 
         if (error) {
@@ -209,7 +208,7 @@ var DeviceController = {
         User.findOne(userId).exec(function (error, user) {
 
           if (error) {
-            return response.send(500, new FlipsError('Error retrieving the device.', error.details));
+            return response.send(500, new FlipsError('Error retrieving the user.', error.details));
           }
 
           if (!user) {
@@ -220,6 +219,161 @@ var DeviceController = {
         });
 
         return response.send(200, device);
+      }
+    );
+
+  },
+
+  registerForPushNotifications: function (request, response) {
+
+    var userId = request.params.parentid;
+    var deviceId = request.params.id;
+
+    if (!userId) {
+      return response.send(400, new FlipsError('Missing parameter [User Id]'));
+    }
+
+    if (!deviceId) {
+      return response.send(400, new FlipsError('Missing parameter [Device Id]'));
+    }
+
+    Device.findOne(deviceId)
+      .exec(function (error, device) {
+
+        if (error) {
+          var errmsg = new FlipsError('Error retrieving the device.', error.details);
+          logger.error(errmsg);
+          return response.send(500, errmsg);
+        }
+
+        if (!device) {
+          return response.send(404, new FlipsError('Device not found.', 'Device id = ' + deviceId));
+        }
+
+        // just ensure that the device is related to user parameter
+        if (userId != device.user) {
+          return response.send(403, new FlipsError('This device does not belong to you'));
+        }
+
+        Participant.find({user: userId}).exec(function (error, participants) {
+
+          if (error) {
+            return response.send(500, new FlipsError('Error retrieving user rooms.'));
+          }
+
+          if (!participants) {
+            return response.send(404, new FlipsError('User rooms not found.'));
+          }
+
+          var roomIds = [];
+
+          for (var i = 0; i < participants.length; i++) {
+            roomIds.push(participants[i].room);
+          }
+
+          Room.find(roomIds).exec(function (error, rooms) {
+
+            if (error) {
+              return response.send(500, new FlipsError('Error retrieving rooms for user.'));
+            }
+
+            if (!rooms) {
+              return response.send(404, new FlipsError('Rooms not found.'));
+            }
+
+            var channels = [];
+
+            for (var j = 0; j < rooms.length; j++) {
+              channels.push(rooms[j].pubnubId);
+            }
+
+            for (var k = 0; k < channels.length; k++) {
+              PubnubGateway.addDeviceToPushNotification(device.uuid, channels[k], device.platform, function (error, channel) {})
+            }
+
+            return response.send(200, {});
+
+          });
+
+        });
+
+      }
+    );
+  },
+
+  unregisterForPushNotifications: function (request, response) {
+
+    var userId = request.params.parentid;
+    var deviceId = request.params.id;
+
+    if (!userId) {
+      return response.send(400, new FlipsError('Missing parameter [User Id]'));
+    }
+
+    if (!deviceId) {
+      return response.send(400, new FlipsError('Missing parameter [Device Id]'));
+    }
+
+    Device.findOne(deviceId)
+      .exec(function (error, device) {
+
+        if (error) {
+          var errmsg = new FlipsError('Error retrieving the device.', error.details);
+          logger.error(errmsg);
+          return response.send(500, errmsg);
+        }
+
+        if (!device) {
+          return response.send(404, new FlipsError('Device not found.', 'Device id = ' + deviceId));
+        }
+
+        // just ensure that the device is related to user parameter
+        if (userId != device.user) {
+          return response.send(403, new FlipsError('This device does not belong to you'));
+        }
+
+        Participant.find({user: userId}).exec(function (error, participants) {
+
+          if (error) {
+            return response.send(500, new FlipsError('Error retrieving user rooms.'));
+          }
+
+          if (!participants) {
+            return response.send(404, new FlipsError('User rooms not found.'));
+          }
+
+          var roomIds = [];
+
+          for (var i = 0; i < participants.length; i++) {
+            roomIds.push(participants[i].room);
+          }
+
+          Room.find(roomIds).exec(function (error, rooms) {
+
+            if (error) {
+              return response.send(500, new FlipsError('Error retrieving rooms for user.'));
+            }
+
+            if (!rooms) {
+              return response.send(404, new FlipsError('Rooms not found.'));
+            }
+
+            var channels = [];
+
+            for (var j = 0; j < rooms.length; j++) {
+              channels.push(rooms[j].pubnubId);
+            }
+
+            for (var k = 0; k < channels.length; k++) {
+              PubnubGateway.removeDeviceFromPushNotification(device.uuid, channels[k], device.platform, function (error, channel) {})
+            }
+
+            return response.send(200, {});
+
+          });
+
+        });
+
       }
     );
 
