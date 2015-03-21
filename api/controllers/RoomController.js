@@ -199,23 +199,30 @@ var createUsersForUnknownParticipants = function (params, callback) {
   }
   async.concat(phoneNumbers,
     function (phoneNumber, callback) {
-      //TODO check if phone number exists
-      var user = {};
-      var anythingTemporary = uuid();
-      user.username = anythingTemporary;
-      user.firstName = anythingTemporary;
-      user.lastName = anythingTemporary;
-      user.birthday = "01/01/1970";
-      user.phoneNumber = phoneNumber;
-      user.isTemporary = true;
-      User.create(user).exec(function (err, createdUser) {
-        if (err) {
-          return callback(null);
+      // check if phone number exists
+      User.findOne({phoneNumber: Krypto.encrypt(phoneNumber)}).exec(function(err, existingUser) {
+        if (err || !existingUser) {
+          // if phone number does not exist then create a temporary user
+          var user = {};
+          var anythingTemporary = uuid();
+          user.username = anythingTemporary;
+          user.firstName = anythingTemporary;
+          user.lastName = anythingTemporary;
+          user.birthday = "01/01/1970";
+          user.phoneNumber = phoneNumber;
+          user.isTemporary = true;
+          User.create(user).exec(function (err, createdUser) {
+            if (err) {
+              return callback(null);
+            }
+            if (createdUser) {
+              return callback(null, createdUser.id);
+            }
+          })
+        } else {
+          return callback(null, existingUser.id);
         }
-        if (createdUser) {
-          return callback(null, createdUser.id);
-        }
-      })
+      });
     },
     function (err, createdUsers) {
       return callback(err, createdUsers);
@@ -224,15 +231,21 @@ var createUsersForUnknownParticipants = function (params, callback) {
 };
 
 var sendInvitationBySMS = function (toNumber, fromUser, callback) {
-  var msg = "You've been Flipped by {{firstname}} {{lastname}}! Download Flips within 30 days to view your message.  {{url}}";
-  msg = msg.replace("{{firstname}}", Krypto.decrypt(fromUser.firstName));
-  msg = msg.replace("{{lastname}}", Krypto.decrypt(fromUser.lastName));
-  msg = msg.replace("{{url}}", process.env.APP_STORE_URL);
-  twilioService.sendSms(toNumber, msg, function (err, message) {
-    if (err) {
-      logger.error('Error sending SMS', err);
+  User.findOne({phoneNumber: Krypto.encrypt(toNumber), isTemporary: false}).exec(function (err, user) {
+    if (!user) {
+      var msg = "You've been Flipped by {{firstname}} {{lastname}}! Download Flips within 30 days to view your message.  {{url}}";
+      msg = msg.replace("{{firstname}}", Krypto.decrypt(fromUser.firstName));
+      msg = msg.replace("{{lastname}}", Krypto.decrypt(fromUser.lastName));
+      msg = msg.replace("{{url}}", process.env.APP_STORE_URL);
+      twilioService.sendSms(toNumber, msg, function (err, message) {
+        if (err) {
+          logger.error('Error sending SMS', err);
+        }
+        return callback(err, toNumber);
+      });
+    } else {
+      return callback(null, toNumber);
     }
-    return callback(err, toNumber);
   });
 };
 
