@@ -1,9 +1,9 @@
 var Krypto = requires('>/api/utilities/Krypto');
+var cryptic = require('crypto');
 var pubnub = require("pubnub").init({
+  ssl: true,
   publish_key: process.env.PUBNUB_PUB_KEY,
-  subscribe_key: process.env.PUBNUB_SUB_KEY,
-  cipher_key: process.env.PUBNUB_CIPHER_KEY,
-  secret_key: process.env.PUBNUB_SECRET_KEY
+  subscribe_key: process.env.PUBNUB_SUB_KEY
 });
 
 var pushNotificationURL = 'http://pubsub.pubnub.com/v1/push/sub-key/{{subscribe_key}}/devices/{{token}}?{{action}}={{channel}}&type={{type}}',
@@ -48,7 +48,9 @@ var PubnubGateway = {
                 updatedAt: flip.updatedAt
               });
             }
+
             welcomeMessage.content = welcomeFlips;
+
             pubnub.publish({
               channel: room.pubnubId,
               message: welcomeMessage,
@@ -103,6 +105,22 @@ function mobilePushGateway(action, token, channel, type, callback) {
   request.get(pushURL, function (error, response, body) {
     callback(error, response, body);
   });
+}
+
+function encrypt(text) {
+  if (!text) return text;
+  var cipher = cryptic.createCipher('aes-256-cbc', process.env.PUBNUB_CIPHER_KEY);
+  cipher.update(text, 'utf8', 'base64');
+  var crypted = cipher.final('base64');
+  return crypted;
+}
+
+function decrypt(text) {
+  if (!text) return text;
+  var decipher = cryptic.createDecipher('aes-256-cbc', process.env.PUBNUB_CIPHER_KEY);
+  decipher.update(text, 'base64', 'utf8');
+  var decrypted = decipher.final('utf8');
+  return decrypted;
 }
 
 module.exports = PubnubGateway;
