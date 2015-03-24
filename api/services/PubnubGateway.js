@@ -1,5 +1,7 @@
 var Krypto = requires('>/api/utilities/Krypto');
-var cryptic = require('crypto');
+
+var crypto = require('crypto');
+
 var pubnub = require("pubnub").init({
   ssl: true,
   publish_key: process.env.PUBNUB_PUB_KEY,
@@ -20,15 +22,19 @@ var PubnubGateway = {
         var formattedNow = now.getUTCFullYear() + '-' + (now.getUTCMonth() + 1) + '-' + now.getUTCDate() + 'T' + now.getUTCHours() + ':' + now.getUTCMinutes() + ':' + now.getUTCSeconds() + '.' + now.getUTCMilliseconds() + 'Z';
 
         var welcomeMessage = {
-          fromUserId: flipboysUser.id,
-          type: "2",
-          flipMessageId: "" + flipboysUser.id + ":" + new Date().getTime(),
           pn_apns: {
             aps: {
               alert: "You received a new Flip message from FlipBoys"
-            }
+            },
+            room_id: room.id
           },
-          sentAt: formattedNow
+          content: {
+            fromUserId: flipboysUser.id,
+            type: "2",
+            flipMessageId: "" + flipboysUser.id + ":" + new Date().getTime(),
+            sentAt: formattedNow
+          }
+
         };
 
         var welcomeFlips = [];
@@ -49,7 +55,9 @@ var PubnubGateway = {
               });
             }
 
-            welcomeMessage.content = welcomeFlips;
+            welcomeMessage.content.content = welcomeFlips;
+
+            welcomeMessage.content = PubnubGateway.encrypt(welcomeMessage.content);
 
             pubnub.publish({
               channel: room.pubnubId,
@@ -90,6 +98,37 @@ var PubnubGateway = {
         return callback('Error trying to remove device from push notification service');
       }
     });
+  },
+
+  encrypt: function (input) {
+    if (input == null || input == '') {
+      return '';
+    }
+    var iv = "0123456789012345";
+    function get_padded_key(key) {
+      return crypto.createHash('sha256').update(key).digest("hex").slice(0,32);
+    }
+    var plain_text = JSON['stringify'](input);
+    var cipher = crypto.createCipheriv('aes-256-cbc', get_padded_key(process.env.PUBNUB_CIPHER_KEY), iv);
+    var base_64_encrypted = cipher.update(plain_text, 'utf8', 'base64') + cipher.final('base64');
+    return base_64_encrypted || input;
+  },
+
+  decrypt: function (input) {
+    if (input == null || input == '') {
+      return '';
+    }
+    var iv = "0123456789012345";
+    function get_padded_key(key) {
+      return crypto.createHash('sha256').update(key).digest("hex").slice(0,32);
+    }
+    var decipher = crypto.createDecipheriv('aes-256-cbc', get_padded_key(process.env.PUBNUB_CIPHER_KEY), iv);
+    try {
+      var decrypted = decipher.update(input, 'base64', 'utf8') + decipher.final('utf8');
+    } catch (e) {
+      return null;
+    }
+    return JSON.parse(decrypted);
   }
 
 };
@@ -107,20 +146,7 @@ function mobilePushGateway(action, token, channel, type, callback) {
   });
 }
 
-function encrypt(text) {
-  if (!text) return text;
-  var cipher = cryptic.createCipher('aes-256-cbc', process.env.PUBNUB_CIPHER_KEY);
-  cipher.update(text, 'utf8', 'base64');
-  var crypted = cipher.final('base64');
-  return crypted;
-}
-
-function decrypt(text) {
-  if (!text) return text;
-  var decipher = cryptic.createDecipher('aes-256-cbc', process.env.PUBNUB_CIPHER_KEY);
-  decipher.update(text, 'base64', 'utf8');
-  var decrypted = decipher.final('utf8');
-  return decrypted;
-}
-
 module.exports = PubnubGateway;
+
+var myjson = {name: "ecil", friends: [{age:35},{age:36},{age:37}]};
+console.log(PubnubGateway.encrypt(myjson));
