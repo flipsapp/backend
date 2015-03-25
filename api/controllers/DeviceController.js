@@ -82,16 +82,13 @@ var DeviceController = {
             user.save();
           }
 
-          sendVerificationCode(device, phoneNumber ? phoneNumber : user.phoneNumber);
+          var numberToSendSMS = phoneNumber ? phoneNumber : Krypto.decrypt(user.phoneNumber);
+
+          sendVerificationCode(device, numberToSendSMS);
+
+          console.log('sending verification code to ' + numberToSendSMS);
 
           logger.debug('sending verification code');
-          sendVerificationCode(device, user.phoneNumber);
-
-          PubnubGateway.addDeviceToPushNotification(device.uuid, device.uuid, device.platform, function (err, channel) {
-            if (err) {
-              logger.error(new FlipsError(err));
-            }
-          });
 
           return response.send(201, device);
         });
@@ -141,7 +138,7 @@ var DeviceController = {
           device.isVerified = false;
           device.save();
           if (device.retryCount > MAX_RETRY_COUNT) {
-            sendVerificationCode(device, device.user.phoneNumber);
+            sendVerificationCode(device, Krypto.decrypt(device.user.phoneNumber));
             return response.send(400, new FlipsError('3 incorrect entries. Check your messages for a new code.'));
           } else {
             return response.send(400, new FlipsError('Wrong validation code.'));
@@ -216,7 +213,7 @@ var DeviceController = {
             return response.send(404, new FlipsError('User not found.', 'Device id = ' + deviceId));
           }
 
-          sendVerificationCode(device, user.phoneNumber);
+          sendVerificationCode(device, Krypto.decrypt(user.phoneNumber));
         });
 
         return response.send(200, device);
@@ -239,7 +236,7 @@ var sendVerificationCode = function (device, phoneNumber) {
   device.retryCount = 0;
   device.save();
 
-  twilioService.sendSms(Krypto.decrypt(phoneNumber), message, function (err, message) {
+  twilioService.sendSms(phoneNumber, message, function (err, message) {
     logger.info(err || message);
   });
 };
