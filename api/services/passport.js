@@ -35,7 +35,7 @@ passport.facebook = function(request, response, next) {
   }
 
   FB.api('/me', {
-    fields: ['id', 'first_name', 'last_name', 'birthday', 'age_range', 'email', 'picture.width(160)'],
+    fields: ['id'],
     access_token: access_token,
     client_id: facebookConfig.clientID,
     client_secret: facebookConfig.clientSecret
@@ -57,18 +57,9 @@ passport.facebook = function(request, response, next) {
         }
 
         if (!user) {
-          //createFacebookUser(fbProfile, next);
-          //User not found
+          //User not found. Expected behavior when logging with FB for the first time.
           return next(null);
         } else {
-
-          user.facebookID = fbProfile.id;
-          user.firstName = Krypto.encrypt(fbProfile.first_name);
-          user.lastName = Krypto.encrypt(fbProfile.last_name);
-          user.photoUrl = user.photoUrl ? user.photoUrl : fbProfile.picture.data.url;
-
-          user.save();
-
           next(null, Krypto.decryptUser(user))
         }
       }
