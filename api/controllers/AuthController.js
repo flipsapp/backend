@@ -81,7 +81,8 @@ var AuthController = {
         return response.send(500, errmsg);
       }
 
-      if (!user) {
+      if (!user || user.isTemporary) {
+        //Expected behavior when logging with FB for the first time or didn't validate verification code.
         return response.send(404, new FlipsError('User not found'));
       }
 
@@ -92,7 +93,7 @@ var AuthController = {
         }
 
         // Upon successful login, send the user to the homepage
-        // were req.user will available.
+        // where req.user will available.
         return response.send(200, Krypto.decryptUser(user));
       });
     });
