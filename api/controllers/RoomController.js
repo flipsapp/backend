@@ -239,7 +239,9 @@ var sendInvitationBySMS = function (toNumber, fromUser, callback) {
       msg = msg.replace("{{url}}", process.env.APP_STORE_URL);
       twilioService.sendSms(toNumber, msg, function (err, message) {
         if (err) {
-          logger.error('Error sending SMS', err);
+          logger.error('Error sending SMS to ' + toNumber, err);
+        } else {
+          console.log('Successfully sent SMS to ' + toNumber);
         }
         return callback(err, toNumber);
       });
