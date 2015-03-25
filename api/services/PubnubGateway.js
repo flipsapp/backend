@@ -28,7 +28,7 @@ var PubnubGateway = {
             },
             room_id: room.id
           },
-          content: {
+          data: {
             fromUserId: flipboysUser.id,
             type: "2",
             flipMessageId: "" + flipboysUser.id + ":" + new Date().getTime(),
@@ -55,9 +55,9 @@ var PubnubGateway = {
               });
             }
 
-            welcomeMessage.content.content = welcomeFlips;
+            welcomeMessage.data.content = welcomeFlips;
 
-            welcomeMessage.content = PubnubGateway.encrypt(welcomeMessage.content);
+            welcomeMessage.data = PubnubGateway.encrypt(welcomeMessage.data);
 
             pubnub.publish({
               channel: room.pubnubId,
