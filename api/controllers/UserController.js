@@ -55,9 +55,14 @@ var UserController = {
 
   forgot: function (request, response) {
     var phoneNumber = request.param('phone_number');
+    var deviceId = request.param('device_id');
 
     if (!phoneNumber) {
       return response.send(400, new FlipsError('Error requesting to reset password.', 'Phone Number is empty.'));
+    }
+
+    if (!deviceId) {
+      return response.send(400, new FlipsError('Error requesting to reset password.', 'Device ID is empty.'));
     }
 
     User.findOne({phoneNumber: Krypto.encrypt(phoneNumber)})
@@ -72,7 +77,7 @@ var UserController = {
           return response.send(404, new FlipsError('User not found.'));
         }
 
-        Device.findOne({user: user.id})
+        Device.findOne({user: user.id, id: deviceId})
           .populate('user')
           .exec(function (error, device) {
             if (error) {
@@ -153,9 +158,18 @@ var UserController = {
   verify: function (request, response) {
     var phoneNumber = request.param('phone_number');
     var verificationCode = request.param('verification_code');
+    var deviceId = request.param('device_id');
 
     if (!phoneNumber || !verificationCode) {
-      return response.send(400, new FlipsError('Error requesting to reset password.', 'Phone Number or verification code is empty.'));
+      return response.send(400, new FlipsError('Error requesting to reset password.', 'Phone Number is missing.'));
+    }
+
+    if (!verificationCode) {
+      return response.send(400, new FlipsError('Error requesting to reset password.', 'Verification code is missing.'));
+    }
+
+    if (!deviceId) {
+      return response.send(400, new FlipsError('Error requesting to reset password.', 'Device ID is missing.'));
     }
 
     User.findOne({phoneNumber: Krypto.encrypt(phoneNumber)}).exec(function (err, user) {
@@ -165,7 +179,7 @@ var UserController = {
       if (!user) {
         return response.send(404, new FlipsError('User not found'));
       }
-      Device.findOne({user: user.id})
+      Device.findOne({user: user.id, id: deviceId})
         .populate('user')
         .exec(function (error, device) {
           if (error) {
@@ -225,8 +239,10 @@ var UserController = {
     var phoneNumber = request.param('phone_number');
     var verificationCode = request.param('verification_code');
     var password = request.param('password');
+    var deviceId = request.param('device_id');
 
-    if (!email || !phoneNumber || !verificationCode || !password) {
+    if (!email || !phoneNumber || !verificationCode || !password || !deviceId) {
+      console.log('Missing parameters.');
       return response.send(400, new FlipsError('Error requesting to update password.', 'Missing parameters.'));
     }
 
@@ -240,7 +256,7 @@ var UserController = {
       if (!user) {
         return response.send(404, new FlipsError('Username and/or phone number do not match any user'));
       }
-      Device.findOne({user: user.id})
+      Device.findOne({user: user.id, id: deviceId})
         .populate('user')
         .exec(function (error, device) {
           if (error) {
@@ -253,8 +269,7 @@ var UserController = {
           }
           if (device.verificationCode != verificationCode) {
             //if the verification code is wrong, it's probably an attack - so the code should be changed to avoid brute-force update
-            var newVerificationCode = Math.floor(Math.random() * 8999) + 1000;
-            device.verificationCode = newVerificationCode;
+            device.verificationCode = Math.floor(Math.random() * 8999) + 1000;
             device.save();
             return response.send(400, new FlipsError('Wrong verification code.'));
           }
@@ -267,8 +282,8 @@ var UserController = {
             return response.send(400, new FlipsError('Password must have at least eight characters, one uppercase letter and one lowercase letter and one number.'));
           }
 
-          var whereClause = {user: device.user.id}
-          var updateColumns = {password: password}
+          var whereClause = {user: device.user.id};
+          var updateColumns = {password: password};
           Passport.update(whereClause, updateColumns, function (error, affectedUsers) {
             if (error) {
               var errmsg = new FlipsError('Error updating passport.');
@@ -497,6 +512,7 @@ var sendVerificationCode = function (device, phoneNumber) {
   var message = 'Your Flips verification code: ' + verificationCode;
 
   device.verificationCode = verificationCode;
+  device.isVerified = false;
   device.retryCount = 0;
   device.save();
 
