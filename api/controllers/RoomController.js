@@ -295,7 +295,12 @@ var assignUsersToRoom = function (users, room, callback) {
                 callback(err);
               } else {
                 room.participants = decryptedParticipants;
-                callback(null, room);
+                room.save(function(err) {
+                  if (err)
+                    callback(err);
+                  else
+                    callback(null, room);
+                });
               }
             });
           }

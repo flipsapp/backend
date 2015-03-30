@@ -180,41 +180,15 @@ exports.createUser = function (userModel, next) {
           }
           tempUser.birthday = userModel.birthday;
 
-          if (photo && photo._files.length >= 1) {
-            s3service.upload(photo, s3service.PICTURES_BUCKET, function (err, uploadedFiles) {
-              if (err) {
-                var errmsg = new FlipsError('Error uploading picture', err);
-                logger.error(errmsg);
-                return response.send(500, errmsg);
-              }
-
-              if (!uploadedFiles || uploadedFiles.length < 1) {
-                return response.send(400, new FlipsError('Error uploading file'));
-              }
-
-              var uploadedFile = uploadedFiles[0];
-              tempUser.photoUrl = s3service.S3_URL + s3service.PICTURES_BUCKET + '/' + uploadedFile.fd;
-              tempUser.save();
-            });
-          }
-
+          logger.debug('1.1 create passport and initial room for temporary user');
           tempUser.save(function (err) {
             if (err) {
-              logger.debug(err);
-              logger.error(err);
+              logger.error('It was not possible to sign up this user: ' + err);
               return next('It was not possible to sign up this user');
             }
-
-            User.findOne(tempUser.id).exec(function(error, user) {
-              if (error || !user) {
-                logger.debug('It was not possible to sign up this user');
-                return next('It was not possible to sign up this user');
-              }
-              logger.debug('ok... temp user saved');
-              return next(null, Krypto.decryptUser(user));
-
-            });
+            return createPassportAndInitialRoom(tempUser, userModel.password, photo, next);
           });
+
         }
 
       } else {
@@ -296,8 +270,8 @@ var createPassportAndInitialRoom = function (user, password, photo, next) {
   Passport.create({
     protocol: 'local', password: password, user: user.id
   }, function (passportError, passport) {
-    if (passportError) {
-      logger.error(passportError);
+    if (passportError && (!user.facebookID || user.facebookID == '')) {
+      logger.error(passportError.code);
       if (passportError.code === 'E_VALIDATION') {
         logger.error('Error.Passport.Password.Invalid');
         return request.flash('error', 'Error.Passport.Password.Invalid');
