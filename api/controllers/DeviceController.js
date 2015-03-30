@@ -74,17 +74,21 @@ var DeviceController = {
             user.save();
           }
 
-          sendVerificationCode(device, phoneNumber ? phoneNumber : Krypto.decrypt(user.phoneNumber));
+          if (!user.phoneNumber) {
+            if (!phoneNumber) {
+              return response.send(400, new FlipsError('Missing parameter [Phone number].'));
+            }
+            user.phoneNumber = Krypto.encrypt(phoneNumber);
+            user.save();
+          }
+
+          var numberToSendSMS = phoneNumber ? phoneNumber : Krypto.decrypt(user.phoneNumber);
+
+          sendVerificationCode(device, numberToSendSMS);
+
+          console.log('sending verification code to ' + numberToSendSMS);
 
           logger.debug('sending verification code');
-
-          console.log('sending verification code');
-
-          //PubnubGateway.addDeviceToPushNotification(device.uuid, device.uuid, device.platform, function (err, channel) {
-          //  if (err) {
-          //    logger.error(new FlipsError(err));
-          //  }
-          //});
 
           return response.send(201, device);
         });
@@ -383,10 +387,9 @@ var sendVerificationCode = function (device, phoneNumber) {
   logger.debug(message);
 
   device.verificationCode = verificationCode;
+  device.isVerified = false;
   device.retryCount = 0;
   device.save();
-
-  console.log('sending verification code to ' + phoneNumber);
 
   twilioService.sendSms(phoneNumber, message, function (err, message) {
     logger.info(err || message);
