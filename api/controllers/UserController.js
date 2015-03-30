@@ -251,16 +251,16 @@ var UserController = {
       phoneNumber: Krypto.encrypt(phoneNumber)
     }).exec(function (err, user) {
       if (err) {
-        return response.send(500, new FlipsError('Error trying to retrieve user'));
+        return response.send(500, new FlipsError('User error', 'Error trying to retrieve user'));
       }
       if (!user) {
-        return response.send(404, new FlipsError('Username and/or phone number do not match any user'));
+        return response.send(404, new FlipsError('Username and/or phone number do not match any user', 'Username and/or phone number do not match any user'));
       }
       Device.findOne({user: user.id, id: deviceId})
         .populate('user')
         .exec(function (error, device) {
           if (error) {
-            var errmsg = new FlipsError('Error when trying to retrieve device info');
+            var errmsg = new FlipsError('Device error', 'Error when trying to retrieve device info');
             logger.error(errmsg);
             return response.send(500, errmsg);
           }
@@ -271,7 +271,7 @@ var UserController = {
             //if the verification code is wrong, it's probably an attack - so the code should be changed to avoid brute-force update
             device.verificationCode = Math.floor(Math.random() * 8999) + 1000;
             device.save();
-            return response.send(400, new FlipsError('Wrong verification code.'));
+            return response.send(400, new FlipsError('Wrong verification code.', 'Wrong verification code.'));
           }
 
           device.user = Krypto.decryptUser(device.user);
@@ -279,20 +279,20 @@ var UserController = {
           var PASSWORD_REGEX = '^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9]).{8,}$';
 
           if (!password.match(PASSWORD_REGEX)) {
-            return response.send(400, new FlipsError('Password must have at least eight characters, one uppercase letter and one lowercase letter and one number.'));
+            return response.send(400, new FlipsError('Password error', 'Password must have at least eight characters, one uppercase letter and one lowercase letter and one number.'));
           }
 
           var whereClause = {user: device.user.id};
           var updateColumns = {password: password};
           Passport.update(whereClause, updateColumns, function (error, affectedUsers) {
             if (error) {
-              var errmsg = new FlipsError('Error updating passport.');
+              var errmsg = new FlipsError('Password error', 'Error updating passport.');
               logger.error(errmsg);
               return response.send(500, errmsg);
             }
 
             if (!affectedUsers || affectedUsers.length < 1) {
-              return response.send(400, new FlipsError("No rows affected while updating passport"));
+              return response.send(400, new FlipsError('Password error', "No rows affected while updating passport"));
             }
 
             return response.json(200, {});
