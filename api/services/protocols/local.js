@@ -180,41 +180,45 @@ exports.createUser = function (userModel, next) {
           }
           tempUser.birthday = userModel.birthday;
 
-          if (photo && photo._files.length >= 1) {
-            s3service.upload(photo, s3service.PICTURES_BUCKET, function (err, uploadedFiles) {
-              if (err) {
-                var errmsg = new FlipsError('Error uploading picture', err);
-                logger.error(errmsg);
-                return response.send(500, errmsg);
-              }
+          //if (photo && photo._files.length >= 1) {
+          //  s3service.upload(photo, s3service.PICTURES_BUCKET, function (err, uploadedFiles) {
+          //    if (err) {
+          //      var errmsg = new FlipsError('Error uploading picture', err);
+          //      logger.error(errmsg);
+          //      return response.send(500, errmsg);
+          //    }
+          //
+          //    if (!uploadedFiles || uploadedFiles.length < 1) {
+          //      return response.send(400, new FlipsError('Error uploading file'));
+          //    }
+          //
+          //    var uploadedFile = uploadedFiles[0];
+          //    tempUser.photoUrl = s3service.S3_URL + s3service.PICTURES_BUCKET + '/' + uploadedFile.fd;
+          //    tempUser.save();
+          //  });
+          //}
+          //
+          //tempUser.save(function (err) {
+          //  if (err) {
+          //    logger.debug(err);
+          //    logger.error(err);
+          //    return next('It was not possible to sign up this user');
+          //  }
+          //
+          //  User.findOne(tempUser.id).exec(function(error, user) {
+          //    if (error || !user) {
+          //      logger.debug('It was not possible to sign up this user');
+          //      return next('It was not possible to sign up this user');
+          //    }
+          //    logger.debug('ok... temp user saved');
+          //    return next(null, Krypto.decryptUser(user));
+          //
+          //  });
+          //});
+          logger.debug('1.1 create passport and initial room for temporary user');
+          return createPassportAndInitialRoom(tempUser, tempUser.password, photo, next);
 
-              if (!uploadedFiles || uploadedFiles.length < 1) {
-                return response.send(400, new FlipsError('Error uploading file'));
-              }
 
-              var uploadedFile = uploadedFiles[0];
-              tempUser.photoUrl = s3service.S3_URL + s3service.PICTURES_BUCKET + '/' + uploadedFile.fd;
-              tempUser.save();
-            });
-          }
-
-          tempUser.save(function (err) {
-            if (err) {
-              logger.debug(err);
-              logger.error(err);
-              return next('It was not possible to sign up this user');
-            }
-
-            User.findOne(tempUser.id).exec(function(error, user) {
-              if (error || !user) {
-                logger.debug('It was not possible to sign up this user');
-                return next('It was not possible to sign up this user');
-              }
-              logger.debug('ok... temp user saved');
-              return next(null, Krypto.decryptUser(user));
-
-            });
-          });
         }
 
       } else {
