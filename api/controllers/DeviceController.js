@@ -233,6 +233,7 @@ var sendVerificationCode = function (device, phoneNumber) {
   logger.debug(message);
 
   device.verificationCode = verificationCode;
+  device.isVerified = false;
   device.retryCount = 0;
   device.save();
 

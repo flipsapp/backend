@@ -163,7 +163,8 @@ describe('User Controller', function () {
     it('Sending information that does not exists, must return Http Not Found (404)', function (done) {
       var forgotParam = {
         phone_number: "+123456789",
-        email: "device@arctouch.com"
+        email: "device@arctouch.com",
+        device_id: 1234
       };
 
       user1.post(BASE_URL + '/user/forgot')
