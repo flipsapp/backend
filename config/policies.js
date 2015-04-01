@@ -63,7 +63,9 @@ module.exports.policies = {
     findOne: ['passport', 'owner', 'deviceOwner'],
     create : ['passport', 'owner'],
     verify : ['passport'],
-    resendVerificationCode: ['passport', 'owner', 'deviceOwner']
+    resendVerificationCode: ['passport', 'owner', 'deviceOwner'],
+    registerForPushNotifications: ['passport', 'owner', 'deviceOwner'],
+    unregisterForPushNotifications: ['passport', 'owner', 'deviceOwner']
   },
 
   ContactController: {

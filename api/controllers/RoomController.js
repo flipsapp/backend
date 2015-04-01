@@ -252,20 +252,19 @@ var sendInvitationBySMS = function (toNumber, fromUser, callback) {
 };
 
 var subscribeUsersToRoom = function (room) {
-  var cleanRoom = removeUnwantedPropertiesFromUsers(room);
   for (var i = 0; i < room.participants.length; i++) {
     var participant = room.participants[i];
-    var message = {type: 1, content: cleanRoom};
+    var message = {data: {type: 1, content: PubnubGateway.encrypt(room)}};
     if (participant.id != room.admin) {
       (function (aParticipant, aRoom, aMessage) {
         PubNub.publish({
           channel: aParticipant.pubnubId,
           message: aMessage,
           callback: function (e) {
-            logger.info('User %s subscribed to room %s on channel %s', aParticipant.id, aRoom.id, aRoom.pubnubId)
+            logger.info('User %s subscribed to room %s on channel %s', aParticipant.id, aRoom.id, aRoom.pubnubId);
           },
           error: function (e) {
-            logger.error('Error when trying to subscribe user %s to room %s on channel %s. Details: %s', aParticipant.id, aRoom.id, aRoom.pubnubId, e)
+            logger.error('Error when trying to subscribe user %s to room %s on channel %s. Details: %s', aParticipant.id, aRoom.id, PubnubGateway.decrypt(aRoom.pubnubId), e)
           }
         });
       })(participant, room, message);
