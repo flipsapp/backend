@@ -77,6 +77,10 @@ var UserController = {
           return response.send(404, new FlipsError('User not found.'));
         }
 
+        if (user.facebookID) {
+          return response.send(400, new FlipsError('Error requesting to reset password.', 'This phone number is associated with a Facebook account, so password reset is not required. Please enter a different number, or return to the Login screen to sign in with Facebook.'));
+        }
+
         Device.findOne({user: user.id, id: deviceId})
           .populate('user')
           .exec(function (error, device) {
