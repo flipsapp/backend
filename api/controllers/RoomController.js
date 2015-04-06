@@ -17,6 +17,8 @@ var RoomController = {
     var params = actionUtil.parseValues(request);
     var room = {name: params.name};
 
+    logger.debug('entered create room function');
+
     if (!params) {
       return response.send(400, new FlipsError('Error creating Room', 'Missing parameters.'));
     }
@@ -30,6 +32,9 @@ var RoomController = {
     }
 
     var admin = params.parentid;
+
+    logger.debug('room admin: ' + admin);
+
 
     User.findOne(admin).exec(function (err, adminUser) {
       if (err) {
@@ -52,6 +57,7 @@ var RoomController = {
         room.admin = admin;
         room.pubnubId = uuid();
 
+        logger.debug('room info: ' + room);
 
         (function (roomAdmin, phoneNumbersToInvite, participants) {
 
@@ -67,6 +73,8 @@ var RoomController = {
               if (!newRoom) {
                 return response.send(400, new FlipsError('Request error creating Room', 'Room returned empty'));
               }
+
+              logger.debug('room created: ' + newRoom.id);
 
               Room.findOne(newRoom.id)
                 .exec(function (error, room) {
@@ -254,7 +262,8 @@ var sendInvitationBySMS = function (toNumber, fromUser, callback) {
 var subscribeUsersToRoom = function (room) {
   for (var i = 0; i < room.participants.length; i++) {
     var participant = room.participants[i];
-    var message = {data: {type: 1, content: PubnubGateway.encrypt(room)}};
+    var message = {data: PubnubGateway.encrypt({type: 1, content: room})};
+    logger.debug(message);
     if (participant.id != room.admin) {
       (function (aParticipant, aRoom, aMessage) {
         PubNub.publish({
