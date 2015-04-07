@@ -147,27 +147,33 @@ var DeviceController = {
 
         device.isVerified = true;
         device.retryCount = 0;
-        var user = device.user;
-        user.isTemporary = false;
-        user.save(function (errSavingUser) {
 
-          device.user = user.id;
-          device.save();
-
-          if (phoneNumber) {
-            user.phoneNumber = Krypto.encrypt(phoneNumber);
-            user.save(function (error) {
-              if (error) {
-                return response.send(500, new FlipsError('Error saving user after update device'));
-              }
-              return response.send(200, device);
-            });
-          } else {
-            return response.send(200, device);
+        User.findOne(userId).exec(function(err, user) {
+          if (err) {
+            return response.send(500, new FLipsError('Verification Error', 'Internal server error'));
           }
+          if (!user) {
+            return response.send(404, new FLipsError('Verification Error', 'User not found.'));
+          }
+          user.isTemporary = false;
+          user.save(function (errSavingUser) {
+
+            device.user = user.id;
+            device.save();
+
+            if (phoneNumber) {
+              user.phoneNumber = Krypto.encrypt(phoneNumber);
+              user.save(function (error) {
+                if (error) {
+                  return response.send(500, new FlipsError('Error saving user after update device'));
+                }
+                return response.send(200, device);
+              });
+            } else {
+              return response.send(200, device);
+            }
+          });
         });
-
-
       }
     );
   },
