@@ -26,60 +26,61 @@ module.exports.policies = {
   *                                                                          *
   ***************************************************************************/
 
-  '*': ['passport'],
+  '*': ['passport', 'version'],
 
   UserController: {
-    forgot: true,
-    verify: true,
-    updatePassword: true,
-    uploadPhoto: ['passport', 'owner'],
-    update: ['passport', 'owner'],
-    findOne: ['passport', 'owner'],
-    populate: ['passport', 'owner'],
-    inviteContacts: ['passport'],
-    myRooms: ['passport', 'owner'],
-    verifyContacts: ['passport'],
-    verifyFacebookUsers: ['passport'],
-    findById: ['passport', 'owner'],
+    forgot: 'version',
+    verify: 'version',
+    updatePassword: 'version',
+    uploadPhoto: ['passport', 'owner', 'version'],
+    update: ['passport', 'owner', 'version'],
+    findOne: ['passport', 'owner', 'version'],
+    populate: ['passport', 'owner', 'version'],
+    inviteContacts: ['passport', 'version'],
+    myRooms: ['passport', 'owner', 'version'],
+    verifyContacts: ['passport', 'version'],
+    verifyFacebookUsers: ['passport', 'version'],
+    findById: ['passport', 'owner', 'version'],
     printUsers: true,
-    findActiveUserByPhoneNumber: ['passport'],
-    resendCodeWhenChangingNumber: ['passport', 'owner', 'deviceOwner']
+    findActiveUserByPhoneNumber: ['passport', 'version'],
+    resendCodeWhenChangingNumber: ['passport', 'owner', 'deviceOwner', 'version']
   },
 
 	FlipController: {
-    create: ['passport', 'flipOwner'],
-    uploadBackground: ['passport'],
-    uploadSound: ['passport'],
-    uploadThumbnail: ['passport'],
-    updateBackground: ['passport', 'flipOwner'],
-    updateSound: ['passport', 'flipOwner'],
-    updateThumbnail: ['passport', 'flipOwner'],
-    myFlips: ['passport', 'flipOwner'],
-    flipById: ['passport', 'flipOwner'],
-    stockFlips: ['passport']
+    create: ['passport', 'flipOwner', 'version'],
+    uploadBackground: ['passport', 'version'],
+    uploadSound: ['passport', 'version'],
+    uploadThumbnail: ['passport', 'version'],
+    updateBackground: ['passport', 'flipOwner', 'version'],
+    updateSound: ['passport', 'flipOwner', 'version'],
+    updateThumbnail: ['passport', 'flipOwner', 'version'],
+    myFlips: ['passport', 'flipOwner', 'version'],
+    flipById: ['passport', 'flipOwner', 'version'],
+    stockFlips: ['passport', 'version']
   },
 
   DeviceController: {
-    findOne: ['passport', 'owner', 'deviceOwner'],
-    create : ['passport', 'owner'],
-    verify : ['passport'],
-    resendVerificationCode: ['passport', 'owner', 'deviceOwner'],
-    registerForPushNotifications: ['passport', 'owner', 'deviceOwner'],
-    unregisterForPushNotifications: ['passport', 'owner', 'deviceOwner']
+    findOne: ['passport', 'owner', 'deviceOwner', 'version'],
+    create : ['passport', 'owner', 'version'],
+    verify : ['passport', 'version'],
+    resendVerificationCode: ['passport', 'owner', 'deviceOwner', 'version'],
+    registerForPushNotifications: ['passport', 'owner', 'deviceOwner', 'version'],
+    unregisterForPushNotifications: ['passport', 'owner', 'deviceOwner', 'version']
   },
 
   ContactController: {
-    uploadContacts: ['passport', 'owner']
+    uploadContacts: ['passport', 'owner', 'version']
   },
 
   RoomController: {
-    create: ['passport', 'owner'],
-    updateParticipants: ['passport', 'owner'],
-    update: ['passport', 'owner'],
-    destroy: ['passport', 'owner']
+    create: ['passport', 'owner', 'version'],
+    updateParticipants: ['passport', 'owner', 'version'],
+    update: ['passport', 'owner', 'version'],
+    destroy: ['passport', 'owner', 'version']
   },
 
   AuthController: {
-    checkSession: ['passport', 'owner']
+    checkSession: ['passport', 'owner', 'version'],
+    minimumAppVersion: 'version'
   }
 };
