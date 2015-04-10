@@ -56,15 +56,13 @@ var UserController = {
   forgot: function (request, response) {
     var phoneNumber = request.param('phone_number');
     var deviceId = request.param('device_id');
+    var platform = request.param('platform');
+    var token = request.param('device_token');
 
     if (!phoneNumber) {
       return response.send(400, new FlipsError('Error requesting to reset password.', 'Phone Number is empty.'));
     }
-
-    if (!deviceId) {
-      return response.send(400, new FlipsError('Error requesting to reset password.', 'Device ID is empty.'));
-    }
-
+    
     User.findOne({phoneNumber: Krypto.encrypt(phoneNumber)})
       .exec(function (err, user) {
         if (err) {
@@ -81,25 +79,52 @@ var UserController = {
           return response.send(400, new FlipsError('Error requesting to reset password.', 'This phone number is associated with a Facebook account, so password reset is not required. Please enter a different number, or return to the Login screen to sign in with Facebook.'));
         }
 
-        Device.findOne({user: user.id, id: deviceId})
-          .populate('user')
-          .exec(function (error, device) {
-            if (error) {
-              var errmsg = new FlipsError('Error retrieving the user.');
-              logger.error(errmsg);
-              return response.send(500, errmsg);
+        if (deviceId) {
+
+          Device.findOne({user: user.id, id: deviceId})
+            .populate('user')
+            .exec(function (error, device) {
+
+              if (error) {
+                var errmsg = new FlipsError('Forgot Password Error', 'Server error while trying to retrieve device information.');
+                logger.error(errmsg);
+                return response.send(500, errmsg);
+              }
+
+              if (!device) {
+                return response.send(404, new FlipsError('Forgot Password Error', 'This device was not found.'));
+              }
+
+              sendVerificationCode(device, phoneNumber);
+
+              return response.json(200, {id: device.id});
+
             }
+          );
 
-            if (!device) {
-              return response.send(404, new FlipsError('Device not found.', 'device number = ' + phoneNumber));
-            }
+        } else {
 
-            sendVerificationCode(device, Krypto.decrypt(device.user.phoneNumber));
+          Device
+            .create({user: user.id, platform: platform, uuid: token})
+            .exec(function (error, device) {
+              if (error) {
+                var errmsg = new FlipsError('Forgot Password Error', 'Server error while trying to create device information.');
+                logger.error(errmsg);
+                return response.send(500, errmsg);
+              }
 
-            return response.json(200, {});
+              if (!device) {
+                return response.send(400, new FlipsError('Forgot Password Error', 'Device information could not be created.'));
+              }
 
-          }
-        );
+              sendVerificationCode(device, phoneNumber);
+
+              return response.json(200, {id: device.id});
+
+            });
+
+        }
+
       }
     );
   },
