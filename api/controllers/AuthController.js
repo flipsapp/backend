@@ -26,7 +26,7 @@ var AuthController = {
       }
 
       if (!user) {
-        return response.send(404, new FlipsError('Username or password not found'));
+        return response.send(404, new FlipsError('Username or Password incorrect, or account does not exist.'));
       }
 
       if (user.isTemporary) {
