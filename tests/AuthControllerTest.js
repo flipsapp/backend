@@ -389,7 +389,7 @@ describe('AuthController - Sign in', function () {
         }
 
         assert.equal(res.status, 404);
-        assert.equal(res.body.error, "Username or password not found");
+        assert.equal(res.body.error, "Email or Password incorrect, or account does not exist.");
 
         done();
       });
