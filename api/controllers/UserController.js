@@ -355,17 +355,42 @@ var UserController = {
     for (var i = 0; i < contacts.length; i++) {
       contacts[i] = Krypto.encrypt(contacts[i]);
     }
-    User.find()
-      .where({phoneNumber: contacts})
-      .exec(function (err, users) {
-        Krypto.decryptUsers(users, function(err, decryptedUsers) {
-          if (err) {
-            return response.send(200, []);
-          } else {
-            return response.send(200, removeUnwantedPropertiesFromUsers(decryptedUsers));
-          }
-        });
-      })
+
+    var subsetStart = 0;
+    var subsetEnd = 0;
+    var subsetSize = 500;
+    var matchingContacts = [];
+
+    function searchNextSubset() {
+      subsetStart = subsetEnd;
+      subsetEnd = Math.min(contacts.length, subsetEnd + subsetSize);
+
+      if (subsetStart >= contacts.length) {
+        returnResponse();
+        return;
+      }
+
+      var subset = contacts.slice(subsetStart, subsetEnd);
+
+      User.find()
+        .where({phoneNumber: subset})
+        .exec(function (err, users) {
+          Array.prototype.push.apply(matchingContacts, users);
+          searchNextSubset();
+        })
+    }
+
+    function returnResponse() {
+      Krypto.decryptUsers(matchingContacts, function(err, decryptedUsers) {
+        if (err) {
+          return response.send(200, []);
+        } else {
+          return response.send(200, removeUnwantedPropertiesFromUsers(decryptedUsers));
+        }
+      });
+    }
+
+    searchNextSubset();
   },
 
   verifyFacebookUsers: function (request, response) {
