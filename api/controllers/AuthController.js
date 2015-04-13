@@ -33,6 +33,10 @@ var AuthController = {
         return response.send(404, new FlipsError('User was not validated. Please sign up or validate verification code.'))
       }
 
+      if (user.isBlocked) {
+        return response.send(421, new FlipsError('Account Disabled', 'Please contact Flips Support via www.flipsapp.com.'))
+      }
+
       request.login(user, function (loginErr) {
 
         if (loginErr) {

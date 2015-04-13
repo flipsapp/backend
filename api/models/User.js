@@ -65,6 +65,11 @@ var User = {
     isTemporary: {
       type: 'boolean',
       defaultsTo: true
+    },
+
+    isBlocked: {
+      type: 'boolean',
+      defaultsTo: false
     }
 
   },

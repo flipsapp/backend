@@ -32,55 +32,50 @@ module.exports.policies = {
     forgot: 'version',
     verify: 'version',
     updatePassword: 'version',
-    uploadPhoto: ['passport', 'owner', 'version'],
-    update: ['passport', 'owner', 'version'],
-    findOne: ['passport', 'owner', 'version'],
-    populate: ['passport', 'owner', 'version'],
-    inviteContacts: ['passport', 'version'],
-    myRooms: ['passport', 'owner', 'version'],
-    verifyContacts: ['passport', 'version'],
-    verifyFacebookUsers: ['passport', 'version'],
-    findById: ['passport', 'owner', 'version'],
+    uploadPhoto: ['passport', 'owner', 'version', 'checkBlockedUser'],
+    update: ['passport', 'owner', 'version', 'checkBlockedUser'],
+    findOne: ['passport', 'owner', 'version', 'checkBlockedUser'],
+    populate: ['passport', 'owner', 'version', 'checkBlockedUser'],
+    inviteContacts: ['passport', 'version', 'checkBlockedUser'],
+    myRooms: ['passport', 'owner', 'version', 'checkBlockedUser'],
+    verifyContacts: ['passport', 'version', 'checkBlockedUser'],
+    verifyFacebookUsers: ['passport', 'version', 'checkBlockedUser'],
+    findById: ['passport', 'owner', 'version', 'checkBlockedUser'],
     printUsers: true,
-    findActiveUserByPhoneNumber: ['passport', 'version'],
-    resendCodeWhenChangingNumber: ['passport', 'owner', 'deviceOwner', 'version']
+    findActiveUserByPhoneNumber: ['passport', 'version', 'checkBlockedUser'],
+    resendCodeWhenChangingNumber: ['passport', 'owner', 'deviceOwner', 'version', 'checkBlockedUser']
   },
 
 	FlipController: {
-    create: ['passport', 'flipOwner', 'version'],
-    uploadBackground: ['passport', 'version'],
-    uploadSound: ['passport', 'version'],
-    uploadThumbnail: ['passport', 'version'],
-    updateBackground: ['passport', 'flipOwner', 'version'],
-    updateSound: ['passport', 'flipOwner', 'version'],
-    updateThumbnail: ['passport', 'flipOwner', 'version'],
-    myFlips: ['passport', 'flipOwner', 'version'],
-    flipById: ['passport', 'flipOwner', 'version'],
-    stockFlips: ['passport', 'version']
+    create: ['passport', 'flipOwner', 'version', 'checkBlockedUser'],
+    uploadBackground: ['passport', 'version', 'checkBlockedUser'],
+    uploadSound: ['passport', 'version', 'checkBlockedUser'],
+    uploadThumbnail: ['passport', 'version', 'checkBlockedUser'],
+    updateBackground: ['passport', 'flipOwner', 'version', 'checkBlockedUser'],
+    updateSound: ['passport', 'flipOwner', 'version', 'checkBlockedUser'],
+    updateThumbnail: ['passport', 'flipOwner', 'version', 'checkBlockedUser'],
+    myFlips: ['passport', 'flipOwner', 'version', 'checkBlockedUser'],
+    flipById: ['passport', 'flipOwner', 'version', 'checkBlockedUser'],
+    stockFlips: ['passport', 'version', 'checkBlockedUser']
   },
 
   DeviceController: {
-    findOne: ['passport', 'owner', 'deviceOwner', 'version'],
-    create : ['passport', 'owner', 'version'],
-    verify : ['passport', 'version'],
-    resendVerificationCode: ['passport', 'owner', 'deviceOwner', 'version'],
-    registerForPushNotifications: ['passport', 'owner', 'deviceOwner', 'version'],
-    unregisterForPushNotifications: ['passport', 'owner', 'deviceOwner', 'version']
-  },
-
-  ContactController: {
-    uploadContacts: ['passport', 'owner', 'version']
+    findOne: ['passport', 'owner', 'deviceOwner', 'version', 'checkBlockedUser'],
+    create : ['passport', 'owner', 'version', 'checkBlockedUser'],
+    verify : ['passport', 'version', 'checkBlockedUser'],
+    resendVerificationCode: ['passport', 'owner', 'deviceOwner', 'version', 'checkBlockedUser'],
+    registerForPushNotifications: ['passport', 'owner', 'deviceOwner', 'version', 'checkBlockedUser'],
+    unregisterForPushNotifications: ['passport', 'owner', 'deviceOwner', 'version', 'checkBlockedUser']
   },
 
   RoomController: {
-    create: ['passport', 'owner', 'version'],
-    updateParticipants: ['passport', 'owner', 'version'],
-    update: ['passport', 'owner', 'version'],
-    destroy: ['passport', 'owner', 'version']
+    create: ['passport', 'owner', 'version', 'checkBlockedUser'],
+    updateParticipants: ['passport', 'owner', 'version', 'checkBlockedUser'],
+    update: ['passport', 'owner', 'version', 'checkBlockedUser'],
+    destroy: ['passport', 'owner', 'version', 'checkBlockedUser']
   },
 
   AuthController: {
-    checkSession: ['passport', 'owner', 'version'],
-    minimumAppVersion: 'version'
+    checkSession: ['passport', 'owner', 'version', 'checkBlockedUser']
   }
 };
