@@ -102,6 +102,7 @@ var AuthController = {
   checkSession: function(request, response) {
     return response.send(200, {});
   }
+
 };
 
 module.exports = AuthController;
