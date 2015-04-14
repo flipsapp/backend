@@ -1,16 +1,7 @@
 module.exports = function (request, response, next) {
 
-  var appVersion = request.headers.app_version;
+  var appVersion = request.headers['x-app-version'];
 
-  //if (!appVersion) {
-  //  return response.send(400, new FlipsError('App Version Error', 'App version is undefined.'));
-  //}
-
-  console.log('CHECKING APP VERSION');
-  console.log('App version: ' + appVersion);
-  console.log('Server version: ' + process.env.MINIMUM_APP_VERSION);
-  console.log('====================');
-  
   if (appVersion) {
     if (appVersion >= process.env.MINIMUM_APP_VERSION) {
       return next();
