@@ -239,8 +239,8 @@ var createUsersForUnknownParticipants = function (params, callback) {
 };
 
 var sendInvitationBySMS = function (toNumber, fromUser, callback) {
-  User.findOne({phoneNumber: Krypto.encrypt(toNumber), isTemporary: false}).exec(function (err, user) {
-    if (!user) {
+  User.findOne({phoneNumber: Krypto.encrypt(toNumber), isTemporary: true}).exec(function (err, user) {
+    if (user) {
       var msg = "You've been Flipped by {{firstname}} {{lastname}}! Download Flips within 30 days to view your message.  {{url}}";
       msg = msg.replace("{{firstname}}", Krypto.decrypt(fromUser.firstName));
       msg = msg.replace("{{lastname}}", Krypto.decrypt(fromUser.lastName));
