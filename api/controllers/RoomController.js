@@ -85,14 +85,8 @@ var RoomController = {
                   if (!room) {
                     return response.send(404, new FlipsError('Error retrieving the room after created.', 'Room id = ' + params.id));
                   }
-                  if (phoneNumbersToInvite) {
-                    var invitedNumberList = Array.prototype.slice.call(phoneNumbersToInvite);
-                    for (var i = 0; i < invitedNumberList.length; i++) {
-                      sendInvitationBySMS(phoneNumbersToInvite[i], roomAdmin, function (err, toNumber) {
-                      });
-                    }
-                  }
                   assignUsersToRoom(participants, room, function (err, populatedRoom) {
+                    sendSMSInvitationToTempUsers(populatedRoom, adminUser);
                     subscribeUsersToRoom(populatedRoom);
                     return response.send(201, removeUnwantedPropertiesFromUsers(populatedRoom));
                   })
@@ -238,25 +232,24 @@ var createUsersForUnknownParticipants = function (params, callback) {
   )
 };
 
-var sendInvitationBySMS = function (toNumber, fromUser, callback) {
-  User.findOne({phoneNumber: Krypto.encrypt(toNumber), isTemporary: true}).exec(function (err, user) {
-    if (user) {
+var sendSMSInvitationToTempUsers = function (room, fromUser) {
+  var participants = room.participants;
+  for (var i = 0; i < participants.length; i++) {
+    if (participants[i].isTemporary) {
+      var user = participants[i];
       var msg = "You've been Flipped by {{firstname}} {{lastname}}! Download Flips within 30 days to view your message.  {{url}}";
       msg = msg.replace("{{firstname}}", Krypto.decrypt(fromUser.firstName));
       msg = msg.replace("{{lastname}}", Krypto.decrypt(fromUser.lastName));
       msg = msg.replace("{{url}}", process.env.APP_STORE_URL);
-      twilioService.sendSms(toNumber, msg, function (err, message) {
+      twilioService.sendSms(user.phoneNumber, msg, function (err, message) {
         if (err) {
-          logger.error('Error sending SMS to ' + toNumber, err);
+          logger.error('Error sending SMS to ' + user.phoneNumber, err);
         } else {
-          console.log('Successfully sent SMS to ' + toNumber);
+          console.log('Successfully sent SMS to ' + user.phoneNumber);
         }
-        return callback(err, toNumber);
       });
-    } else {
-      return callback(null, toNumber);
     }
-  });
+  }
 };
 
 var subscribeUsersToRoom = function (room) {
