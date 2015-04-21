@@ -155,7 +155,11 @@ var DeviceController = {
           if (!user) {
             return response.send(404, new FLipsError('Verification Error', 'User not found.'));
           }
-          user.isTemporary = false;
+
+          if (user.isTemporary) {
+            user.isTemporary = false;
+            PubnubGateway.publishWelcomeMessage(user);
+          }
           user.save(function (errSavingUser) {
 
             device.user = user.id;
