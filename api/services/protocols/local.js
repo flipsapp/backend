@@ -299,9 +299,6 @@ var createPassportAndInitialRoom = function (user, password, photo, next) {
       logger.debug('4. Flipboys user found');
       logger.debug('5. user id: ' + user.id);
       logger.debug('6. flipboys id: ' + teamFlipsUser.id);
-      //var participants = [];
-      //participants.push(user.id);
-      //participants.push(teamFlipsUser.id);
 
       Room.create({
         admin: user.id,
