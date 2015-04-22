@@ -13,64 +13,84 @@ var pushNotificationURL = 'http://pubsub.pubnub.com/v1/push/sub-key/{{subscribe_
 
 var PubnubGateway = {
 
-  publishWelcomeMessage: function (room) {
+  publishWelcomeMessage: function (user) {
 
+    // retrieve flipboys user
     User.findOne({username: Krypto.encrypt(process.env.FLIPBOYS_USERNAME)})
       .exec(function (err, flipboysUser) {
 
-        var now = new Date();
-        var formattedNow = now.getUTCFullYear() + '-' + (now.getUTCMonth() + 1) + '-' + now.getUTCDate() + 'T' + now.getUTCHours() + ':' + now.getUTCMinutes() + ':' + now.getUTCSeconds() + '.' + now.getUTCMilliseconds() + 'Z';
+        if (err || !flipboysUser) {
+          logger.error('Flipboys user not found');
+          return;
+        }
 
-        var welcomeMessage = {
-          pn_apns: {
-            aps: {
-              alert: "You received a new Flip message from FlipBoys"
-            },
-            room_id: room.id
-          },
-          data: {
-            fromUserId: flipboysUser.id,
-            type: "2",
-            flipMessageId: "" + flipboysUser.id + ":" + new Date().getTime(),
-            sentAt: formattedNow
-          }
-
-        };
-
-        var welcomeFlips = [];
-
-        Welcome.find({sort: 'sequence ASC'}).exec(function (err, flips) {
-          if (err || !flips || flips.length <= 0) {
-            console.log("Error. Welcome message not found in database.")
-          } else {
-            console.log("is about to send welcome message");
-            for (var i = 0; i < flips.length; i++) {
-              var flip = flips[i];
-              welcomeFlips.push({
-                id: flip.sequence,
-                thumbnailURL: flip.thumbnailURL,
-                backgroundURL: flip.backgroundURL,
-                word: flip.word,
-                updatedAt: flip.updatedAt
-              });
+        // retrieve welcome message room (a room whose participants are the current user and flipboys)
+        Participant.query('select room from participant where user = ' + user.id + ' and room in (select room from participant where user = ' + flipboysUser.id +')', function(err, queryResult) {
+          Room.findOne(queryResult[0].room).exec(function(err, room) {
+            if (err || !room) {
+              logger.error(err);
+              logger.error('Welcome room not found');
+              return;
             }
 
-            welcomeMessage.data.content = welcomeFlips;
+            var now = new Date();
+            var formattedNow = now.getUTCFullYear() + '-' + (now.getUTCMonth() + 1) + '-' + now.getUTCDate() + 'T' + now.getUTCHours() + ':' + now.getUTCMinutes() + ':' + now.getUTCSeconds() + '.' + now.getUTCMilliseconds() + 'Z';
 
-            welcomeMessage.data = PubnubGateway.encrypt(welcomeMessage.data);
-
-            pubnub.publish({
-              channel: room.pubnubId,
-              message: welcomeMessage,
-              callback: function (e) {
-                console.log("Successfully sent the welcome message to channel " + room.pubnubId);
+            var welcomeMessage = {
+              pn_apns: {
+                aps: {
+                  alert: "You received a new Flip message from FlipBoys"
+                },
+                room_id: room.id
               },
-              error: function (e) {
-                console.log("Error sending the welcome message. [" + e + "]")
+              data: {
+                fromUserId: flipboysUser.id,
+                type: "2",
+                flipMessageId: "" + flipboysUser.id + ":" + new Date().getTime(),
+                sentAt: formattedNow
+              }
+
+            };
+
+            var welcomeFlips = [];
+
+            Welcome.find({sort: 'sequence ASC'}).exec(function (err, flips) {
+              if (err || !flips || flips.length <= 0) {
+                logger.error("Error. Welcome message not found in database.");
+              } else {
+                logger.info("is about to send welcome message");
+                for (var i = 0; i < flips.length; i++) {
+                  var flip = flips[i];
+                  welcomeFlips.push({
+                    id: flip.sequence,
+                    thumbnailURL: flip.thumbnailURL,
+                    backgroundURL: flip.backgroundURL,
+                    word: flip.word,
+                    updatedAt: flip.updatedAt
+                  });
+                }
+
+                welcomeMessage.data.content = welcomeFlips;
+
+                welcomeMessage.data = PubnubGateway.encrypt(welcomeMessage.data);
+
+                pubnub.publish({
+                  channel: room.pubnubId,
+                  message: welcomeMessage,
+                  callback: function (e) {
+                    logger.info('Welcome message sent to user: ' + user.id);
+                  },
+                  error: function (e) {
+                    logger.error("Error sending the welcome message. [" + e + "]");
+                  }
+                });
               }
             });
-          }
+
+          });
+
         });
+
       });
   },
 

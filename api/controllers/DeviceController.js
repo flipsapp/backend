@@ -139,7 +139,7 @@ var DeviceController = {
           device.save();
           if (device.retryCount > MAX_RETRY_COUNT) {
             sendVerificationCode(device, Krypto.decrypt(device.user.phoneNumber));
-            return response.send(400, new FlipsError('3 incorrect entries. Check your messages for a new code.'));
+            return response.send(400, new FlipsError(MAX_RETRY_COUNT + ' incorrect entries. Check your messages for a new code.'));
           } else {
             return response.send(400, new FlipsError('Wrong validation code.'));
           }
@@ -155,7 +155,11 @@ var DeviceController = {
           if (!user) {
             return response.send(404, new FLipsError('Verification Error', 'User not found.'));
           }
-          user.isTemporary = false;
+
+          if (user.isTemporary) {
+            user.isTemporary = false;
+            PubnubGateway.publishWelcomeMessage(user);
+          }
           user.save(function (errSavingUser) {
 
             device.user = user.id;
