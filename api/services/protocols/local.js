@@ -283,14 +283,14 @@ var createPassportAndInitialRoom = function (user, password, photo, next) {
     }
     logger.debug('3. passport created');
 
-    User.findOne({username: Krypto.encrypt(process.env.FLIPBOYS_USERNAME)}).exec(function (flipBoysErr, flipboysUser) {
-      if (flipBoysErr) {
-        logger.error(flipBoysErr);
+    User.findOne({username: Krypto.encrypt(process.env.TEAMFLIPS_USERNAME)}).exec(function (teamFlipsErr, teamFlipsUser) {
+      if (teamFlipsErr) {
+        logger.error(teamFlipsErr);
         return user.destroy(function (destroyErr) {
-          next(destroyErr || flipBoysErr);
+          next(destroyErr || teamFlipsErr);
         });
       }
-      if (!flipboysUser) {
+      if (!teamFlipsUser) {
         return user.destroy(function (destroyErr) {
           next(destroyErr || new FlipsError('Flipboys user not found'));
         });
@@ -298,10 +298,10 @@ var createPassportAndInitialRoom = function (user, password, photo, next) {
 
       logger.debug('4. Flipboys user found');
       logger.debug('5. user id: ' + user.id);
-      logger.debug('6. flipboys id: ' + flipboysUser.id);
+      logger.debug('6. flipboys id: ' + teamFlipsUser.id);
       //var participants = [];
       //participants.push(user.id);
-      //participants.push(flipboysUser.id);
+      //participants.push(teamFlipsUser.id);
 
       Room.create({
         admin: user.id,
@@ -329,7 +329,7 @@ var createPassportAndInitialRoom = function (user, password, photo, next) {
               next(destroyErr || new FlipsError('Error trying to add user to a room'));
             });
           }
-          Participant.create({user: flipboysUser.id, room: room.id}).exec(function (err, flipBoysParticipant) {
+          Participant.create({user: teamFlipsUser.id, room: room.id}).exec(function (err, teamFlipsParticipant) {
             if (err) {
               logger.error('Error creating flipboys  participation in room: ' + err);
               return user.destroy(function (destroyErr) {

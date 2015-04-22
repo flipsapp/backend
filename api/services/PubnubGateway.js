@@ -16,16 +16,16 @@ var PubnubGateway = {
   publishWelcomeMessage: function (user) {
 
     // retrieve flipboys user
-    User.findOne({username: Krypto.encrypt(process.env.FLIPBOYS_USERNAME)})
-      .exec(function (err, flipboysUser) {
+    User.findOne({username: Krypto.encrypt(process.env.TEAMFLIPS_USERNAME)})
+      .exec(function (err, teamFlipsUser) {
 
-        if (err || !flipboysUser) {
+        if (err || !teamFlipsUser) {
           logger.error('Flipboys user not found');
           return;
         }
 
         // retrieve welcome message room (a room whose participants are the current user and flipboys)
-        Participant.query('select room from participant where user = ' + user.id + ' and room in (select room from participant where user = ' + flipboysUser.id +')', function(err, queryResult) {
+        Participant.query('select room from participant where user = ' + user.id + ' and room in (select room from participant where user = ' + teamFlipsUser.id +')', function(err, queryResult) {
           Room.findOne(queryResult[0].room).exec(function(err, room) {
             if (err || !room) {
               logger.error(err);
@@ -44,9 +44,9 @@ var PubnubGateway = {
                 room_id: room.id
               },
               data: {
-                fromUserId: flipboysUser.id,
+                fromUserId: teamFlipsUser.id,
                 type: "2",
-                flipMessageId: "" + flipboysUser.id + ":" + new Date().getTime(),
+                flipMessageId: "" + teamFlipsUser.id + ":" + new Date().getTime(),
                 sentAt: formattedNow
               }
 
