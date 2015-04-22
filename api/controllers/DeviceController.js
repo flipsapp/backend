@@ -139,7 +139,7 @@ var DeviceController = {
           device.save();
           if (device.retryCount > MAX_RETRY_COUNT) {
             sendVerificationCode(device, Krypto.decrypt(device.user.phoneNumber));
-            return response.send(400, new FlipsError('3 incorrect entries. Check your messages for a new code.'));
+            return response.send(400, new FlipsError(MAX_RETRY_COUNT + ' incorrect entries. Check your messages for a new code.'));
           } else {
             return response.send(400, new FlipsError('Wrong validation code.'));
           }

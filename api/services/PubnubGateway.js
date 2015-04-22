@@ -56,9 +56,9 @@ var PubnubGateway = {
 
             Welcome.find({sort: 'sequence ASC'}).exec(function (err, flips) {
               if (err || !flips || flips.length <= 0) {
-                console.log("Error. Welcome message not found in database.")
+                logger.error("Error. Welcome message not found in database.");
               } else {
-                console.log("is about to send welcome message");
+                logger.info("is about to send welcome message");
                 for (var i = 0; i < flips.length; i++) {
                   var flip = flips[i];
                   welcomeFlips.push({
@@ -78,11 +78,10 @@ var PubnubGateway = {
                   channel: room.pubnubId,
                   message: welcomeMessage,
                   callback: function (e) {
-                    logger.debug('Welcome message sent to user: ' + user.id);
-                    console.log("Successfully sent the welcome message to channel " + room.pubnubId);
+                    logger.info('Welcome message sent to user: ' + user.id);
                   },
                   error: function (e) {
-                    console.log("Error sending the welcome message. [" + e + "]")
+                    logger.error("Error sending the welcome message. [" + e + "]");
                   }
                 });
               }
