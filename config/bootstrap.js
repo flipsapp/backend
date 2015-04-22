@@ -59,57 +59,35 @@ module.exports.bootstrap = function(cb) {
           if (passportError) {
             logger.error("##### CRITICAL ERROR: Error creating passport for Stock Flips user");
           } else {
-            updateTeamFlipsPassword(cb);
+            updatePassword(process.env.TEAMFLIPS_USERNAME, process.env.TEAMFLIPS_PASSWORD, cb);
           }
         });
       } else {
-        updateTeamFlipsPassword(cb);
+        updatePassword(process.env.TEAMFLIPS_USERNAME, process.env.TEAMFLIPS_PASSWORD, cb);
       }
     });
   }
 
-  function updateTeamFlipsPassword(cb) {
+  function updatePassword(username, newPassword, cb) {
 
     var PASSWORD_REGEX = '^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9]).{8,}$';
-    var newPassword = process.env.TEAMFLIPS_PASSWORD;
 
     if (!newPassword.match(PASSWORD_REGEX)) {
-      logger.error('##### CRITICAL ERROR: Team Flips Password must have at least eight characters, one uppercase letter and one lowercase letter and one number.');
+      logger.error('##### CRITICAL ERROR: Password must have at least eight characters, one uppercase letter and one lowercase letter and one number. User ' + username);
     } else {
-      User.findOne({username: Krypto.encrypt(process.env.TEAMFLIPS_USERNAME)}).exec(function(err, user) {
+      User.findOne({username: Krypto.encrypt(username)}).exec(function(err, user) {
         Passport.update({user: user.id}, {password: newPassword}, function (error, userRecords) {
           if (error) {
-            logger.error('##### CRITICAL ERROR: Error while trying to update password for Team Flips user');
+            logger.error('##### CRITICAL ERROR: Error while trying to update password for user ' + username);
           } else {
             if (!userRecords || userRecords.length < 1) {
-              logger.error('##### CRITICAL ERROR: No rows affected when trying to update password for Team Flips user');
+              logger.error('##### CRITICAL ERROR: No rows affected when trying to update password for user ' + username);
             } else {
-              updateStockFlipsPassword(cb);
-            }
-          }
-        });
-      });
-    }
-
-  }
-
-  function updateStockFlipsPassword(cb) {
-
-    var PASSWORD_REGEX = '^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9]).{8,}$';
-    var newPassword = process.env.STOCKFLIPS_PASSWORD;
-
-    if (!newPassword.match(PASSWORD_REGEX)) {
-      logger.error('##### CRITICAL ERROR: Stock Flips Password must have at least eight characters, one uppercase letter and one lowercase letter and one number.');
-    } else {
-      User.findOne({username: Krypto.encrypt(process.env.STOCKFLIPS_USERNAME)}).exec(function(err, user) {
-        Passport.update({user: user.id}, {password: newPassword}, function (error, userRecords) {
-          if (error) {
-            logger.error('##### CRITICAL ERROR: Error while trying to update password for Stock Flips user');
-          } else {
-            if (!userRecords || userRecords.length < 1) {
-              logger.error('##### CRITICAL ERROR: No rows affected when trying to update password for Team Flips user');
-            } else {
-              cb();
+              if (username == process.env.TEAMFLIPS_USERNAME) {
+                updatePassword(process.env.STOCKFLIPS_USERNAME, process.env.STOCKFLIPS_PASSWORD, cb);
+              } else {
+                cb()
+              }
             }
           }
         });
