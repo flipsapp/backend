@@ -39,7 +39,8 @@ var PubnubGateway = {
             var welcomeMessage = {
               pn_apns: {
                 aps: {
-                  alert: "You received a new Flip message from FlipBoys"
+                  alert: "You received a new Flip message from FlipBoys",
+                  sound: "default"
                 },
                 room_id: room.id
               },
