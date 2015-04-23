@@ -22,8 +22,16 @@
 
 module.exports.routes = {
 
-  '/': {
+  'GET /': {
     view: 'index.html'
+  },
+
+  'GET /about': {
+    view: 'about'
+  },
+
+  'GET /licenses': {
+    view: 'Pods-acknowledgements.markdown'
   },
 
   'POST   /signin'                                  : 'AuthController.signin',
