@@ -272,7 +272,6 @@ var subscribeUsersToRoom = function (room) {
           data: PubnubGateway.encrypt({type: 1, content: room})
         };
         logger.debug(message);
-        console.log(message);
         if (participant.id != room.admin) {
           (function (aParticipant, aRoom, aMessage) {
             PubNub.publish({
