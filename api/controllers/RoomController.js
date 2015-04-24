@@ -264,13 +264,15 @@ var subscribeUsersToRoom = function (room) {
           pn_apns: {
             aps: {
               alert: "You received a new Flip message from " + admin.firstName + " " + admin.lastName,
-              sound: "default"
+              sound: "default",
+              "content-available" : 1
             },
             room_id: room.id
           },
           data: PubnubGateway.encrypt({type: 1, content: room})
         };
         logger.debug(message);
+        console.log(message);
         if (participant.id != room.admin) {
           (function (aParticipant, aRoom, aMessage) {
             PubNub.publish({
