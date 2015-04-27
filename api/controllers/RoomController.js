@@ -253,25 +253,42 @@ var sendSMSInvitationToTempUsers = function (room, fromUser) {
 };
 
 var subscribeUsersToRoom = function (room) {
-  for (var i = 0; i < room.participants.length; i++) {
-    var participant = room.participants[i];
-    var message = {data: PubnubGateway.encrypt({type: 1, content: room})};
-    logger.debug(message);
-    if (participant.id != room.admin) {
-      (function (aParticipant, aRoom, aMessage) {
-        PubNub.publish({
-          channel: aParticipant.pubnubId,
-          message: aMessage,
-          callback: function (e) {
-            logger.info('User %s subscribed to room %s on channel %s', aParticipant.id, aRoom.id, aRoom.pubnubId);
-          },
-          error: function (e) {
-            logger.error('Error when trying to subscribe user %s to room %s on channel %s. Details: %s', aParticipant.id, aRoom.id, PubnubGateway.decrypt(aRoom.pubnubId), e)
-          }
-        });
-      })(participant, room, message);
+  User.findOne(room.admin).exec(function(err, admin) {
+    if(err || !admin) {
+      logger.error('Could not subscribe users to room. Error: ' + err);
+    } else {
+      admin = Krypto.decryptUser(admin);
+      for (var i = 0; i < room.participants.length; i++) {
+        var participant = room.participants[i];
+        var message = {
+          //pn_apns: {
+          //  aps: {
+          //    alert: "You received a new Flip message from " + admin.firstName + " " + admin.lastName,
+          //    sound: "default",
+          //    "content-available" : 1
+          //  },
+          //  room_id: room.id
+          //},
+          data: PubnubGateway.encrypt({type: 1, content: room})
+        };
+        logger.debug(message);
+        if (participant.id != room.admin) {
+          (function (aParticipant, aRoom, aMessage) {
+            PubNub.publish({
+              channel: aParticipant.pubnubId,
+              message: aMessage,
+              callback: function (e) {
+                logger.info('User %s subscribed to room %s on channel %s', aParticipant.id, aRoom.id, aRoom.pubnubId);
+              },
+              error: function (e) {
+                logger.error('Error when trying to subscribe user %s to room %s on channel %s. Details: %s', aParticipant.id, aRoom.id, PubnubGateway.decrypt(aRoom.pubnubId), e)
+              }
+            });
+          })(participant, room, message);
+        }
+      }
     }
-  }
+  });
 };
 
 var assignUsersToRoom = function (users, room, callback) {

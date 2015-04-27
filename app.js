@@ -33,6 +33,7 @@ process.on('uncaughtException', function (exception) {
   logger.error("We found an uncaught exception");
   logger.error("******************************");
   logger.error(exception.stack);
+  process.exit(1);
 });
 
 // CREATE AND LOAD ENVIRONMENT VARIABLES
