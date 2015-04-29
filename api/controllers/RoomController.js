@@ -261,14 +261,14 @@ var subscribeUsersToRoom = function (room) {
       for (var i = 0; i < room.participants.length; i++) {
         var participant = room.participants[i];
         var message = {
-          //pn_apns: {
-          //  aps: {
-          //    alert: "You received a new Flip message from " + admin.firstName + " " + admin.lastName,
-          //    sound: "default",
-          //    "content-available" : 1
-          //  },
-          //  room_id: room.id
-          //},
+          pn_apns: {
+            aps: {
+              alert: "You received a new Flip message from " + admin.firstName + " " + admin.lastName,
+              sound: "default",
+              "content-available" : 1
+            },
+            room_id: room.id
+          },
           data: PubnubGateway.encrypt({type: 1, content: room})
         };
         logger.debug(message);
