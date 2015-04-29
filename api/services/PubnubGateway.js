@@ -67,6 +67,7 @@ var PubnubGateway = {
                     thumbnailURL: flip.thumbnailURL,
                     backgroundURL: flip.backgroundURL,
                     word: flip.word,
+                    isPrivate: true,
                     updatedAt: flip.updatedAt
                   });
                 }
