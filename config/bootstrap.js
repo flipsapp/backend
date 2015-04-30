@@ -27,7 +27,6 @@ module.exports.bootstrap = function(cb) {
     phoneNumber: process.env.TEAMFLIPS_PHONE_NUMBER,
     isTemporary: false
   }).exec(function(err, teamFlipsUser) {
-    console.log(err);
     if (teamFlipsUser) {
       Passport.create({
         protocol: 'local', password: process.env.TEAMFLIPS_PASSWORD, user: teamFlipsUser.id
@@ -53,7 +52,6 @@ module.exports.bootstrap = function(cb) {
       phoneNumber: process.env.STOCKFLIPS_PHONE_NUMBER,
       isTemporary: false
     }).exec(function(err, stockFlipsUser) {
-      console.log(err);
       if (stockFlipsUser) {
         Passport.create({
           protocol: 'local', password: process.env.STOCKFLIPS_PASSWORD, user: stockFlipsUser.id
@@ -77,9 +75,7 @@ module.exports.bootstrap = function(cb) {
     if (!newPassword.match(PASSWORD_REGEX)) {
       logger.error('##### CRITICAL ERROR: Password must have at least eight characters, one uppercase letter and one lowercase letter and one number. User ' + username);
     } else {
-      console.log(username);
       User.findOne({username: Krypto.encrypt(username)}).exec(function(err, user) {
-        console.log(user);
         Passport.update({user: user.id}, {password: newPassword}, function (error, userRecords) {
           if (error) {
             logger.error('##### CRITICAL ERROR: Error while trying to update password for user ' + username);

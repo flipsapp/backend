@@ -169,6 +169,3 @@ function mobilePushGateway(action, token, channel, type, callback) {
 }
 
 module.exports = PubnubGateway;
-
-var myjson = {name: "ecil", friends: [{age:35},{age:36},{age:37}]};
-console.log(PubnubGateway.encrypt(myjson));
