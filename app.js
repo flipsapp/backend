@@ -25,18 +25,6 @@ process.chdir(__dirname);
 GLOBAL.requires = require('r').r;
 GLOBAL.FlipsError = requires('>/api/utilities/FlipsError');
 
-var logger = requires('>/api/services/logger');
-
-//catch unhandled exceptions
-process.on('uncaughtException', function (exception) {
-  console.error("We found an uncaught exception");
-  console.error("******************************")
-  console.error(exception.stack);
-  logger.error("We found an uncaught exception");
-  logger.error("******************************");
-  logger.error(exception.stack);
-  process.exit(1);
-});
 
 // CREATE AND LOAD ENVIRONMENT VARIABLES
 var dotenv_path;
@@ -51,6 +39,21 @@ if (process.env.NODE_ENV && process.env.NODE_ENV.toUpperCase() === 'PRODUCTION')
 var dotenv = require('dotenv');
 dotenv._getKeysAndValuesFromEnvFilePath(dotenv_path);
 dotenv._setEnvs();
+
+/////////////////////////////
+
+var logger = requires('>/api/services/logger');
+
+//catch unhandled exceptions
+process.on('uncaughtException', function (exception) {
+  console.error("We found an uncaught exception");
+  console.error("******************************")
+  console.error(exception.stack);
+  logger.error("We found an uncaught exception");
+  logger.error("******************************");
+  logger.error(exception.stack);
+  process.exit(1);
+});
 
 /////////////////////////////
 
