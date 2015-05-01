@@ -25,11 +25,13 @@ process.chdir(__dirname);
 GLOBAL.requires = require('r').r;
 GLOBAL.FlipsError = requires('>/api/utilities/FlipsError');
 
+var logger = requires('>/api/services/logger');
+
 //catch unhandled exceptions
 process.on('uncaughtException', function (exception) {
-  console.log("We found an uncaught exception");
-  console.log("******************************")
-  console.log(exception.stack);
+  console.error("We found an uncaught exception");
+  console.error("******************************")
+  console.error(exception.stack);
   logger.error("We found an uncaught exception");
   logger.error("******************************");
   logger.error(exception.stack);
