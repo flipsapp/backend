@@ -62,7 +62,7 @@ var PubnubGateway = {
                 logger.error("Error. Welcome message not found in database.");
               } else {
                 logger.info("is about to send welcome message");
-                for (var i = 0; i < welcomeFlips.length; i++) {
+                for (var i = 0; i < welcomeMessageFragments.length; i++) {
                   var welcomeMessageFragment = welcomeMessageFragments[i];
                   welcomeFlips.push({
                     id: welcomeMessageFragment.sequence,
