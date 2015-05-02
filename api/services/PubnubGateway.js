@@ -55,20 +55,22 @@ var PubnubGateway = {
 
             var welcomeFlips = [];
 
-            Welcome.find({sort: 'sequence ASC'}).exec(function (err, flips) {
-              if (err || !flips || flips.length <= 0) {
+            Welcome.find({sort: 'sequence ASC'})
+              .populate('flip')
+              .exec(function (err, welcomeMessageFragments) {
+              if (err || !welcomeMessageFragments || welcomeMessageFragments.length <= 0) {
                 logger.error("Error. Welcome message not found in database.");
               } else {
                 logger.info("is about to send welcome message");
-                for (var i = 0; i < flips.length; i++) {
-                  var flip = flips[i];
+                for (var i = 0; i < welcomeFlips.length; i++) {
+                  var welcomeMessageFragment = welcomeMessageFragments[i];
                   welcomeFlips.push({
-                    id: flip.sequence,
-                    thumbnailURL: flip.thumbnailURL,
-                    backgroundURL: flip.backgroundURL,
-                    word: flip.word,
+                    id: welcomeMessageFragment.sequence,
+                    thumbnailURL: welcomeMessageFragment.flip.thumbnailURL,
+                    backgroundURL: welcomeMessageFragment.flip.backgroundURL,
+                    word: welcomeMessageFragment.flip.word,
                     isPrivate: true,
-                    updatedAt: flip.updatedAt
+                    updatedAt: welcomeMessageFragment.flip.updatedAt
                   });
                 }
 

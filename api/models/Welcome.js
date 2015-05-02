@@ -14,18 +14,8 @@ module.exports = {
       required: true
     },
 
-    word: {
-      type: 'string',
-      required: true
-    },
-
-    thumbnailURL: {
-      type: 'string',
-      required: true
-    },
-
-    backgroundURL: {
-      type: 'string',
+    flip: {
+      model: 'Flip',
       required: true
     }
 
