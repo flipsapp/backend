@@ -19,10 +19,6 @@ var Flip = {
       type: 'string'
     },
 
-    soundURL: {
-      type: 'string'
-    },
-
     thumbnailURL: {
       type: 'string'
     },
