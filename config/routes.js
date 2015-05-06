@@ -70,6 +70,8 @@ module.exports.routes = {
 
   'POST   /background'                              : 'FlipController.uploadBackground',
   'POST   /sound'                                   : 'FlipController.uploadSound',
-  'POST   /thumbnail'                               : 'FlipController.uploadThumbnail'
+  'POST   /thumbnail'                               : 'FlipController.uploadThumbnail',
+
+  'GET    /status'                                  : 'AuthController.status'
 
 };

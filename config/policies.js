@@ -76,6 +76,7 @@ module.exports.policies = {
   },
 
   AuthController: {
-    checkSession: ['passport', 'owner', 'version', 'checkBlockedUser']
+    checkSession: ['passport', 'owner', 'version', 'checkBlockedUser'],
+    status: true
   }
 };

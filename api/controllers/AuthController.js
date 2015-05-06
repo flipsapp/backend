@@ -105,8 +105,91 @@ var AuthController = {
 
   checkSession: function(request, response) {
     return response.send(200, {});
+  },
+
+  status: function(request, response) {
+    checkPubnubStatus(response);
   }
 
 };
+
+function checkPubnubStatus(response) {
+  var pubnub = require("pubnub").init({
+    ssl: true,
+    publish_key: process.env.PUBNUB_PUB_KEY,
+    subscribe_key: process.env.PUBNUB_SUB_KEY
+  });
+
+  var status = {};
+  var pubnub_status = {};
+  var response_code = 200;
+  pubnub.time(function (time) {
+    if (!time) {
+      pubnub_status.status_code = 1;
+      pubnub_status.status_description = 'PubNub service is not available';
+      response_code = 500;
+    } else {
+      pubnub_status.status_code = 0;
+      pubnub_status.status_description = 'PubNub service is up and running';
+    }
+    status.pubnub_status = pubnub_status;
+    checkTwilioStatus(response, response_code, status);
+  });
+}
+
+function checkTwilioStatus(response, response_code, status) {
+  var twilio = require('twilio')(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
+  var twilio_status = {};
+  twilio.incomingPhoneNumbers.list(function (err, data) {
+    if (err) {
+      twilio_status.status_code = 1;
+      twilio_status.status_description = 'Twilio service is not available: ' + err;
+      response_code = 500;
+    } else {
+      twilio_status.status_code = 0;
+      twilio_status.status_description = 'Twilio service is up and running';
+    }
+    status.twilio_status = twilio_status;
+    checkAmazonStatus(response, response_code, status);
+  });
+}
+
+function checkAmazonStatus(response, response_code, status) {
+  var AWS = require('aws-sdk');
+  var s3 = new AWS.S3({
+    accessKeyId: process.env.AWS_S3_KEY,
+    secretAccessKey: process.env.AWS_S3_SECRET
+  });
+  var s3_status = {};
+  s3.listBuckets(function(err, data) {
+    if (err) {
+      s3_status.status_code = 1;
+      s3_status.status_description = 'Amazon S3 service is not available: ' + err;
+      response_code = 500;
+    }
+    else {
+      s3_status.status_code = 0;
+      s3_status.status_description = 'Amazon S3 service is up and running';
+    }
+    status.s3_status = s3_status;
+    checkDatabaseStatus(response, response_code, status);
+  });
+}
+
+function checkDatabaseStatus(response, response_code, status) {
+  var database_status = {};
+  User.findOne({username: process.env.TEAMFLIPS_USERNAME}).exec(function (err, user) {
+    if (err) {
+      database_status.status_code = 1;
+      database_status.status_description = 'Database connection is down or database error: ' + err;
+      response_code = 500;
+    } else {
+      database_status.status_code = 0;
+      database_status.status_description = 'Database connection is up and running';
+    }
+    status.database_status = database_status;
+    return response.send(response_code, status);
+  });
+}
 
 module.exports = AuthController;
