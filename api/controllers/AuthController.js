@@ -107,13 +107,35 @@ var AuthController = {
     return response.send(200, {});
   },
 
-  status: function(request, response) {
-    checkPubnubStatus(response);
+  twilioStatus: function(request, response) {
+    checkServiceStatus(response, checkTwilioStatus);
+  },
+
+  s3Status: function(request, response) {
+    checkServiceStatus(response, checkS3Status);
+  },
+
+  pubnubStatus: function(request, response) {
+    checkServiceStatus(response, checkPubnubStatus);
+  },
+
+  databaseStatus: function(request, response) {
+    checkServiceStatus(response, checkDatabaseStatus);
   }
 
 };
 
-function checkPubnubStatus(response) {
+function checkServiceStatus(response, service) {
+  var response_code = 200;
+  service(function(status) {
+    if (status.code == 1) {
+      response_code = 500;
+    }
+    return response.send(response_code, status);
+  });
+}
+
+function checkPubnubStatus(cb) {
   var pubnub = require("pubnub").init({
     ssl: true,
     publish_key: process.env.PUBNUB_PUB_KEY,
@@ -121,88 +143,82 @@ function checkPubnubStatus(response) {
   });
 
   var status = {};
-  var pubnub_status = {};
-  var response_code = 200;
+  status.service = 'Pubnub';
   var startTime = getTimeInMilliseconds();
   pubnub.time(function (time) {
     var elapsedTime = getTimeInMilliseconds() - startTime;
     if (!time) {
-      pubnub_status.status_code = 1;
-      pubnub_status.status_description = 'PubNub service is not available';
-      response_code = 500;
+      status.code = 1;
+      status.description = 'PubNub service is not available';
     } else {
-      pubnub_status.status_code = 0;
-      pubnub_status.status_description = 'PubNub service is up and running';
+      status.code = 0;
+      status.description = 'PubNub service is up and running';
     }
-    pubnub_status.elapsed_time = elapsedTime;
-    status.pubnub_status = pubnub_status;
-    checkTwilioStatus(response, response_code, status);
+    status.elapsed_time = elapsedTime;
+    cb(status);
   });
 }
 
-function checkTwilioStatus(response, response_code, status) {
+function checkTwilioStatus(cb) {
   var twilio = require('twilio')(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
-  var twilio_status = {};
+  var status = {};
+  status.service = 'Twilio';
   var startTime = getTimeInMilliseconds();
   twilio.accounts(process.env.TWILIO_ACCOUNT_SID).get(function (err, account) {
     var elapsedTime = getTimeInMilliseconds() - startTime;
     if (err) {
-      twilio_status.status_code = 1;
-      twilio_status.status_description = 'Twilio service is not available: ' + err;
-      response_code = 500;
+      status.code = 1;
+      status.description = 'Twilio service is not available: ' + err;
     } else {
-      twilio_status.status_code = 0;
-      twilio_status.status_description = 'Twilio service is up and running';
+      status.code = 0;
+      status.description = 'Twilio service is up and running';
     }
-    twilio_status.elapsed_time = elapsedTime;
-    status.twilio_status = twilio_status;
-    // bypassing S3 status check
-    //checkAmazonStatus(response, response_code, status);
-    checkDatabaseStatus(response, response_code, status);
+    status.elapsed_time = elapsedTime;
+    cb(status);
   });
 }
 
-function checkAmazonStatus(response, response_code, status) {
+function checkS3Status(cb) {
   var AWS = require('aws-sdk');
   var s3 = new AWS.S3({
     accessKeyId: process.env.AWS_S3_KEY,
     secretAccessKey: process.env.AWS_S3_SECRET
   });
-  var s3_status = {};
+  var status = {};
+  status.service = 'Amazon S3';
   var startTime = getTimeInMilliseconds();
   s3.listBuckets(function(err, data) {
     var elapsedTime = getTimeInMilliseconds() - startTime;
     if (err) {
-      s3_status.status_code = 1;
-      s3_status.status_description = 'Amazon S3 service is not available: ' + err;
+      status.code = 1;
+      status.description = 'Amazon S3 service is not available: ' + err;
       response_code = 500;
     }
     else {
-      s3_status.status_code = 0;
-      s3_status.status_description = 'Amazon S3 service is up and running';
+      status.code = 0;
+      status.description = 'Amazon S3 service is up and running';
     }
-    s3_status.elapsed_time = elapsedTime;
-    status.s3_status = s3_status;
-    checkDatabaseStatus(response, response_code, status);
+    status.elapsed_time = elapsedTime;
+    cb(status);
   });
 }
 
-function checkDatabaseStatus(response, response_code, status) {
-  var database_status = {};
+function checkDatabaseStatus(cb) {
+  var status = {};
+  status.service = 'MySQL Database';
   var startTime = getTimeInMilliseconds();
   User.findOne({username: process.env.TEAMFLIPS_USERNAME}).exec(function (err, user) {
     var elapsedTime = getTimeInMilliseconds() - startTime;
     if (err) {
-      database_status.status_code = 1;
-      database_status.status_description = 'Database connection is down or database error: ' + err;
+      status.code = 1;
+      status.description = 'MySQL Database connection is down or database error: ' + err;
       response_code = 500;
     } else {
-      database_status.status_code = 0;
-      database_status.status_description = 'Database connection is up and running';
+      status.code = 0;
+      status.description = 'MySQL Database connection is up and running';
     }
-    database_status.elapsed_time = elapsedTime;
-    status.database_status = database_status;
-    return response.send(response_code, status);
+    status.elapsed_time = elapsedTime;
+    cb(status);
   });
 }
 

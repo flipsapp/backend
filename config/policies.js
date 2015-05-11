@@ -77,6 +77,10 @@ module.exports.policies = {
 
   AuthController: {
     checkSession: ['passport', 'owner', 'version', 'checkBlockedUser'],
-    status: true
+    twilioStatus: true,
+    s3Status: true,
+    pubnubStatus: true,
+    databaseStatus: true
   }
+
 };
