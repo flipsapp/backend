@@ -70,6 +70,10 @@ module.exports.routes = {
 
   'POST   /background'                              : 'FlipController.uploadBackground',
   'POST   /sound'                                   : 'FlipController.uploadSound',
-  'POST   /thumbnail'                               : 'FlipController.uploadThumbnail'
+  'POST   /thumbnail'                               : 'FlipController.uploadThumbnail',
 
+  'GET    /status/twilio'                           : 'AuthController.twilioStatus',
+  'GET    /status/s3'                               : 'AuthController.s3Status',
+  'GET    /status/pubnub'                           : 'AuthController.pubnubStatus',
+  'GET    /status/database'                         : 'AuthController.databaseStatus'
 };
