@@ -80,7 +80,8 @@ module.exports.policies = {
     twilioStatus: true,
     s3Status: true,
     pubnubStatus: true,
-    databaseStatus: true
+    databaseStatus: true,
+    flipsStatus: true
   }
 
 };
