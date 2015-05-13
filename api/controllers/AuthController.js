@@ -121,6 +121,15 @@ var AuthController = {
 
   databaseStatus: function(request, response) {
     checkServiceStatus(response, checkDatabaseStatus);
+  },
+
+  flipsStatus: function(request, response) {
+    return response.send(200, {
+      service: 'Flips API',
+      code: 0,
+      description: 'Flips API is up and running',
+      elapsed_time: 0
+    })
   }
 
 };
