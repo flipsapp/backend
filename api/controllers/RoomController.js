@@ -237,10 +237,15 @@ var sendSMSInvitationToTempUsers = function (room, fromUser) {
   for (var i = 0; i < participants.length; i++) {
     if (participants[i].isTemporary) {
       var user = participants[i];
-      var msg = "You've been Flipped by {{firstname}} {{lastname}}! Download Flips within 30 days to view your message.  {{url}}";
-      msg = msg.replace("{{firstname}}", Krypto.decrypt(fromUser.firstName));
-      msg = msg.replace("{{lastname}}", Krypto.decrypt(fromUser.lastName));
-      msg = msg.replace("{{url}}", process.env.APP_STORE_URL);
+      var name = Krypto.decrypt(fromUser.firstName) + ' ' + Krypto.decrypt(fromUser.lastName);
+      var msg = process.env.SMS_INVITATION_MSG;
+      var appStoreUrl = process.env.APP_STORE_URL;
+      var maxNameLength = 155 - msg.length - appStoreUrl.length;
+      if (name.length > maxNameLength) {
+        name = name.substring(0, maxNameLength - 3);
+        name = name + '...'
+      }
+      msg = name + ' ' + msg + ' ' + appStoreUrl;
       twilioService.sendSms(user.phoneNumber, msg, function (err, message) {
         if (err) {
           logger.error('Error sending SMS to ' + user.phoneNumber, err);
