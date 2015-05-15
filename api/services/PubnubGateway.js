@@ -40,6 +40,7 @@ var PubnubGateway = {
               pn_apns: {
                 aps: {
                   alert: "You received a new Flip message from Team Flips",
+                  badge: 1,
                   sound: "default"
                 },
                 room_id: room.id

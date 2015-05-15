@@ -270,6 +270,7 @@ var subscribeUsersToRoom = function (room) {
             aps: {
               alert: "You received a new Flip message from " + admin.firstName + " " + admin.lastName,
               sound: "default",
+              badge: 1,
               "content-available" : 1
             },
             room_id: room.id
