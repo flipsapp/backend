@@ -44,8 +44,7 @@ module.exports.connections = {
     port: process.env.RDS_PORT,
     user: process.env.RDS_USERNAME,
     password: process.env.RDS_PASSWORD,
-    database: 'flips',
-    charset: 'utf8mb4_unicode_ci'
+    database: 'flips'
   }
 
 };
