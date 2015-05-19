@@ -7,6 +7,8 @@
 
 var Flip = {
 
+  connection: 'mysql_utf8bm4',
+
   attributes: {
 
     word: {

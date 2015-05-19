@@ -9,6 +9,8 @@ var Krypto = requires('>/api/utilities/Krypto');
 
 var User = {
 
+  connection: 'mysql_utf8bm4',
+
   attributes: {
 
     username: {

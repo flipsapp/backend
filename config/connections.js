@@ -45,6 +45,17 @@ module.exports.connections = {
     user: process.env.RDS_USERNAME,
     password: process.env.RDS_PASSWORD,
     database: 'flips'
+  },
+
+  mysql_utf8bm4: {
+    module: 'sails-mysql',
+    host: process.env.RDS_HOSTNAME,
+    port: process.env.RDS_PORT,
+    user: process.env.RDS_USERNAME,
+    password: process.env.RDS_PASSWORD,
+    database: 'flips',
+    charset: 'utf8mb4',
+    collation: 'utf8mb4_unicode_ci'
   }
 
 };
