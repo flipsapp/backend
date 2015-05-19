@@ -89,7 +89,6 @@ describe('FlipController', function () {
     var aFlip = {
       word: "I",
       background_url: "url1",
-      sound_url: "url2",
       is_private: "true"
     };
     user1.post('http://localhost:1337/user/' + userId + '/flips')
