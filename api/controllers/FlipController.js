@@ -33,7 +33,7 @@ var FlipController = {
     }
     User.findOne(values.owner).exec(function (err, user) {
       if (user && Krypto.decrypt(user.username) == process.env.STOCKFLIPS_USERNAME) {
-        values.isPrivate = true;
+        values.isPrivate = false;
       }
       Flip.create(values).exec(function (err, flip) {
         if (err || !flip) {
