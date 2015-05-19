@@ -7,8 +7,6 @@
 
 module.exports = {
 
-  connection: 'mysql_utf8bm4',
-
   attributes: {
 
     user: {
