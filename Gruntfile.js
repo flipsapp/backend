@@ -64,7 +64,6 @@ module.exports = function(grunt) {
 
 
   // Add the grunt-mocha-test tasks.
-	/*
   grunt.loadNpmTasks('grunt-mocha-test');
 
   grunt.initConfig({
@@ -74,13 +73,12 @@ module.exports = function(grunt) {
         options: {
           reporter: 'spec'
         },
-        src: ['tests/*.js']
+        src: ['tests/99*.js']
       }
     }
   });
 
   grunt.registerTask('test', 'mochaTest');
-  */
 
 	// Load task functions
 	var taskConfigurations = loadTasks('./tasks/config'),
