@@ -136,7 +136,7 @@ exports.createUser = function (userModel, next) {
         logger.debug(existingUsers);
 
         var activeUser = getActiveUser(existingUsers);
-        var tempUser = getTempUser(existingUsers);
+        var tempUser = getTempUser(existingUsers, userModel.phoneNumber);
 
         logger.debug('activeUser');
         logger.debug(activeUser);
@@ -243,13 +243,33 @@ var getActiveUser = function (users) {
   return null;
 };
 
-var getTempUser = function(users) {
+var getTempUser = function(users, phoneNumber) {
+  var tempUsers = [];
   for (var i = 0; i < users.length; i++) {
     if (users[i].isTemporary) {
-      return users[i];
+      tempUsers.push(users[i]);
     }
   }
-  return null;
+  if (tempUsers.length == 1) {
+    return tempUsers[0];
+  } else {
+    var tempUser;
+    for (var j = 0; j < tempUsers.length; j++) {
+      if (Krypto.decrypt(tempUsers[j].phoneNumber) == phoneNumber) {
+        tempUser = tempUsers[j];
+      }
+    }
+    if (tempUser) {
+      for (var k = 0; k < tempUsers.length; k++) {
+        if (tempUser.id != tempUsers[k].id) {
+          tempUsers[k].destroy();
+        }
+      }
+    } else {
+      tempUser = tempUsers[0];
+    }
+    return tempUser;
+  }
 };
 
 
