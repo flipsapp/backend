@@ -136,60 +136,62 @@ exports.createUser = function (userModel, next) {
         logger.debug(existingUsers);
 
         var activeUser = getActiveUser(existingUsers);
-        var tempUser = getTempUser(existingUsers, userModel.phoneNumber);
+        getTempUser(existingUsers, userModel.phoneNumber, function(tempUser) {
 
-        logger.debug('activeUser');
-        logger.debug(activeUser);
-        logger.debug('tempUser');
-        logger.debug(tempUser);
+          logger.debug('activeUser');
+          logger.debug(activeUser);
+          logger.debug('tempUser');
+          logger.debug(tempUser);
 
-        if (activeUser) {
+          if (activeUser) {
 
-          logger.debug('active user');
+            logger.debug('active user');
 
-          // has the same username?
-          if (activeUser.username === Krypto.encrypt(userModel.username)) {
-            return next('An account already exists for that email address.  Log in or sign up with a different address.');
-          }
-
-          // has the same phone number?
-          if (activeUser.phoneNumber === Krypto.encrypt(userModel.phoneNumber)) {
-            return next('This phone number is already used by an existing Flips user.');
-          }
-        }
-        if (tempUser) {
-          // temporary user (just created or invited user)
-
-          // update user info using the new values
-          logger.debug('replacing existing user information');
-
-          if (userModel.username) {
-            tempUser.username = Krypto.encrypt(userModel.username);
-          }
-          if (userModel.firstName) {
-            tempUser.firstName = Krypto.encrypt(userModel.firstName);
-          }
-          if (userModel.lastName) {
-            tempUser.lastName = Krypto.encrypt(userModel.lastName);
-          }
-          if (userModel.phoneNumber) {
-            tempUser.phoneNumber = Krypto.encrypt(userModel.phoneNumber);
-          }
-          if (userModel.nickname) {
-            tempUser.nickname = Krypto.encrypt(userModel.nickname);
-          }
-          tempUser.birthday = userModel.birthday;
-
-          logger.debug('1.1 create passport and initial room for temporary user');
-          tempUser.save(function (err) {
-            if (err) {
-              logger.error('It was not possible to sign up this user: ' + err);
-              return next('It was not possible to sign up this user');
+            // has the same username?
+            if (activeUser.username === Krypto.encrypt(userModel.username)) {
+              return next('An account already exists for that email address.  Log in or sign up with a different address.');
             }
-            return createPassportAndInitialRoom(tempUser, userModel.password, photo, next);
-          });
 
-        }
+            // has the same phone number?
+            if (activeUser.phoneNumber === Krypto.encrypt(userModel.phoneNumber)) {
+              return next('This phone number is already used by an existing Flips user.');
+            }
+          }
+          if (tempUser) {
+            // temporary user (just created or invited user)
+
+            // update user info using the new values
+            logger.debug('replacing existing user information');
+
+            if (userModel.username) {
+              tempUser.username = Krypto.encrypt(userModel.username);
+            }
+            if (userModel.firstName) {
+              tempUser.firstName = Krypto.encrypt(userModel.firstName);
+            }
+            if (userModel.lastName) {
+              tempUser.lastName = Krypto.encrypt(userModel.lastName);
+            }
+            if (userModel.phoneNumber) {
+              tempUser.phoneNumber = Krypto.encrypt(userModel.phoneNumber);
+            }
+            if (userModel.nickname) {
+              tempUser.nickname = Krypto.encrypt(userModel.nickname);
+            }
+            tempUser.birthday = userModel.birthday;
+
+            logger.debug('1.1 create passport and initial room for temporary user');
+            tempUser.save(function (err) {
+              if (err) {
+                logger.error('It was not possible to sign up this user: ' + err);
+                return next('It was not possible to sign up this user');
+              }
+              return createPassportAndInitialRoom(tempUser, userModel.password, photo, next);
+            });
+
+          }
+
+        });
 
       } else {
         logger.debug('1. insert user');
@@ -243,15 +245,18 @@ var getActiveUser = function (users) {
   return null;
 };
 
-var getTempUser = function(users, phoneNumber) {
+var getTempUser = function(users, phoneNumber, callback) {
   var tempUsers = [];
   for (var i = 0; i < users.length; i++) {
     if (users[i].isTemporary) {
       tempUsers.push(users[i]);
     }
   }
-  if (tempUsers.length == 1) {
-    return tempUsers[0];
+
+  if (tempUsers.length == 0) {
+    return callback(null);
+  } else if (tempUsers.length == 1) {
+    return callback(tempUsers[0]);
   } else {
     var tempUser;
     for (var j = 0; j < tempUsers.length; j++) {
@@ -260,15 +265,22 @@ var getTempUser = function(users, phoneNumber) {
       }
     }
     if (tempUser) {
+      var userToDestroy;
       for (var k = 0; k < tempUsers.length; k++) {
         if (tempUser.id != tempUsers[k].id) {
-          tempUsers[k].destroy();
+          userToDestroy = tempUsers[k];
         }
       }
+      if (userToDestroy) {
+        userToDestroy.destroy(function(err) {
+          return callback(tempUser);
+        })
+      } else {
+        return callback(tempUser);
+      }
     } else {
-      tempUser = tempUsers[0];
+      return callback(tempUsers[0]);
     }
-    return tempUser;
   }
 };
 
