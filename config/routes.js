@@ -76,6 +76,8 @@ module.exports.routes = {
   'GET    /status/s3'                               : 'AuthController.s3Status',
   'GET    /status/pubnub'                           : 'AuthController.pubnubStatus',
   'GET    /status/database'                         : 'AuthController.databaseStatus',
-  'GET    /status/flips'                            : 'AuthController.flipsStatus'
+  'GET    /status/flips'                            : 'AuthController.flipsStatus'/*,
+
+  'GET    /printUsers'                              : 'UserController.printUsers'*/
 
 };
