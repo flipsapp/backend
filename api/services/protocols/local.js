@@ -178,6 +178,9 @@ exports.createUser = function (userModel, next) {
             if (userModel.nickname) {
               tempUser.nickname = Krypto.encrypt(userModel.nickname);
             }
+            if (userModel.facebookID) {
+              tempUser.facebookID = userModel.facebookID;
+            }
             tempUser.birthday = userModel.birthday;
 
             logger.debug('1.1 create passport and initial room for temporary user');
