@@ -269,7 +269,7 @@ var FlipController = {
       whereClause.isDeleted = false;
     }
 
-    Flip.find({where: whereClause, sort: 'updatedAt ASC'}).populate('owner').exec(function (err, flips) {
+    Flip.find({where: whereClause, sort: 'updatedAt ASC'}).exec(function (err, flips) {
       if (err) {
         var errmsg = new FlipsError('Error trying to retrieve flips', err);
         logger.error(errmsg);
