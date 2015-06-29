@@ -1,0 +1,14 @@
+[global]
+ApplicationName=Flips
+AwsCredentialFile=/Users/buildmachine/.elasticbeanstalk/flips_credentials
+DevToolsEndpoint=git.elasticbeanstalk.us-west-2.amazonaws.com
+EnvironmentName=flips-dev
+EnvironmentTier=WebServer::Standard::1.0
+EnvironmentType=SingleInstance
+InstanceProfileName=
+OptionSettingFile=/Users/buildmachine/jenkins/jobs/Mugchat-Server/workspace/.elasticbeanstalk/optionsettings.mugchat-dev
+RdsEnabled=Yes
+Region=us-west-2
+ServiceEndpoint=https://elasticbeanstalk.us-west-2.amazonaws.com
+SolutionStack=64bit Amazon Linux 2014.09 v1.0.9 running Node.js
+
