@@ -1,2 +1,3 @@
-# backend
-Backend Codebase
+# Flips
+
+a [Sails](http://sailsjs.org) application

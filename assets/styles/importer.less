@@ -1,0 +1,97 @@
+/**
+ * importer.less
+ *
+ * By default, new Sails projects are configured to compile this file
+ * from LESS to CSS.  Unlike CSS files, LESS files are not compiled and
+ * included automatically unless they are imported below.
+ *
+ * The LESS files imported below are compiled and included in the order
+ * they are listed.  Mixins, variables, etc. should be imported first
+ * so that they can be accessed by subsequent LESS stylesheets.
+ *
+ * (Just like the rest of the asset pipeline bundled in Sails, you can
+ * always omit, customize, or replace this behavior with SASS, SCSS,
+ * or any other Grunt tasks you like.)
+ */
+html {
+  height: 100%;
+}
+body {
+  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+  margin: 0px;
+  padding: 0px;
+  height: -moz-calc(100%);
+  height: -webkit-calc(100%);
+  height: calc(100%);
+}
+section#chatroom {
+  height: -moz-calc((100%) - 20px);
+  height: -webkit-calc((100%) - 20px);
+  height: calc((100%) - 20px);
+  background-color: #EFFFEC;
+}
+div#messages {
+  height: -moz-calc(80%);
+  height: -webkit-calc(80%);
+  height: calc(80%);
+  padding: 10px;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+div#fields {
+  position: absolute;
+  bottom: 0px;
+  width: 100%;
+}
+
+input#message {
+  width: -moz-calc(70%);
+  width: -webkit-calc(70%);
+  width: calc(70%);
+}
+input#send {
+  width: 70px;
+}
+header {
+  background-color: #4192C1;
+  text-align: right;
+  margin-top: 15px;
+  h1 {
+    padding: 5px;
+    padding-right: 15px;
+    color: #FFFFFF;
+    margin: 0px;
+  }
+}
+footer {
+  padding: 6px;
+  background-color: #4192C1;
+  color: #FFFFFF;
+  bottom: 0;
+  position: absolute;
+  width: 100%;
+  margin: 0px;
+  margin-bottom: 10px;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+}
+a {
+  color: #00B7FF;
+}
+
+
+// For example:
+//
+// @import 'variables/colors.less';
+// @import 'mixins/foo.less';
+// @import 'mixins/bar.less';
+// @import 'mixins/baz.less';
+//
+// @import 'styleguide.less';
+// @import 'pages/login.less';
+// @import 'pages/signup.less';
+//
+// etc.

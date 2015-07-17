@@ -1,0 +1,31 @@
+AWS_S3_KEY            = AKIAILGTT2X6FTUAFI6Q
+AWS_S3_SECRET         = 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
+RDS_HOSTNAME          = aa4jr69qs07gsy.cuc047pruo5n.us-west-2.rds.amazonaws.com
+RDS_USERNAME          = root
+RDS_PASSWORD          = sdv13rn97x0ftw313
+RDS_PORT              = 3306
+RDS_DATABASE_NAME     = flips
+PUBNUB_SUB_KEY        = sub-c-3bcb7c42-59ff-11e4-9632-02ee2ddab7fe
+PUBNUB_PUB_KEY        = pub-c-579fbcaa-1c0a-44fc-bb1c-e02e43e7eb30
+JWT_SECRET            = U868D8e6zUfKes8w3Ye6WBq8426u2c5Tnn788A64p7876mRIZx
+TWILIO_ACCOUNT_SID    = AC57f96b1bc5a0164e2809934c67f947d3
+TWILIO_AUTH_TOKEN     = c1a3ea76494a3366376051cf1801e595
+APP_STORE_URL         = appstore.com/flips
+CRYPTO_PASSWORD       = ce7E5bBb94f0416fbAaf74bBDa0b12bF9b600e77a1F64f6D8b8C0e2AF18fe5Af
+MINIMUM_APP_VERSION   = 1.0.0
+
+TEAMFLIPS_USERNAME    = flipboys@flipsapp.com
+TEAMFLIPS_PASSWORD    = Password1
+TEAMFLIPS_PHONE_NUMBER = +14155555555
+TEAMFLIPS_FIRST_NAME  = Team
+TEAMFLIPS_LAST_NAME   = Flips
+TEAMFLIPS_BIRTHDAY    = 1970-01-01
+TEAMFLIPS_PHOTO_URL   = https://s3.amazonaws.com/flips-pictures/flipboys_avatar.png
+
+STOCKFLIPS_USERNAME   = stockflips@flipsapp.com
+STOCKFLIPS_PASSWORD   = d@lla5Fl!ps
+STOCKFLIPS_PHONE_NUMBER = +14155555556
+STOCKFLIPS_FIRST_NAME = Stock
+STOCKFLIPS_LAST_NAME  = Flips
+STOCKFLIPS_BIRTHDAY   = 1970-01-01
+STOCKFLIPS_PHOTO_URL  = https://s3.amazonaws.com/flips-pictures/flipboys_avatar.png
