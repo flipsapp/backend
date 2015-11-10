@@ -86,7 +86,6 @@ var RoomController = {
                     return response.send(404, new FlipsError('Error retrieving the room after created.', 'Room id = ' + params.id));
                   }
                   assignUsersToRoom(participants, room, function (err, populatedRoom) {
-                    sendSMSInvitationToTempUsers(populatedRoom, adminUser);
                     subscribeUsersToRoom(populatedRoom);
                     return response.send(201, removeUnwantedPropertiesFromUsers(populatedRoom));
                   })
@@ -230,31 +229,6 @@ var createUsersForUnknownParticipants = function (params, callback) {
       return callback(err, createdUsers);
     }
   )
-};
-
-var sendSMSInvitationToTempUsers = function (room, fromUser) {
-  var participants = room.participants;
-  for (var i = 0; i < participants.length; i++) {
-    if (participants[i].isTemporary) {
-      var user = participants[i];
-      var name = Krypto.decrypt(fromUser.firstName) + ' ' + Krypto.decrypt(fromUser.lastName);
-      var msg = process.env.SMS_INVITATION_MSG;
-      var appStoreUrl = process.env.APP_STORE_URL;
-      var maxNameLength = 155 - msg.length - appStoreUrl.length;
-      if (name.length > maxNameLength) {
-        name = name.substring(0, maxNameLength - 3);
-        name = name + '...'
-      }
-      msg = name + ' ' + msg + ' ' + appStoreUrl;
-      twilioService.sendSms(user.phoneNumber, msg, function (err, message) {
-        if (err) {
-          logger.error('Error sending SMS to ' + user.phoneNumber, err);
-        } else {
-          console.log('Successfully sent SMS to ' + user.phoneNumber);
-        }
-      });
-    }
-  }
 };
 
 var subscribeUsersToRoom = function (room) {
