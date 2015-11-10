@@ -40,5 +40,3 @@ FLIPBOYS_PASSWORD     = Rea3Hyts8
 
 LOGGLY_SUBDOMAIN      = flipsapp
 LOGGLY_TOKEN          = 5c8ad91c-f1b0-4e8d-9dd4-fde5ebe11572
-
-SMS_INVITATION_MSG    = "just sent you a Flip Message! Download Flips now to view your message."
